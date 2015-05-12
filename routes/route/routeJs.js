@@ -17,9 +17,9 @@ routeRouter.all('/routeSearch', function (req, res, next) {
      * 3. url request devide city
      * 4. function( dbDataObject ) -> return url format
      */
-
-     var routeNm = req.body.routeNm;
-     var cityCodeObj = req.body.cityObject;
+     var getdata = req.body.data;
+     var routeNm = getdata.routeNm;
+     var cityCodeObj = getdata.cityObject;
 
     koreaDb.routeSearch(cityCodeObj, routeNm, function (routeData) {
         console.log(routeData);
@@ -30,9 +30,10 @@ routeRouter.all('/routeSearch', function (req, res, next) {
 
 routeRouter.all('/routeDetail', function (req, res, next) {
 
-    var cityEnNm = req.body.cityEnNm;
-    var rid = req.body.rid;
-    var cityCode = req.body.cityCode;
+    var getdata = req.body.data;
+    var cityEnNm = getdata.cityEnNm;
+    var rid = getdata.rid;
+    var cityCode = getdata.cityCode;
 
     var cityDir = "../../server_biz/korea_city/" + cityEnNm + ".js";
     var cityObject = require(cityDir);
@@ -40,7 +41,7 @@ routeRouter.all('/routeDetail', function (req, res, next) {
     var dbObject = undefined;
     var urlRouteObject = undefined;
     var routeObject = undefined;
-    
+
 
     /**
      * nimble 사용하여 series 로 구성 dbObject -> urlrequest method

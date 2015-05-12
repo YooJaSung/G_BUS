@@ -10,8 +10,9 @@ var koreaDb = require('../../server_biz/korea_common/korea_db.js');
 
 stationRouter.all('/stationSearch', function(req,res, next){
 
-    var stationNm = req.body.stationNm;
-    var cityCodeObj = req.body.cityObject;
+    var getdata = req.body.data;
+    var stationNm = getdata.stationNm;
+    var cityCodeObj = getdata.cityObject;
 
 
     koreaDb.stationSearch(cityCodeObj, stationNm , function(stationData){
@@ -21,9 +22,11 @@ stationRouter.all('/stationSearch', function(req,res, next){
 
 stationRouter.all('/stationDetail', function(req,res, next){
 
-    var cityEnNm = req.body.cityEnNm;
-    var rid = req.body.rid;
-    var cityCode = req.body.cityCode;
+
+    var getdata = req.body.data;
+    var cityEnNm = getdata.cityEnNm;
+    var rid = getdata.rid;
+    var cityCode = getdata.cityCode;
 
     var cityDir = "../../server_biz/korea_city/" + cityEnNm + ".js";
     var cityObject = require(cityDir);
