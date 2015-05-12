@@ -39,10 +39,12 @@ mysqlconfig.g_busquery.temp = "";
  " AND R.ROUTENM LIKE '?'; " ;
  */
 mysqlconfig.g_busquery.ROUTESEARCH =
-    "SELECT R.citycd, R.rid, R.routeid, R.routenm, R.routesubnm " +
+    "SELECT R.citycd, R.rid, R.routeid, R.routenm, R.routesubnm" +
     " , ST.STOPNM AS ststopnm " +
     " , ED.STOPNM AS edstopnm " +
+    " , C.cityEnNm " +
     " FROM ROUTES R " +
+    " INNER JOIN CITY C ON R.CITYCD = C.CITYCD "+
     " LEFT OUTER JOIN STOPS ST  ON R.CITYCD = ST.CITYCD AND R.STSTOPSID = ST.SID " +
     " LEFT OUTER JOIN STOPS ED  ON R.CITYCD = ED.CITYCD AND R.EDSTOPSID = ED.SID " +
     " WHERE R.ROUTENM LIKE ? ";
@@ -84,8 +86,11 @@ mysqlconfig.g_busquery.ROUTEDETAIL =
  */
 
 mysqlconfig.g_busquery.STATIONSEARCH =
-    " SELECT citycd, sid, stopnm, stopid, arsid " +
-    " FROM STOPS " +
+    " SELECT S.citycd, sid, stopnm, stopid, arsid " +
+    " , C.cityEnNm " +
+    " , if(locate('가상',stopnm)!=0, '0','1') as vFlag " +
+    " FROM STOPS S " +
+    " INNER JOIN CITY C ON S.CITYCD = C.CITYCD "+
     " WHERE stopnm like ? ";
 
 
