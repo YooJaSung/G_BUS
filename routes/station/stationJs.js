@@ -9,38 +9,23 @@ var nimble = require('nimble');
 var koreaDb = require('../../server_biz/korea_common/korea_db.js');
 
 stationRouter.all('/stationSearch', function(req,res, next){
-    /**
-     * 1. database access and get data
-     * 2. url format method call param @dataObject
-     * 3. url request devide city
-     * 4. function( dbDataObject ) -> return url format
-     */
 
-    /*var stationNm = req.body.stationNm;
-    var cityCodeObj = req.body.cityObject;*/
-    var tempCityCodeObj = [
-        {
-            "cityCode" : "101",
-            "cityEnNm" : "seoul"
-        },
-        {
-            "cityCode" : "102",
-            "cityEnNm" : "gyunggi"
-        },
-        {
-            "cityCode" : "103",
-            "cityEnNm" : "incheon"
-        }
-    ];
+    var stationNm = req.body.stationNm;
+    var cityCodeObj = req.body.cityObject;
 
-    koreaDb.stationSearch(tempCityCodeObj, '시청' , function(stationData){
+
+    koreaDb.stationSearch(cityCodeObj, stationNm , function(stationData){
         res.send(stationData);
     });
 });
 
 stationRouter.all('/stationDetail', function(req,res, next){
 
-    var cityDir = "../../server_biz/korea_city/" + "asan" + ".js";
+    var cityEnNm = req.body.cityEnNm;
+    var rid = req.body.rid;
+    var cityCode = req.body.cityCode;
+
+    var cityDir = "../../server_biz/korea_city/" + cityEnNm + ".js";
     var cityObject = require(cityDir);
 
     var dbObject = undefined;
@@ -48,13 +33,10 @@ stationRouter.all('/stationDetail', function(req,res, next){
     var stationObject = undefined;
 
 
-    /**
-     * nimble 사용하여 series 로 구성 dbObject -> urlrequest method
-     */
 
     nimble.series([
         function(DBCallback){
-            koreaDb.dbStationDetail('102', "2844" , function(stationDetailData){
+            koreaDb.dbStationDetail(cityCode, rid , function(stationDetailData){
 
                 dbObject = stationDetailData;
                 DBCallback();
