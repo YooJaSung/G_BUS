@@ -10,6 +10,7 @@
 
 var request = require('request');
 var xml2jsparser = require('xml2json');
+var errorHaldling = require('../../utility/errorHandling.js');
 
 var chunanObject = {};
 
@@ -52,7 +53,7 @@ chunanObject.urlRouteRequest = function(dbObject, callback){
         }
     }, function (err, httpResponse, body) {
         if (err) {
-            throw err;
+            errorHaldling.throw(5001, 'Route URL Request Error');
         } else {
             var chunan_bus_location_seq = [];
             var xmldata = body;
@@ -91,7 +92,7 @@ chunanObject.urlStationRequest = function(dbObject, callback){
         }
     }, function (err, httpResponse, body) {
         if (err) {
-            throw err;
+            errorHaldling.throw(5002, 'Station URL Request Error');
         } else {
             var xmldata = body;
             var options = {

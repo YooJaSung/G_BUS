@@ -13,6 +13,7 @@
 var koreaDbObject = {};
 var dbQuery = require('../../server_config/mysql/mysql_config.js');
 var pool = require('../../server_config/mysql/DBConnect.js');
+var errorHaldling = require('../../utility/errorHandling.js');
 
 
 koreaDbObject.routeSearch = function(cityObject, routeNm, callback){
@@ -23,15 +24,18 @@ koreaDbObject.routeSearch = function(cityObject, routeNm, callback){
 
     // AND  R.CITYCD = ?
 
+        console.log('routeSearch2');
+
     var routeQuery = dbQuery.g_busquery.ROUTESEARCH;
 
     var routeStr = queryCityCodeRoute(cityObject, routeQuery);
 
     pool.getConnection(function(err, db){
        if(err){
-           throw err;
+           errorHaldling.throw(5003, 'Database Select Error ');
        }else{
             db.query(routeStr, ["%"+routeNm+"%"], function(err, rows){
+                console.log('routeSearch3');
                 callback(rows);
             })
        }
@@ -49,7 +53,7 @@ koreaDbObject.stationSearch = function(cityObject, stationNm, callback){
 
     pool.getConnection(function(err, db){
         if(err){
-            throw err;
+            errorHaldling.throw(5003, 'Database Select Error ');
         }else{
             db.query(stationStr, ["%"+stationNm+"%"], function(err, rows){
                 callback(rows);
@@ -117,13 +121,16 @@ function queryCityCodeStation (cityObject, stationQuery){
 
 koreaDbObject.dbRouteDetail = function(cityCd, rid, callback){
 
+    console.log('routeDetail2');
+
     var routeDetailQuery = dbQuery.g_busquery.ROUTEDETAIL;
     //citycd, rid
     pool.getConnection(function(err, db){
         if(err){
-            throw err;
+            errorHaldling.throw(5003, 'Database Select Error ');
         }else{
             db.query(routeDetailQuery, [cityCd, rid], function(err, rows){
+                console.log('routeDetail3');
                 callback(rows);
             })
         }
@@ -137,7 +144,7 @@ koreaDbObject.dbStationDetail = function(cityCd, sid, callback){
     //cityCd, sid
     pool.getConnection(function(err, db){
         if(err){
-            throw err;
+            errorHaldling.throw(5003, 'Database Select Error ');
         }else{
             db.query(stationDetailQuery, [cityCd, sid], function(err, rows){
                 callback(rows);

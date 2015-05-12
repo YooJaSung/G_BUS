@@ -11,6 +11,7 @@
 //   station param -> busStopId
 
 var request = require('request');
+var errorHaldling = require('../../utility/errorHandling.js');
 
 var sejongObject = {};
 
@@ -109,7 +110,7 @@ sejongObject.urlRouteRequest = function (dbObject, callback) {
             callback(sejong_bus_location_seq);
 
         } else {
-            throw error;
+            errorHaldling.throw(5001, 'Route URL Request Error');
         }
     });
 
@@ -137,7 +138,7 @@ sejongObject.urlStationRequest = function (dbObject, callback) {
             callback(sejong_list);
 
         }else{
-            throw error;
+            errorHaldling.throw(5002, 'Station URL Request Error');
         }
     });
 

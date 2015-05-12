@@ -11,6 +11,7 @@
 //   station param -> sid
 
 var request = require('request');
+var errorHaldling = require('../../utility/errorHandling.js');
 
 var chungjuObject = {};
 
@@ -66,7 +67,7 @@ chungjuObject.urlRouteRequest = function(dbObject, callback){
             callback(chungju_bus_location_seq);
 
         }else{
-            throw error;
+            errorHaldling.throw(5001, 'Route URL Request Error');
         }
     });
 
@@ -95,7 +96,7 @@ chungjuObject.urlStationRequest = function(dbObject, callback){
             callback(chungju_list);
 
         }else{
-            throw error;
+            errorHaldling.throw(5002, 'Station URL Request Error');
         }
     });
 

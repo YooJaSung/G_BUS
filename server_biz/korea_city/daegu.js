@@ -7,6 +7,7 @@
 var request = require('request');
 var iconv = require('iconv');
 var cheerio = require('cheerio');
+var errorHaldling = require('../../utility/errorHandling.js');
 
 var seoulObject = {};
 
@@ -102,7 +103,7 @@ seoulObject.urlRouteRequest = function (dbObject, callback) {
             callback(daegu_bus_location_seq);
 
         }else{
-            throw error;
+            errorHaldling.throw(5001, 'Route URL Request Error');
         }
     });
 
@@ -159,7 +160,7 @@ seoulObject.urlStationRequest = function (dbObject, callback) {
 
                 callback(daegu_list);
             }else{
-                throw error;
+                errorHaldling.throw(5002, 'Station URL Request Error');
             }
         }
     );

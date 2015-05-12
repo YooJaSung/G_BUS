@@ -50,13 +50,6 @@ app.use('/', station);
 app.use('/', place);
 app.use('/', region);
 
-
-/**
- * routing rest api
- * after finish uri formatting, change domain url
- */
-
-
 /**
  * show index page first get request
  */
@@ -76,36 +69,15 @@ app.use(function(req, res, next) {
 app.use(function errorHandler(err, req, res, next) {
 
   console.log('error on request %d | %s | %s | %d', process.domain.id, req.method, req.url, err.status);
-  console.log('-------------------------------------------------------');
+
   console.log(err.stack);
-  console.log('-------------------------------------------------------');
-  err.message = err.status == 500 ? 'Something bad happened. :(' : err.message;
-  console.log('-------------------------------------------------------');
-  res.send(err.status, err.message);
+
+  err.message = err.status == 500 ? ' Error -->  ' : err.message;
+
+  res.status(err.status).send(err.message);
 });
 
 
-// development error handler
-// will print stacktrace
-if (app.get('env') === 'development') {
-  app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
-    res.render('error', {
-      message: err.message,
-      error: err
-    });
-  });
-}
-
-// production error handler
-// no stacktraces leaked to user
-app.use(function(err, req, res, next) {
-  res.status(err.status || 500);
-  res.render('error', {
-    message: err.message,
-    error: {}
-  });
-});
 
 
 /**

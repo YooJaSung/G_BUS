@@ -9,6 +9,8 @@
 //   station param -> busStopId
 
 var request = require('request');
+var errorHaldling = require('../../utility/errorHandling.js');
+
 
 var asanObject = {};
 
@@ -47,20 +49,18 @@ asanObject.urlRouteRequest = function (dbObject, callback) {
         form: {
             busRouteId: requestData.route.busRouteId
         }
-    }, function (err, httpResponse, json) {
+    }, function (error, httpResponse, json) {
 
         var asan_bus_location_seq = [];
-        if (err) {
-            throw err;
+        if (error) {
+            errorHaldling.throw(5001, 'Route URL Request Error');
         } else {
-
             var parsed = JSON.parse(json);
             // json -> array 변환
             var arr = [];
             for (var x in parsed) {
                 arr.push(parsed[x]);
             }
-
             var jsondata = arr[0];
             // 방어코드
             if (arr.length === 0) {
@@ -70,7 +70,6 @@ asanObject.urlRouteRequest = function (dbObject, callback) {
                 for(var i in jsondata){
                     asan_bus_location_seq.push(findRouteSeq(jsondata[i].stop_id, dbObject));
                 }
-
                 callback(asan_bus_location_seq);
             }
         }
@@ -101,7 +100,7 @@ asanObject.urlStationRequest = function (dbObject, callback) {
             callback(arriveTime_list);
 
         } else {
-            throw error;
+            errorHaldling.throw(5002, 'Station URL Request Error');
         }
     });
 

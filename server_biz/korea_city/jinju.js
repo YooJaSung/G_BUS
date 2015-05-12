@@ -10,6 +10,7 @@
 //   station param -> stop_id
 
 var request = require('request');
+var errorHaldling = require('../../utility/errorHandling.js');
 
 var jinjuObject = {};
 
@@ -65,6 +66,8 @@ jinjuObject.urlRouteRequest = function(dbObject , callback){
 
             callback(jinju_bus_location_seq);
 
+        }else{
+            errorHaldling.throw(5001, 'Route URL Request Error');
         }
     });
 
@@ -98,7 +101,7 @@ jinjuObject.urlStationRequest = function(dbObject, callback){
             callback(jinju_bus_curr);
 
         }else{
-            throw error;
+            errorHaldling.throw(5002, 'Station URL Request Error');
         }
     });
 

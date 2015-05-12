@@ -11,6 +11,7 @@
 
 var request = require('request');
 var cheerio = require('cheerio');
+var errorHaldling = require('../../utility/errorHandling.js');
 
 var gumiObject = {};
 
@@ -72,7 +73,7 @@ gumiObject.urlRouteRequest = function(dbObject, callback){
             callback(gumi_bus_location_seq);
 
         }else{
-            throw error;
+            errorHaldling.throw(5001, 'Route URL Request Error');
         }
     })
 
@@ -106,7 +107,7 @@ gumiObject.urlStationRequest = function(dbObject, callback){
                 console.log(gumi_list);
                 callback(gumi_list);
             }else{
-                throw error;
+                errorHaldling.throw(5002, 'Station URL Request Error');
             }
         });
 

@@ -16,7 +16,7 @@ stationRouter.all('/stationSearch', function(req,res, next){
 
 
     koreaDb.stationSearch(cityCodeObj, stationNm , function(stationData){
-        res.send(stationData);
+        res.status(200).send(stationData);
     });
 });
 
@@ -33,7 +33,7 @@ stationRouter.all('/stationDetail', function(req,res, next){
 
     var dbObject = undefined;
     var urlStationObject = undefined;
-    var stationObject = undefined;
+    var stationObject = {};
 
 
 
@@ -57,7 +57,7 @@ stationRouter.all('/stationDetail', function(req,res, next){
             stationObject.urlStationObject = urlStationObject;
             stationObject.dbObject = dbObject;
 
-            res.send(stationObject);
+            res.status(200).send(stationObject);
             resCallback();
         }
     ]);

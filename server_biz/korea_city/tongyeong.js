@@ -10,6 +10,7 @@
 //   station param -> prmOperation=getStationInfo, prmStationName=인코딩, prmStationID
 
 var request = require('request');
+var errorHaldling = require('../../utility/errorHandling.js');
 
 var tongyeongObject = {};
 
@@ -74,7 +75,7 @@ tongyeongObject.urlRouteRequest = function(dbObject, callback){
             callback(tongyeong_bus_location_seq);
 
         }else{
-            throw error;
+            errorHaldling.throw(5001, 'Route URL Request Error');
         }
     });
 
@@ -128,7 +129,7 @@ tongyeongObject.urlStationRequest = function(dbObject, callback){
             console.log(tongyeong_list);
             callback(tongyeong_list);
         }else{
-            throw error;
+            errorHaldling.throw(5002, 'Station URL Request Error');
         }
     });
 

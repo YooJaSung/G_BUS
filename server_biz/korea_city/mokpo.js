@@ -11,6 +11,7 @@
 
 var request = require('request');
 var cheerio = require('cheerio');
+var errorHaldling = require('../../utility/errorHandling.js');
 
 var mokpoObject = {};
 
@@ -62,7 +63,7 @@ mokpoObject.urlRouteRequest = function(dbObject, callback){
             callback(mokpo_bus_location_seq);
 
         }else{
-            throw error;
+            errorHaldling.throw(5001, 'Route URL Request Error');
         }
     })
 
@@ -103,7 +104,7 @@ mokpoObject.urlStationRequest = function(dbObject, callback) {
                 callback(mokpo_list);
 
             } else {
-                throw error;
+                errorHaldling.throw(5002, 'Station URL Request Error');
             }
         });
 };

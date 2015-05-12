@@ -6,6 +6,7 @@ var request = require('request');
 
 var xml2jsparser = require('xml2json');
 var iconv = require('iconv');
+var errorHaldling = require('../../utility/errorHandling.js');
 
 
 var jeonjuObject = {};
@@ -51,7 +52,7 @@ jeonjuObject.urlRouteRequest = function(dbObject , callback){
             }
             callback(jeonju_bus_location_seq);
         }else{
-            throw error;
+            errorHaldling.throw(5001, 'Route URL Request Error');
         }
     });
 
@@ -95,7 +96,7 @@ jeonjuObject.urlStationRequest = function(dbObject, callback){
                 });
                 callback(jeonju_list);
             }else{
-                throw error;
+                errorHaldling.throw(5002, 'Station URL Request Error');
             }
         });
 };

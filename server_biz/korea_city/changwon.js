@@ -11,6 +11,7 @@
 var request = require('request');
 var jsdom = require('jsdom');
 
+var errorHaldling = require('../../utility/errorHandling.js');
 var changwonObject = {};
 
 var routeurl = "http://mbus.changwon.go.kr/mobile/busLocation.jsp";
@@ -70,7 +71,7 @@ changwonObject.urlRouteRequest = function(dbObject, callback){
                 }
             });
         }else{
-            throw error;
+            errorHaldling.throw(5001, 'Route URL Request Error');
         }
     });
 
@@ -108,7 +109,7 @@ changwonObject.urlStationRequest = function(dbObject, callback){
                 }
             });
         }else{
-            throw error;
+            errorHaldling.throw(5002, 'Station URL Request Error');
         }
     });
 

@@ -10,6 +10,7 @@
 
 var request = require('request');
 var jsdom = require('jsdom');
+var errorHaldling = require('../../utility/errorHandling.js');
 
 var busanObject = {};
 
@@ -65,7 +66,7 @@ busanObject.urlRouteRequest = function(dbObject, callback){
                 }
             });
         }else{
-           throw error;
+            errorHaldling.throw(5001, 'Route URL Request Error');
         }
     });
 
@@ -100,6 +101,8 @@ busanObject.urlStationRequest = function(dbObject, callback){
 
             callback(busan_list);
 
+        }else{
+            errorHaldling.throw(5002, 'Station URL Request Error');
         }
     });
 };

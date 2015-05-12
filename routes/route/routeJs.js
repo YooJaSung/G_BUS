@@ -21,9 +21,11 @@ routeRouter.all('/routeSearch', function (req, res, next) {
      var routeNm = getdata.routeNm;
      var cityCodeObj = getdata.cityObject;
 
+    console.log('routeSearch1');
+
     koreaDb.routeSearch(cityCodeObj, routeNm, function (routeData) {
-        console.log(routeData);
-        res.send(routeData);
+        console.log('routeSearch4');
+        res.status(200).send(routeData);
     });
 
 });
@@ -35,42 +37,42 @@ routeRouter.all('/routeDetail', function (req, res, next) {
     var rid = getdata.rid;
     var cityCode = getdata.cityCode;
 
+    console.log('routeDetail1');
+
     var cityDir = "../../server_biz/korea_city/" + cityEnNm + ".js";
     var cityObject = require(cityDir);
 
     var dbObject = undefined;
     var urlRouteObject = undefined;
-    var routeObject = undefined;
-
+    var routeObject = {};
 
     /**
      * nimble 사용하여 series 로 구성 dbObject -> urlrequest method
      */
 
     nimble.series([
+
         function(DBCallback){
-
             koreaDb.dbRouteDetail(cityCode, rid, function (routeDetailData) {
-
+                console.log('routeDetail4');
                 dbObject = routeDetailData;
                 DBCallback();
             });
         },
         function(urlCallback){
             cityObject.urlRouteRequest(dbObject, function (urlRouteData) {
+                console.log('routeDetail5');
                 urlRouteObject = urlRouteData;
                 urlCallback();
             });
         },
         function(resCallback){
-
+            console.log('routeDetail6');
             routeObject.urlRouteObject = urlRouteObject;
             routeObject.dbObject = dbObject;
-
-            res.send(routeObject);
+            res.status(200).send(routeObject);
             resCallback();
         }
-
     ]);
 });
 

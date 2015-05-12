@@ -11,6 +11,8 @@
 
 var request = require('request');
 var cheerio = require('cheerio');
+var errorHaldling = require('../../utility/errorHandling.js');
+
 var yeosuObject = {};
 
 var routeurl = "http://mbis.yeosu.go.kr:8286/smart/routeResult.htm";
@@ -55,7 +57,7 @@ yeosuObject.urlRouteRequest = function(dbObject, callback){
             });
             callback(yeosu_bus_location_seq);
         }else{
-            throw error;
+            errorHaldling.throw(5001, 'Route URL Request Error');
         }
     })
 
@@ -92,7 +94,7 @@ yeosuObject.urlStationRequest = function(dbObject, callback){
             callback(yeosu_list);
 
         }else{
-            throw error;
+            errorHaldling.throw(5002, 'Station URL Request Error');
         }
     });
 

@@ -10,6 +10,7 @@
 //   station param -> BUSSTOP_ID
 
 var request = require('request');
+var errorHaldling = require('../../utility/errorHandling.js');
 
 var gwangjuObject = {};
 
@@ -59,7 +60,7 @@ gwangjuObject.urlRouteRequest = function(dbObject, callback){
             callback(gwangju_bus_location_seq);
 
         }else{
-            throw error;
+            errorHaldling.throw(5001, 'Route URL Request Error');
         }
     });
 
@@ -90,7 +91,7 @@ gwangjuObject.urlStationRequest = function(dbObject, callback){
             callback(gwangju_list);
 
         }else{
-            throw error;
+            errorHaldling.throw(5002, 'Station URL Request Error');
         }
     });
 

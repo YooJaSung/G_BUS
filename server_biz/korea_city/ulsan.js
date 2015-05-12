@@ -11,6 +11,7 @@
 
 var request = require('request');
 var cheerio = require('cheerio');
+var errorHaldling = require('../../utility/errorHandling.js');
 
 var ulsanObject = {};
 
@@ -79,7 +80,7 @@ ulsanObject.urlRouteRequest = function(dbObject, callback){
             callback(ulsan_bus_location_seq);
 
         }else{
-            throw error;
+            errorHaldling.throw(5001, 'Route URL Request Error');
         }
     });
 
@@ -128,6 +129,8 @@ ulsanObject.urlStationRequest = function(dbObject, callback){
                         ulsan_list.push(temp);
 
                     })
+                }else{
+                    errorHaldling.throw(5002, 'Station URL Request Error');
                 }
             }
         )

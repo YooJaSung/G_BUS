@@ -11,6 +11,7 @@
 
 var request = require('request');
 var cheerio = require('cheerio');
+var errorHaldling = require('../../utility/errorHandling.js');
 
 var gwangyangObject = {};
 
@@ -66,7 +67,7 @@ gwangyangObject.urlRouteRequest = function(dbObject, callback){
             callback(gwangyang_bus_location_seq);
 
         }else{
-            throw error;
+            errorHaldling.throw(5001, 'Route URL Request Error');
         }
     })
 
@@ -112,7 +113,7 @@ gwangyangObject.urlStationRequest = function(dbObject, callback){
                 callback(gwangyang_list);
 
             }else{
-                throw error;
+                errorHaldling.throw(5002, 'Station URL Request Error');
             }
         });
 

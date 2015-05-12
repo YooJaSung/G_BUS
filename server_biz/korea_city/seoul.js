@@ -16,6 +16,7 @@
 
 var request = require('request');
 var xml2jsparser = require('xml2json');
+var errorHaldling = require('../../utility/errorHandling.js');
 
 var seoulObject = {};
 
@@ -54,7 +55,7 @@ seoulObject.urlRouteRequest = function (dbObject, callback) {
     request(url, function (error, response, body) {
         var seoul_bus_location_seq = [];
         if (error) {
-            throw error;
+            errorHaldling.throw(5001, 'Route URL Request Error');
         }
         else {
             var xmldata = body;
@@ -92,7 +93,7 @@ seoulObject.urlStationRequest = function (dbObject, callback) {
     request(url, function (error, response, body) {
         var seoul_list = [];
         if (error) {
-            throw error;
+            errorHaldling.throw(5002, 'Station URL Request Error');
         }
         else {
             var xmldata = body;
