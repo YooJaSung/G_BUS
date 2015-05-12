@@ -40,11 +40,7 @@ routeRouter.all('/routeDetail', function (req, res, next) {
     var dbObject = undefined;
     var urlRouteObject = undefined;
     var routeObject = undefined;
-
-
-
-    sid
-    cityEnNm
+    
 
     /**
      * nimble 사용하여 series 로 구성 dbObject -> urlrequest method
