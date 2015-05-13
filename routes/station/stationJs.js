@@ -14,10 +14,10 @@ stationRouter.all('/stationSearch', function(req,res, next){
     var stationNm = getdata.stationNm;
     var cityCodeObj = getdata.cityObject;
 
-
     koreaDb.stationSearch(cityCodeObj, stationNm , function(stationData){
         res.status(200).send(stationData);
     });
+
 });
 
 stationRouter.all('/stationDetail', function(req,res, next){
@@ -33,9 +33,8 @@ stationRouter.all('/stationDetail', function(req,res, next){
 
     var dbObject = undefined;
     var urlStationObject = undefined;
+    var aroundXY = undefined;
     var stationObject = {};
-
-
 
     nimble.series([
         function(DBCallback){
@@ -52,10 +51,17 @@ stationRouter.all('/stationDetail', function(req,res, next){
             });
 
         },
+        function(aroundCallback){
+            koreaDb.dbAroundXY(cityCode, dbObject, function(aroundxyData){
+                aroundXY = aroundxyData;
+                aroundCallback();
+            });
+        },
         function(resCallback){
 
             stationObject.urlStationObject = urlStationObject;
             stationObject.dbObject = dbObject;
+            stationObject.aroundXY = aroundXY;
 
             res.status(200).send(stationObject);
             resCallback();

@@ -2,7 +2,6 @@
  * Created by airnold on 15. 4. 29..
  */
 
-
 /**
  *
  * 1. database 연동을 위한 변수 생성
@@ -10,21 +9,18 @@
  * 3. 한국 버전 쿼리는 모두 이 파일에서 처리해준다
  *
  */
+
 var koreaDbObject = {};
 var dbQuery = require('../../server_config/mysql/mysql_config.js');
 var pool = require('../../server_config/mysql/DBConnect.js');
 var errorHaldling = require('../../utility/errorHandling.js');
-
 
 koreaDbObject.routeSearch = function(cityObject, routeNm, callback){
     /**
      * route search 할때 (R.CITYCD + 로 이어서 city 한정지어주기
      */
 
-
     // AND  R.CITYCD = ?
-
-        console.log('routeSearch2');
 
     var routeQuery = dbQuery.g_busquery.ROUTESEARCH;
 
@@ -35,7 +31,7 @@ koreaDbObject.routeSearch = function(cityObject, routeNm, callback){
            errorHaldling.throw(5003, 'Database Select Error ');
        }else{
             db.query(routeStr, ["%"+routeNm+"%"], function(err, rows){
-                console.log('routeSearch3');
+
                 callback(rows);
             })
        }
@@ -86,7 +82,8 @@ function queryCityCodeRoute (cityObject, routeQuery){
 
     }
 
-    routeQuery += ' ) ;';
+    routeQuery += ' ) ';
+    routeQuery += 'LIMIT 0,49 ;';
 
 
     return routeQuery;
@@ -103,10 +100,10 @@ function queryCityCodeStation (cityObject, stationQuery){
 
     for(var i in cityObject){
         if(i < cityObject.length -1 ){
-            stationQuery += "citycd = " + cityObject[i].cityCode + " OR ";
+            stationQuery += "S.citycd = " + cityObject[i].cityCode + " OR ";
         }
         else{
-            stationQuery += "citycd = " + cityObject[i].cityCode;
+            stationQuery += "S.citycd = " + cityObject[i].cityCode;
         }
 
     }
@@ -152,5 +149,21 @@ koreaDbObject.dbStationDetail = function(cityCd, sid, callback){
         }
     });
 };
+
+koreaDbObject.dbAroundXY = function(cityCd, dbObject, callback){
+    var getAroundQuery = dbQuery.g_busquery.AROUNDXY;
+    pool.getConnection(function(err,db){
+        if(err){
+            errorHaldling.throw(5003, 'Database Select Error ');
+        }else{
+            db.query(getAroundQuery,[dbObject[0].LATIX,dbObject[0].LATIX,dbObject[0].LONGY,cityCd, dbObject[0].LATIX,dbObject[0].LATIX,dbObject[0].LONGY,dbObject[0].LONGY, dbObject[0].LATIX,dbObject[0].LATIX,dbObject[0].LONGY], function(err,rows){
+                callback(rows);
+            })
+        }
+    })
+};
+
+
+
 
 module.exports = koreaDbObject;

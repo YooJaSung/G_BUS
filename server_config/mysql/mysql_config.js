@@ -13,8 +13,6 @@ mysqlconfig.database = {};
  *
  * connection setting
  */
-
-
 mysqlconfig.g_busquery = {};
 
 mysqlconfig.g_busquery.temp = "";
@@ -38,6 +36,7 @@ mysqlconfig.g_busquery.temp = "";
  " WHERE R.CITYCD = ? " +
  " AND R.ROUTENM LIKE '?'; " ;
  */
+
 mysqlconfig.g_busquery.ROUTESEARCH =
     "SELECT R.citycd, R.rid, R.routeid, R.routenm, R.routesubnm" +
     " , ST.STOPNM AS ststopnm " +
@@ -48,7 +47,6 @@ mysqlconfig.g_busquery.ROUTESEARCH =
     " LEFT OUTER JOIN STOPS ST  ON R.CITYCD = ST.CITYCD AND R.STSTOPSID = ST.SID " +
     " LEFT OUTER JOIN STOPS ED  ON R.CITYCD = ED.CITYCD AND R.EDSTOPSID = ED.SID " +
     " WHERE R.ROUTENM LIKE ? ";
-
 
 /*
  #####################################################################
@@ -66,9 +64,11 @@ mysqlconfig.g_busquery.ROUTEDETAIL =
     " SELECT RVS.citycd, RVS.seq " +
     " , R.rid,R.routeid, R.routenm, R.routedesc, R.trnsid " +
     " , S.sid, S.stopid, S.stopnm " +
+    " , R.term, R.firsttm, R.lasttm " +
+    " , if(locate('가상',S.stopnm)!=0, '0','1') as vFlag "+
     " FROM ROUTEVIASTOP RVS " +
     " INNER JOIN ROUTES R " +
-    " ON RVS.CITYCD = R.CITYCD AND RVS.RID = R.RID " +
+    " ON RVS.CITYCD = R.CITYCD AND RVS.RID = R.RID "+
     " INNER JOIN STOPS S " +
     " ON RVS.CITYCD = S.CITYCD AND RVS.SID = S.SID " +
     " WHERE RVS.CITYCD = ? AND RVS.RID = ?; ";
@@ -86,9 +86,8 @@ mysqlconfig.g_busquery.ROUTEDETAIL =
  */
 
 mysqlconfig.g_busquery.STATIONSEARCH =
-    " SELECT S.citycd, sid, stopnm, stopid, arsid " +
+    " SELECT S.citycd, sid, stopnm, stopid, arsid, S.latiX, S.longY " +
     " , C.cityEnNm " +
-    " , if(locate('가상',stopnm)!=0, '0','1') as vFlag " +
     " FROM STOPS S " +
     " INNER JOIN CITY C ON S.CITYCD = C.CITYCD "+
     " WHERE stopnm like ? ";
@@ -109,13 +108,26 @@ mysqlconfig.g_busquery.STATIONSEARCH =
 mysqlconfig.g_busquery.STATIONDETAIL =
     " SELECT distinct RVS.citycd, RVS.seq " +
     " , R.rid, R.routeid, R.routedesc, R.routenm, R.routesubnm " +
-    " , RVS.sid, S.stopid, S.stopnm, S.arsid, S.stopdesc " +
+    " , RVS.sid, S.stopid, S.stopnm, S.arsid, S.stopdesc, S.LATIX, S.LONGY " +
     " FROM ROUTEVIASTOP RVS " +
     " INNER JOIN ROUTES R " +
     " ON RVS.CITYCD = R.CITYCD AND RVS.RID = R.RID " +
     " INNER JOIN STOPS S " +
     " ON RVS.CITYCD = S.CITYCD AND RVS.SID = S.SID " +
     " WHERE RVS.CITYCD = ? AND RVS.SID = ?";
+
+mysqlconfig.g_busquery.AROUNDXY =
+    " SELECT sid, stopid, stopnm, arsid, latix AS aroundX, longy AS aroundY " +
+    " , (acos(sin(radians(37)) * sin(radians(LATIX)) + " +
+    " cos(radians(37)) * cos(radians(LATIX)) * " +
+    " cos(radians(127) - radians(LONGY))) * 6378) AS DIST " +
+    " FROM STOPS " +
+    " WHERE CITYCD = 102 " +
+    " AND LATIX BETWEEN 37 -0.005  AND 37 +0.005 " +
+    " AND LONGY BETWEEN 127 -0.005  AND 127 + 0.005 " +
+    " AND (acos(sin(radians(37)) * sin(radians(LATIX)) + " +
+    " cos(radians(37)) * cos(radians(LATIX)) * " +
+    " cos(radians(127) - radians(LONGY))) * 6378) BETWEEN 0.01 AND 0.5; ";
 
 /**
  *

@@ -70,8 +70,6 @@ incheonObject.urlRouteRequest = function(dbObject, callback){
             errorHaldling.throw(5001, 'Route URL Request Error');
         }
     });
-
-
 };
 incheonObject.urlStationRequest = function(dbObject, callback){
 

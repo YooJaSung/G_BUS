@@ -78,17 +78,12 @@ seoulObject.urlRouteRequest = function (dbObject, callback) {
 
         }
     });
-
-
 };
 seoulObject.urlStationRequest = function (dbObject, callback) {
 
-
-
-    requestData.station.arsId = dbObject[0].stopid;
+    requestData.station.arsId = dbObject[0].arsid;
 
     var url = stationurl + "&arsId=" + requestData.station.arsId;
-
 
     request(url, function (error, response, body) {
         var seoul_list = [];
@@ -96,6 +91,7 @@ seoulObject.urlStationRequest = function (dbObject, callback) {
             errorHaldling.throw(5002, 'Station URL Request Error');
         }
         else {
+
             var xmldata = body;
             var options = {
                 object: true,
@@ -104,14 +100,13 @@ seoulObject.urlStationRequest = function (dbObject, callback) {
             };
             var result = xml2jsparser.toJson(xmldata, options);
 
-
             var tempre = result.ServiceResult[0].msgBody[0];
             var stArr = tempre.itemList;
             for(var i in stArr){
                 var temp = {};
-                temp.routenm = stArr[i].routeno[0];
-                temp.routeid = stArr[i].routeid[0];
-                temp.arrive_time = stArr[i].arrtime[0];
+                temp.routenm = stArr[i].rtNm[0];
+                temp.routeid = stArr[i].busRouteId[0];
+                temp.arrive_time = stArr[i].traTime1[0];
 
                 seoul_list.push(temp);
             }

@@ -108,12 +108,6 @@ jinjuObject.urlStationRequest = function(dbObject, callback){
 };
 
 
-
-
-
-
-
-
 module.exports = jinjuObject;
 
 

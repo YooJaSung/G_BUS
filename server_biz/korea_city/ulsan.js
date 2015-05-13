@@ -144,7 +144,6 @@ function splitColon(beforeString){
     var afterString = beforeString.split(":");
     return afterString;
 }
-
 module.exports = ulsanObject;
 
 

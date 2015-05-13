@@ -107,8 +107,8 @@ mokpoObject.urlStationRequest = function(dbObject, callback) {
                 errorHaldling.throw(5002, 'Station URL Request Error');
             }
         });
-};
 
+};
 
 module.exports = mokpoObject;
 

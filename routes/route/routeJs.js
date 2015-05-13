@@ -37,7 +37,7 @@ routeRouter.all('/routeDetail', function (req, res, next) {
     var rid = getdata.rid;
     var cityCode = getdata.cityCode;
 
-    console.log('routeDetail1');
+
 
     var cityDir = "../../server_biz/korea_city/" + cityEnNm + ".js";
     var cityObject = require(cityDir);
@@ -54,20 +54,20 @@ routeRouter.all('/routeDetail', function (req, res, next) {
 
         function(DBCallback){
             koreaDb.dbRouteDetail(cityCode, rid, function (routeDetailData) {
-                console.log('routeDetail4');
+
                 dbObject = routeDetailData;
                 DBCallback();
             });
         },
         function(urlCallback){
             cityObject.urlRouteRequest(dbObject, function (urlRouteData) {
-                console.log('routeDetail5');
+
                 urlRouteObject = urlRouteData;
                 urlCallback();
             });
         },
         function(resCallback){
-            console.log('routeDetail6');
+
             routeObject.urlRouteObject = urlRouteObject;
             routeObject.dbObject = dbObject;
             res.status(200).send(routeObject);
