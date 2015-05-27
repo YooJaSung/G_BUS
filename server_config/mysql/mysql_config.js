@@ -66,6 +66,7 @@ mysqlconfig.g_busquery.ROUTEDETAIL =
     " , S.sid, S.stopid, S.stopnm " +
     " , R.term, R.firsttm, R.lasttm " +
     " , if(locate('가상',S.stopnm)!=0, '0','1') as vFlag "+
+    " , R.ststopnm, R.edstopnm " +
     " FROM ROUTEVIASTOP RVS " +
     " INNER JOIN ROUTES R " +
     " ON RVS.CITYCD = R.CITYCD AND RVS.RID = R.RID "+
@@ -118,16 +119,13 @@ mysqlconfig.g_busquery.STATIONDETAIL =
 
 mysqlconfig.g_busquery.AROUNDXY =
     " SELECT sid, stopid, stopnm, arsid, latix AS aroundX, longy AS aroundY " +
-    " , (acos(sin(radians(37)) * sin(radians(LATIX)) + " +
-    " cos(radians(37)) * cos(radians(LATIX)) * " +
-    " cos(radians(127) - radians(LONGY))) * 6378) AS DIST " +
     " FROM STOPS " +
-    " WHERE CITYCD = 102 " +
-    " AND LATIX BETWEEN 37 -0.005  AND 37 +0.005 " +
-    " AND LONGY BETWEEN 127 -0.005  AND 127 + 0.005 " +
-    " AND (acos(sin(radians(37)) * sin(radians(LATIX)) + " +
-    " cos(radians(37)) * cos(radians(LATIX)) * " +
-    " cos(radians(127) - radians(LONGY))) * 6378) BETWEEN 0.01 AND 0.5; ";
+    " WHERE CITYCD = ? " +
+    " AND LATIX BETWEEN ? -0.005  AND ? +0.005 " +
+    " AND LONGY BETWEEN ? -0.005  AND ? + 0.005 " +
+    " AND (acos(sin(radians(?)) * sin(radians(LATIX)) + " +
+    " cos(radians(?)) * cos(radians(LATIX)) * " +
+    " cos(radians(?) - radians(LONGY))) * 6378) BETWEEN 0.01 AND 0.5; ";
 
 /**
  *

@@ -53,7 +53,7 @@ chunanObject.urlRouteRequest = function(dbObject, callback){
         }
     }, function (err, httpResponse, body) {
         if (err) {
-            errorHaldling.throw(5001, 'Route URL Request Error');
+            throw err;
         } else {
             var chunan_bus_location_seq = [];
             var xmldata = body;
@@ -66,16 +66,18 @@ chunanObject.urlRouteRequest = function(dbObject, callback){
 
             var bus_location_data_item = bus_location_data.found_item[0].item;
 
-            for (var i in bus_location_data_item) {
-
-                if (bus_location_data_item[i].bus_name[0] !== 'null') {
-                    console.log(bus_location_data_item[i].stop_seq[0]);
-                    chunan_bus_location_seq.push(bus_location_data_item[i].stop_seq[0]);
+            if(bus_location_data === undefined){
+                //잘못된 버스 번호
+                callback(chunan_bus_location_seq);
+            }else{
+                for (var i in bus_location_data_item) {
+                    if (bus_location_data_item[i].bus_name[0] !== 'null') {
+                        console.log(bus_location_data_item[i].stop_seq[0]);
+                        chunan_bus_location_seq.push(bus_location_data_item[i].stop_seq[0]);
+                    }
                 }
+                callback(chunan_bus_location_seq);
             }
-
-            callback(chunan_bus_location_seq);
-
         }
     });
 
@@ -92,7 +94,7 @@ chunanObject.urlStationRequest = function(dbObject, callback){
         }
     }, function (err, httpResponse, body) {
         if (err) {
-            errorHaldling.throw(5002, 'Station URL Request Error');
+            throw err;
         } else {
             var xmldata = body;
             var options = {

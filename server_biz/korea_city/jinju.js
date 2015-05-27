@@ -57,22 +57,21 @@ jinjuObject.urlRouteRequest = function(dbObject , callback){
             }
 
             var jsondata = arr[2];
-
-            for(var i in jsondata){
-                console.log(jsondata[i].BRN_FROMSEQNO);
-                jinju_bus_location_seq.push(jsondata[i].BRN_FROMSEQNO);
-                //-1 or 그대로 해야함
+            if(jsondata === undefined){
+                callback(jinju_bus_location_seq);
+            }else{
+                for(var i in jsondata){
+                    jinju_bus_location_seq.push(findRouteSeq(dbObject,jsondata[i].BrtId));
+                }
+                callback(jinju_bus_location_seq);
             }
-
-            callback(jinju_bus_location_seq);
-
         }else{
-            errorHaldling.throw(5001, 'Route URL Request Error');
+            throw error;
         }
     });
-
-
 };
+
+
 jinjuObject.urlStationRequest = function(dbObject, callback){
 
     requestData.station.stop_id = dbObject[0].stopid;
@@ -97,16 +96,25 @@ jinjuObject.urlStationRequest = function(dbObject, callback){
                 console.log("노선 위치 : "+ jinju_bus_curr[i].remainStopCnt + "전");
                 console.log("도착 예정 시간 : "+ jinju_bus_curr[i].remainTime+"초\n");
             }
-
             callback(jinju_bus_curr);
 
         }else{
-            errorHaldling.throw(5002, 'Station URL Request Error');
+            throw error;
         }
     });
-
 };
 
+function findRouteSeq(dbObject, BrtId){
+    var seq;
+    for(var i in dbObject){
+        if(dbObject[i].stopid === BrtId){
+            seq = i;
+            seq = seq*1+1;
+            break;
+        }
+    }
+    return seq;
+}
 
 module.exports = jinjuObject;
 

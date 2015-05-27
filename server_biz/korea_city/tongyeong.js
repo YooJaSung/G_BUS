@@ -35,12 +35,6 @@ requestData.station.prmOperation = "getStationInfo";
 requestData.station.prmStationName = "";
 requestData.station.prmStationID = "";
 
-
-
-
-
-
-
 tongyeongObject.urlRouteRequest = function(dbObject, callback){
 
     /**
@@ -49,7 +43,6 @@ tongyeongObject.urlRouteRequest = function(dbObject, callback){
      */
 
     requestData.route.prmRouteID = dbObject[0].routeid;
-
     request.post({
         url: routeurl,
         form: {
@@ -60,31 +53,34 @@ tongyeongObject.urlRouteRequest = function(dbObject, callback){
     }, function (error, response, html) {
         var tongyeong_bus_location_seq = [];
         if (!error && response.statusCode == 200) {
-
             var $ = cheerio.load(html);
             var $td = $('.routeLineH');
-            $td.each(function(i){
-
-                if($(this).find('img').attr('src') === 'images/businfo/popup02/popup_02_bus.gif' || $(this).find('img').attr('src') === 'images/businfo/popup02/popup_02_bus02.gif'){
-                    tongyeong_bus_location_seq.push(i);
-                    console.log(i);
-                    //seq -1해주셈
-                }
-            });
-
-            callback(tongyeong_bus_location_seq);
+            if($td.length === 0){
+                //잘못된 버스 번호
+                callback(tongyeong_bus_location_seq);
+            }else{
+                //images/businfo/popup02/popup_02_bus.gif 그냥버스1
+                //images/businfo/popup02/popup_02_bus02.gif 그냥버스2
+                //images/businfo/popup02/popup_02_bus02_low.gif 저상버스2
+                //images/businfo/popup02/popup_02_bus_low.gif 저상버스1
+                //총 4개의 이미지
+                $td.each(function(i){
+                    if($(this).find('img').attr('src') === 'images/businfo/popup02/popup_02_bus02.gif' || $(this).find('img').attr('src') === 'images/businfo/popup02/popup_02_bus02_low.gif'  || $(this).find('img').attr('src') === 'images/businfo/popup02/popup_02_bus.gif'  || $(this).find('img').attr('src') === 'images/businfo/popup02/popup_02_bus_low.gif'){
+                        tongyeong_bus_location_seq.push(i);
+                    }
+                });
+                callback(tongyeong_bus_location_seq);
+            }
 
         }else{
-            errorHaldling.throw(5001, 'Route URL Request Error');
+            throw error;
         }
     });
-
-
 };
+
 tongyeongObject.urlStationRequest = function(dbObject, callback){
 
     requestData.station.prmStationID = dbObject[0].stopid;
-
     request.post({
         url: stationurl,
         encoding: null,
@@ -129,10 +125,9 @@ tongyeongObject.urlStationRequest = function(dbObject, callback){
             console.log(tongyeong_list);
             callback(tongyeong_list);
         }else{
-            errorHaldling.throw(5002, 'Station URL Request Error');
+            throw error;
         }
     });
-
 };
 
 module.exports = tongyeongObject;

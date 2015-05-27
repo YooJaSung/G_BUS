@@ -32,11 +32,6 @@ requestData.route.keyword = "" ;
 requestData.station = {};
 requestData.station.keyword = "";
 
-
-
-
-
-
 incheonObject.urlRouteRequest = function(dbObject, callback){
 
     /**
@@ -56,21 +51,24 @@ incheonObject.urlRouteRequest = function(dbObject, callback){
             var $ = cheerio.load(html);
             var $a = $('.subMenu2 > li a');
 
-            $a.each(function (i) {
-
-                if ($(this).find('span img').attr('src') === '/images/bus_icon.png') {
-                    console.log(i);
-                    incheon_bus_location_seq.push(i);
-                }
-            });
-
-            callback(incheon_bus_location_seq);
-
+            if($a.length === 0){
+                //잘못된 버스번호로 없는 요청
+                callback(incheon_bus_location_seq);
+            }else{
+                $a.each(function (i) {
+                    if ($(this).find('span img').attr('src') === '/images/bus_icon.png') {
+                        console.log(i);
+                        incheon_bus_location_seq.push(i*1+1);
+                    }
+                });
+                callback(incheon_bus_location_seq);
+            }
         }else{
-            errorHaldling.throw(5001, 'Route URL Request Error');
+            throw error;
         }
     });
 };
+
 incheonObject.urlStationRequest = function(dbObject, callback){
 
     requestData.station.keyword = dbObject[0].stopid;
@@ -113,7 +111,7 @@ incheonObject.urlStationRequest = function(dbObject, callback){
                 }
             });
         }else{
-            errorHaldling.throw(5002, 'Station URL Request Error');
+            throw error;
         }
     });
 

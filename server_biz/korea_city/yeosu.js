@@ -26,43 +26,45 @@ var stationurl = "http://its.yeosu.go.kr/New/include/clip/searchPredictInfo.jsp"
 
 var requestData = {};
 requestData.route = {};
-requestData.route.busRouteID = "" ;
+requestData.route.busRouteID = "";
 
 requestData.station = {};
 requestData.station.sId = "";
 
 
-
-
-yeosuObject.urlRouteRequest = function(dbObject, callback){
+yeosuObject.urlRouteRequest = function (dbObject, callback) {
 
     /**
      * 1. routeUrl 포멧을 db에서 선택한 데이터를 가지고 맞춰준다
      * 2. post or get 방식에 따라 request 까지 해준다.
      */
 
-    requestData.route.busRouteID = dbObject[0].routeid ;
+    requestData.route.busRouteID = dbObject[0].routeid;
 
-    var url = routeurl+"?busRouteID="+requestData.route.busRouteID;
+    var url = routeurl + "?busRouteID=" + requestData.route.busRouteID;
 
     request(url, function (error, response, html) {
         if (!error && response.statusCode == 200) {
             var yeosu_bus_location_seq = [];
             var $ = cheerio.load(html);
             var $td = $('td[width="20"]');
-            $td.each(function(i){
-                if($(this).find('img').attr('src') === 'images/icon_bus.gif'){
-                    yeosu_bus_location_seq.push(i);
-                }
-            });
-            callback(yeosu_bus_location_seq);
-        }else{
-            errorHaldling.throw(5001, 'Route URL Request Error');
+            if ($td.length === 0) {
+                //잘못된 버스 번호 요청
+                callback(yeosu_bus_location_seq);
+            } else {
+                $td.each(function (i) {
+                    if ($(this).find('img').attr('src') === 'images/icon_bus.gif') {
+                        yeosu_bus_location_seq.push(i*1+1);
+                    }
+                });
+                callback(yeosu_bus_location_seq);
+            }
+        } else {
+            throw error;
         }
     })
-
 };
-yeosuObject.urlStationRequest = function(dbObject, callback){
+yeosuObject.urlStationRequest = function (dbObject, callback) {
 
     requestData.station.sId = dbObject[0].stopid;
 
@@ -81,10 +83,10 @@ yeosuObject.urlStationRequest = function(dbObject, callback){
 
             var yeosu_list = [];
 
-            $tr.each(function(){
+            $tr.each(function () {
                 var temp = {};
 
-                if($(this).find('td').attr('class') !== 'col t_a_c') {
+                if ($(this).find('td').attr('class') !== 'col t_a_c') {
                     temp.route_name = $(this).find('td:nth-child(1)').text();
                     temp.curr_pos = $(this).find('td:nth-child(2)').text();
                     temp.arrive_time = $(this).children().last().text();
@@ -93,8 +95,8 @@ yeosuObject.urlStationRequest = function(dbObject, callback){
             });
             callback(yeosu_list);
 
-        }else{
-            errorHaldling.throw(5002, 'Station URL Request Error');
+        } else {
+            throw error;
         }
     });
 

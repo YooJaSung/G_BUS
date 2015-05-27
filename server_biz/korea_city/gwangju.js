@@ -50,17 +50,20 @@ gwangjuObject.urlRouteRequest = function(dbObject, callback){
                 arr.push(parsed[x]);
             }
             var jsondata = arr[0];
-            for(var i in jsondata){
-                if(jsondata[i].CARNO !== null){
-                    gwangju_bus_location_seq.push(i);
-                    console.log(i);
+
+            if(jsondata.length === 0){
+                //잘못된 버스번호
+                callback(gwangju_bus_location_seq);
+            }else{
+                for(var i in jsondata){
+                    if(jsondata[i].CARNO !== null){
+                        gwangju_bus_location_seq.push(i*1+1);
+                    }
                 }
+                callback(gwangju_bus_location_seq);
             }
-
-            callback(gwangju_bus_location_seq);
-
         }else{
-            errorHaldling.throw(5001, 'Route URL Request Error');
+            throw error;
         }
     });
 
@@ -91,7 +94,7 @@ gwangjuObject.urlStationRequest = function(dbObject, callback){
             callback(gwangju_list);
 
         }else{
-            errorHaldling.throw(5002, 'Station URL Request Error');
+            throw error;
         }
     });
 

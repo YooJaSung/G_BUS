@@ -61,52 +61,68 @@ seoulObject.urlRouteRequest = function (dbObject, callback) {
 
             //정방역방 없는것 -> 바로 검색 무조건 실행
             var $li = $('.bl li');
-            $li.each(function (i) {
-                if ($(this).attr('class') === 'bloc_b') {
-                    console.log(i);
-                    daegu_bus_location_seq1.push(i);
-                }
-
-            });
-            daegu_bus_location_seq.push(daegu_bus_location_seq1);
-
-            var flfind = $('.r');
-
-            if (flfind.length !== 0) {
-
-                requestData.route.moveDir = "0";
-
-                url = routeurl + "?act=" + requestData.route.act +
-                "&roId=" + requestData.route.roId +
-                "&roNo=" + requestData.route.roNo +
-                "&moveDir=" + requestData.route.moveDir;
-
-                //정방역방 있는것 -> http://m.businfo.go.kr/bp/m/realTime.do?act=posInfo&roId=3000726000&roNo=726&moveDir=0 로 다시 요청
-                request(url, function (error, response, html) {
-                    if (!error && response.statusCode == 200) {
-                        var $ = cheerio.load(html);
-                        var $li = $('.bl li');
-                        $li.each(function (i) {
-                            if ($(this).attr('class') === 'bloc_b') {
-                                console.log(i);
-                                daegu_bus_location_seq2.push(i);
-                            }
-
-                        });
-                        daegu_bus_location_seq.push(daegu_bus_location_seq2);
-
+            if($li.length === 0) {
+                //잘못된 버스 검색
+                callback(daegu_bus_location_seq);
+            }else{
+                $li.each(function (i) {
+                    if ($(this).attr('class') === 'bloc_b') {
+                        var temp = $(this).prev().find('span').text();
+                        var seq = temp.split('.');
+                        /**
+                         * .이전걸 짤라서 담기
+                         */
+                        daegu_bus_location_seq1.push(seq[0]);
                     }
 
-                })
+                });
+                daegu_bus_location_seq.push(daegu_bus_location_seq1);
 
+                var flfind = $('.r');
+
+                if (flfind.length !== 0) {
+
+                    requestData.route.moveDir = "0";
+
+                    url = routeurl + "?act=" + requestData.route.act +
+                    "&roId=" + requestData.route.roId +
+                    "&roNo=" + requestData.route.roNo +
+                    "&moveDir=" + requestData.route.moveDir;
+
+                    //정방역방 있는것 -> http://m.businfo.go.kr/bp/m/realTime.do?act=posInfo&roId=3000726000&roNo=726&moveDir=0 로 다시 요청
+                    request(url, function (error, response, html) {
+                        if (!error && response.statusCode == 200) {
+                            var $ = cheerio.load(html);
+                            var $li = $('.bl li');
+                            if($li.length === 0){
+                                daegu_bus_location_seq.push(daegu_bus_location_seq2);
+                            }else{
+                                $li.each(function (i) {
+                                    if ($(this).attr('class') === 'bloc_b') {
+                                        var temp = $(this).prev().find('span').text();
+                                        var seq = temp.split('.');
+                                        /**
+                                         * .이전걸 짤라서 담기
+                                         */
+                                        daegu_bus_location_seq2.push(seq[0]);
+                                    }
+                                });
+                                daegu_bus_location_seq.push(daegu_bus_location_seq2);
+
+                                callback(daegu_bus_location_seq);
+                            }
+                        }
+                    })
+
+                }else{
+                    callback(daegu_bus_location_seq);
+                }
             }
-            callback(daegu_bus_location_seq);
 
         }else{
-            errorHaldling.throw(5001, 'Route URL Request Error');
+            throw error;
         }
     });
-
 };
 seoulObject.urlStationRequest = function (dbObject, callback) {
 
@@ -160,7 +176,7 @@ seoulObject.urlStationRequest = function (dbObject, callback) {
 
                 callback(daegu_list);
             }else{
-                errorHaldling.throw(5002, 'Station URL Request Error');
+                throw error;
             }
         }
     );

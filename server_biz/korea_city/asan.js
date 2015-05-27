@@ -53,7 +53,7 @@ asanObject.urlRouteRequest = function (dbObject, callback) {
 
         var asan_bus_location_seq = [];
         if (error) {
-            errorHaldling.throw(5001, 'Route URL Request Error');
+            throw error;
         } else {
             var parsed = JSON.parse(json);
             // json -> array 변환
@@ -61,20 +61,22 @@ asanObject.urlRouteRequest = function (dbObject, callback) {
             for (var x in parsed) {
                 arr.push(parsed[x]);
             }
-            var jsondata = arr[0];
-            // 방어코드
             if (arr.length === 0) {
-                callback(asan_bus_location_seq);
-            } else {
-
-                for(var i in jsondata){
-                    asan_bus_location_seq.push(findRouteSeq(jsondata[i].stop_id, dbObject));
-                }
+                //잘못된 버스번호
                 callback(asan_bus_location_seq);
             }
+            var jsondata = arr[0];
+
+            for (var i in jsondata) {
+                /**
+                 * +1 된 값
+                 */
+                asan_bus_location_seq.push(findRouteSeq(jsondata[i].stop_id, dbObject));
+            }
+            callback(asan_bus_location_seq);
+
         }
     });
-
 };
 asanObject.urlStationRequest = function (dbObject, callback) {
 
@@ -83,13 +85,14 @@ asanObject.urlStationRequest = function (dbObject, callback) {
     request.post({
         url: 'http://bus.asan.go.kr/mobile/traffic/searchBusStopRoute',
         form: {
-            busStopId:requestData.station.busStopId
+            busStopId: requestData.station.busStopId
         }
     }, function (error, response, json) {
         if (!error && response.statusCode == 200) {
 
             var psd = JSON.parse(json);
             var arriveTime_list = psd.busStopRouteList;
+
 
             for (var i in arriveTime_list) {
                 console.log("노선명 : " + arriveTime_list[i].route_name);
@@ -100,7 +103,7 @@ asanObject.urlStationRequest = function (dbObject, callback) {
             callback(arriveTime_list);
 
         } else {
-            errorHaldling.throw(5002, 'Station URL Request Error');
+            throw error;
         }
     });
 
@@ -114,8 +117,9 @@ function findRouteSeq(stopid, dbObject) {
          * urlarr에 있는 stopid와 db에 stopnm을 비교하여 seq저장
          */
 
-        if(dbObject[i].stopid === stopid){
-            seq =  dbObject[i].seq;
+        if (dbObject[i].stopid === stopid) {
+            seq = dbObject[i].seq;
+            seq = seq * 1 + 1;
             break;
         }
     }

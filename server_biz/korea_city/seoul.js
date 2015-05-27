@@ -55,7 +55,7 @@ seoulObject.urlRouteRequest = function (dbObject, callback) {
     request(url, function (error, response, body) {
         var seoul_bus_location_seq = [];
         if (error) {
-            errorHaldling.throw(5001, 'Route URL Request Error');
+            throw error;
         }
         else {
             var xmldata = body;
@@ -63,7 +63,6 @@ seoulObject.urlRouteRequest = function (dbObject, callback) {
                 object: true,
                 sanitize: false,
                 arrayNotation: true
-
             };
             var result = xml2jsparser.toJson(xmldata, options);
 
@@ -71,7 +70,9 @@ seoulObject.urlRouteRequest = function (dbObject, callback) {
             var locArr = tempre.itemList;
 
             for(var i in locArr){
-                seoul_bus_location_seq.push(locArr[i].sectOrd[0]);
+                var seq = locArr[i].sectOrd[0];
+                seq = seq*1+1;
+                seoul_bus_location_seq.push(seq);
             }
 
             callback(seoul_bus_location_seq);
@@ -88,7 +89,7 @@ seoulObject.urlStationRequest = function (dbObject, callback) {
     request(url, function (error, response, body) {
         var seoul_list = [];
         if (error) {
-            errorHaldling.throw(5002, 'Station URL Request Error');
+            throw error;
         }
         else {
 

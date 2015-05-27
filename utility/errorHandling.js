@@ -5,16 +5,12 @@
 exports.throw = function(status, errorMessage){
     var err = new Error(errorMessage);
     err.status = status;
+    console.log('error here');
     throw err;
 };
 
-
 /**
  *
- *
- * 5001 -> route URL request error
- * 5002 -> station URL request error
- * 5003 -> database error
- *
+ * 에러코드 정해서 추가하기
  *
  */

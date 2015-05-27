@@ -24,14 +24,14 @@ var stationurl = "http://bus.busan.go.kr/busanBIMS/Ajax/map_Arrival.asp";
 
 var requestData = {};
 requestData.route = {};
-requestData.route.line_id = "" ;
+requestData.route.line_id = "";
 
 
 requestData.station = {};
 requestData.station.optARSNO = "";
 
 
-busanObject.urlRouteRequest = function(dbObject, callback){
+busanObject.urlRouteRequest = function (dbObject, callback) {
 
     requestData.route.line_id = dbObject[0].routeid;
 
@@ -51,22 +51,32 @@ busanObject.urlRouteRequest = function(dbObject, callback){
                     var $wrapper = $body.find('#wrapper');
                     var $img = $wrapper.find('img');
 
-                    $img.each(function (i) {
-                        console.log(i);
-                        if ($img[i].src === 'file://images/bus_real_green_GL_4045.png') {
-                            /*
-                             sequence start at 1, real time bus location sequence save array and send to front
-                             */
-                            console.log($img[i].src);
-                            busan_bus_location_seq.push(i);
-                        }
-                    });
-                    console.log(busan_bus_location_seq);
-                    callback(busan_bus_location_seq);
+                    if ($img.length === 0) {
+                        // 잘못된 버스
+                        callback(busan_bus_location_seq);
+                    }
+
+                    else {
+
+                        $img.each(function (i) {
+                            if ($img[i].src === 'file://images/bus_real_green_GL_4045.png') {
+                                /*
+                                 sequence start at 1, real time bus location sequence save array and send to front
+                                 */
+                                console.log($img[i].src);
+
+                                busan_bus_location_seq.push(i * 1 + 1);
+                            }
+                        });
+                        console.log(busan_bus_location_seq);
+                        callback(busan_bus_location_seq);
+                    }
+
+
                 }
             });
-        }else{
-            errorHaldling.throw(5001, 'Route URL Request Error');
+        } else {
+            throw error;
         }
     });
 
@@ -76,10 +86,10 @@ busanObject.urlRouteRequest = function(dbObject, callback){
      */
 
 };
-busanObject.urlStationRequest = function(dbObject, callback){
+busanObject.urlStationRequest = function (dbObject, callback) {
     requestData.station.optARSNO = dbObject[0].stopid;
 
-    var url = stationurl+"?optARSNO=" + requestData.station.optARSNO;
+    var url = stationurl + "?optARSNO=" + requestData.station.optARSNO;
 
     request(url, function (error, response, body) {
         if (!error && response.statusCode == 200) {
@@ -93,22 +103,19 @@ busanObject.urlStationRequest = function(dbObject, callback){
 
             var busan_list = parsed_data.Buss;
 
-            for(var x in arriveTime_list[0].bus) {
-                console.log("노선명 : "+arriveTime_list[0].bus[x].value0);
-                console.log("도착예정시간 : "+arriveTime_list[0].bus[x].value5);
-                console.log("노선 ID : "+arriveTime_list[0].bus[x].value6);
+            for (var x in arriveTime_list[0].bus) {
+                console.log("노선명 : " + arriveTime_list[0].bus[x].value0);
+                console.log("도착예정시간 : " + arriveTime_list[0].bus[x].value5);
+                console.log("노선 ID : " + arriveTime_list[0].bus[x].value6);
             }
 
             callback(busan_list);
 
-        }else{
-            errorHaldling.throw(5002, 'Station URL Request Error');
+        } else {
+            throw error;
         }
     });
 };
-
-
-
 
 
 module.exports = busanObject;

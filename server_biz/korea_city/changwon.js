@@ -25,14 +25,13 @@ var stationurl = "http://mbus.changwon.go.kr/mobile/busArrStation.jsp";
 
 var requestData = {};
 requestData.route = {};
-requestData.route.routeId = "" ;
-
+requestData.route.routeId = "";
 
 
 requestData.station = {};
 requestData.station.stationId = "";
 
-changwonObject.urlRouteRequest = function(dbObject, callback){
+changwonObject.urlRouteRequest = function (dbObject, callback) {
 
     /**
      * 1. routeUrl 포멧을 db에서 선택한 데이터를 가지고 맞춰준다
@@ -54,31 +53,34 @@ changwonObject.urlRouteRequest = function(dbObject, callback){
                     var $ = window.jQuery;
                     var document = window.document;
                     var $sub_a = $('.sub-content table tbody tr td a ');
-                    $sub_a.each(function (i) {
-                        /*
-                         0에서 시작이기에 해당 시퀀스가 버스가 있는 위치
-                         */
-                        if ($(this).find('img').attr('src') === '../images/mobile/ico_bus_7.gif') {
-                            console.log($(this).find('img').attr('src'));
-                            console.log(i);
-                            changwon_bus_location_seq.push(i);
-                        }
 
-                    });
+                    if ($sub_a.length === 0) {
+                        //잘못된 버스 번호 요청
+                        callback(changwon_bus_location_seq);
+                    }
+                    else {
+                        $sub_a.each(function (i) {
+                            /*
+                             0에서 시작이기에 해당 시퀀스가 버스가 있는 위치
+                             */
+                            if ($(this).find('img').attr('src') === '../images/mobile/ico_bus_7.gif') {
+                                console.log($(this).find('img').attr('src'));
+                                changwon_bus_location_seq.push(i * 1 + 1);
+                            }
 
-                    callback(changwon_bus_location_seq);
-
+                        });
+                        callback(changwon_bus_location_seq);
+                    }
                 }
             });
-        }else{
-            errorHaldling.throw(5001, 'Route URL Request Error');
+        } else {
+            throw error;
         }
     });
 
 
-
 };
-changwonObject.urlStationRequest = function(dbObject, callback){
+changwonObject.urlStationRequest = function (dbObject, callback) {
 
     requestData.station.stationId = dbObject[0].stopid;
     var url = stationurl + "stationId=" + requestData.station.stationId;
@@ -108,17 +110,12 @@ changwonObject.urlStationRequest = function(dbObject, callback){
                     callback(changwon_list);
                 }
             });
-        }else{
-            errorHaldling.throw(5002, 'Station URL Request Error');
+        } else {
+            throw error;
         }
     });
 
 };
-
-
-
-
-
 
 
 module.exports = changwonObject;

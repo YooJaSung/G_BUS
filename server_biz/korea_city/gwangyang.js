@@ -54,24 +54,23 @@ gwangyangObject.urlRouteRequest = function(dbObject, callback){
             var gwangyang_bus_location_seq = [];
             var $ = cheerio.load(html);
             var $icon = $('.rmt_icon');
-            $icon.each(function(i){
+            if($icon.length === 0){
+                // 잘못된 버스 번호 요청
+                callback(gwangyang_bus_location_seq);
+            }else{
 
-
-
-                //  /internet/images/route/icon_bus_sc01.gif
-                if($(this).find('img').attr('src') === '/internet/images/route/icon_bus_sc02.gif' || $(this).find('img').attr('src') === '/internet/images/route/icon_bus_sc01.gif'){
-                    gwangyang_bus_location_seq.push(i);
-                }
-            });
-
-            callback(gwangyang_bus_location_seq);
-
+                $icon.each(function(i){
+                    //  /internet/images/route/icon_bus_sc01.gif
+                    if($(this).find('img').attr('src') === '/internet/images/route/icon_bus_sc02.gif' || $(this).find('img').attr('src') === '/internet/images/route/icon_bus_sc01.gif'){
+                        gwangyang_bus_location_seq.push(i*1+1);
+                    }
+                });
+                callback(gwangyang_bus_location_seq);
+            }
         }else{
-            errorHaldling.throw(5001, 'Route URL Request Error');
+            throw error;
         }
     })
-
-
 
 };
 gwangyangObject.urlStationRequest = function(dbObject, callback){
@@ -113,14 +112,13 @@ gwangyangObject.urlStationRequest = function(dbObject, callback){
                 callback(gwangyang_list);
 
             }else{
-                errorHaldling.throw(5002, 'Station URL Request Error');
+                throw error;
             }
         });
 
-
-
-
 };
+
+
 
 
 

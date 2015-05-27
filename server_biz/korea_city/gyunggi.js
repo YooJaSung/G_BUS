@@ -55,7 +55,7 @@ gyunggiObject.urlRouteRequest = function (dbObject, callback) {
         var gyunggi_bus_location_seq = [];
 
         if (error) {
-            errorHaldling.throw(5001, 'Route URL Request Error');
+            throw error;
         }
         else {
             var xmldata = body;
@@ -68,7 +68,6 @@ gyunggiObject.urlRouteRequest = function (dbObject, callback) {
             var result = xml2jsparser.toJson(xmldata, options);
             if (result.response[0].msgBody === undefined) {
 
-                gyunggi_bus_location_seq = [];
                 callback(gyunggi_bus_location_seq);
             }
             else {
@@ -76,7 +75,9 @@ gyunggiObject.urlRouteRequest = function (dbObject, callback) {
                 var locarr = tempre.busLocationList;
 
                 for (var i in locarr) {
-                    gyunggi_bus_location_seq.push(locarr[i].stationSeq[0]);
+                    var seq = locarr[i].stationSeq[0];
+                    seq = seq*1+1;
+                    gyunggi_bus_location_seq.push(seq);
                 }
                 callback(gyunggi_bus_location_seq);
 
@@ -95,7 +96,7 @@ gyunggiObject.urlStationRequest = function (dbObject, callback) {
 
         var gyunggi_list = [];
         if (error) {
-            errorHaldling.throw(5002, 'Station URL Request Error');
+            throw error;
         }
         else {
             var xmldata = body;

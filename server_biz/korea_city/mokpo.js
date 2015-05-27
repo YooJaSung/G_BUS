@@ -53,17 +53,20 @@ mokpoObject.urlRouteRequest = function(dbObject, callback){
             var $ = cheerio.load(html);
 
             var $div = $('#busstop_wrap, #busstop_wrap2');
-            $div.each(function(i){
-                if($(this).find('li').attr('class') === 'businfo' || $(this).find('li').attr('class') === 'businfo2'){
-                    mokpo_bus_location_seq.push(i);
-
-                }
-            });
-
-            callback(mokpo_bus_location_seq);
+            if($div.length === 0){
+                // 잘못된 버스번호
+                callback(mokpo_bus_location_seq);
+            }else{
+                $div.each(function(i){
+                    if($(this).find('li').attr('class') === 'businfo' || $(this).find('li').attr('class') === 'businfo2'){
+                        mokpo_bus_location_seq.push(i*1+1);
+                    }
+                });
+                callback(mokpo_bus_location_seq);
+            }
 
         }else{
-            errorHaldling.throw(5001, 'Route URL Request Error');
+            throw error;
         }
     })
 
@@ -104,7 +107,7 @@ mokpoObject.urlStationRequest = function(dbObject, callback) {
                 callback(mokpo_list);
 
             } else {
-                errorHaldling.throw(5002, 'Station URL Request Error');
+                throw error;
             }
         });
 

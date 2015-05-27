@@ -60,16 +60,19 @@ hwasoonObject.urlRouteRequest = function(dbObject, callback){
             }
             var jsondata = arr[0];
 
-            for(var i in jsondata){
-                if(jsondata[i].CARNO !== null ){
-                    hwasoon_bus_location_seq.push(i);
+            if(jsondata.length === 0){
+                //잘못된 버스번호
+                callback(hwasoon_bus_location_seq);
+            }else{
+                for(var i in jsondata){
+                    if(jsondata[i].CARNO !== null ){
+                        hwasoon_bus_location_seq.push(i*1+1);
+                    }
                 }
+                callback(hwasoon_bus_location_seq);
             }
-
-            callback(hwasoon_bus_location_seq);
-
         }else{
-            errorHaldling.throw(5001, 'Route URL Request Error');
+            throw error;
         }
     });
 
@@ -100,7 +103,7 @@ hwasoonObject.urlStationRequest = function(dbObject, callback){
             callback(hwasoon_list);
 
         }else{
-            errorHaldling.throw(5002, 'Station URL Request Error');
+            throw error;
         }
     });
 

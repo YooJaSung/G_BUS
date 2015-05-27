@@ -69,18 +69,24 @@ ulsanObject.urlRouteRequest = function(dbObject, callback){
             var $ = cheerio.load(html);
             console.log(html);
             var $li = $('.nx li');
-            $li.each(function(i){
 
-                if($(this).find('img').attr('src') === '/m/img/ico_bus.png'){
-                    console.log(i);
-                    ulsan_bus_location_seq.push(i);
-                }
-            });
+            if($li.length === 0){
+                // 잘못된 버스번호
+                callback(ulsan_bus_location_seq);
+            }else{
+                $li.each(function(i){
 
-            callback(ulsan_bus_location_seq);
+                    if($(this).find('img').attr('src') === '/m/img/ico_bus.png'){
+
+                        ulsan_bus_location_seq.push(i*1+1);
+                    }
+                });
+
+                callback(ulsan_bus_location_seq);
+            }
 
         }else{
-            errorHaldling.throw(5001, 'Route URL Request Error');
+            throw error;
         }
     });
 
@@ -130,7 +136,7 @@ ulsanObject.urlStationRequest = function(dbObject, callback){
 
                     })
                 }else{
-                    errorHaldling.throw(5002, 'Station URL Request Error');
+                    throw error;
                 }
             }
         )

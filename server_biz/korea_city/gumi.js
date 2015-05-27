@@ -63,17 +63,21 @@ gumiObject.urlRouteRequest = function(dbObject, callback){
             var gumi_bus_location_seq = [];
             var $ = cheerio.load(html);
             var $li = $('#list01_12 li');
-            $li.each(function(i){
-                console.log($(this).attr('class'));
-                if($(this).attr('class') === 'list_desc'){
-                    gumi_bus_location_seq.push(i);
-                }
-            });
 
-            callback(gumi_bus_location_seq);
+            if( $li.length === 0){
+                callback(gumi_bus_location_seq);
+            }else{
+                $li.each(function(i){
+                    console.log($(this).attr('class'));
+                    if($(this).attr('class') === 'list_desc'){
+                        gumi_bus_location_seq.push(i);
+                    }
+                });
 
+                callback(gumi_bus_location_seq);
+            }
         }else{
-            errorHaldling.throw(5001, 'Route URL Request Error');
+            throw error;
         }
     })
 
@@ -107,20 +111,10 @@ gumiObject.urlStationRequest = function(dbObject, callback){
                 console.log(gumi_list);
                 callback(gumi_list);
             }else{
-                errorHaldling.throw(5002, 'Station URL Request Error');
+                throw error;
             }
         });
-
-
 };
-
-
-
-
-
-
-
-
 module.exports = gumiObject;
 
 

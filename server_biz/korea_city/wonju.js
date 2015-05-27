@@ -61,14 +61,20 @@ wonjuObject.urlRouteRequest = function(dbObject, callback){
                 arr.push(parsed[x]);
             }
             var jsondata = arr;
-            for(var i in jsondata){
-                wonju_bus_location_seq.push(i);
-            }
-            wonju_bus_location_seq.sort();
-            callback(wonju_bus_location_seq);
 
+            if(jsondata.length === 0){
+                //버스가 다니지 않아도
+                //잘못된 버스번호 요청
+                callback(wonju_bus_location_seq);
+            }else{
+                for(var i in jsondata){
+                    wonju_bus_location_seq.push(jsondata[i].LATEST_STOP_ORD);
+                }
+                wonju_bus_location_seq.sort();
+                callback(wonju_bus_location_seq);
+            }
         }else{
-            errorHaldling.throw(5001, 'Route URL Request Error');
+            throw error;
         }
 
     });
@@ -109,7 +115,7 @@ wonjuObject.urlStationRequest = function(dbObject, callback){
 
             callback(wonju_list);
         }else{
-            errorHaldling.throw(5002, 'Station URL Request Error');
+            throw error;
         }
     });
 

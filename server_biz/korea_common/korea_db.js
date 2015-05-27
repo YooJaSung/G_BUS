@@ -16,11 +16,7 @@ var pool = require('../../server_config/mysql/DBConnect.js');
 var errorHaldling = require('../../utility/errorHandling.js');
 
 koreaDbObject.routeSearch = function(cityObject, routeNm, callback){
-    /**
-     * route search 할때 (R.CITYCD + 로 이어서 city 한정지어주기
-     */
 
-    // AND  R.CITYCD = ?
 
     var routeQuery = dbQuery.g_busquery.ROUTESEARCH;
 
@@ -28,7 +24,7 @@ koreaDbObject.routeSearch = function(cityObject, routeNm, callback){
 
     pool.getConnection(function(err, db){
        if(err){
-           errorHaldling.throw(5003, 'Database Select Error ');
+           throw err;
        }else{
             db.query(routeStr, ["%"+routeNm+"%"], function(err, rows){
 
@@ -39,17 +35,13 @@ koreaDbObject.routeSearch = function(cityObject, routeNm, callback){
 };
 
 koreaDbObject.stationSearch = function(cityObject, stationNm, callback){
-    /**
-     * station search 할때 (S.CITYCD + 로 이어서 city 한정지어주기
-     */
-
 
     var stationQuery = dbQuery.g_busquery.STATIONSEARCH;
     var stationStr = queryCityCodeStation(cityObject, stationQuery);
 
     pool.getConnection(function(err, db){
         if(err){
-            errorHaldling.throw(5003, 'Database Select Error ');
+            throw err;
         }else{
             db.query(stationStr, ["%"+stationNm+"%"], function(err, rows){
                 callback(rows);
@@ -68,7 +60,7 @@ function queryCityCodeRoute (cityObject, routeQuery){
      * cityObject 숫자에 맞춰 마지막 index에서는 OR 없게 한다
      */
 
-    /*console.log(cityObject[0].cityEnNm);*/
+
 
 
     console.log(cityObject.length);
@@ -83,7 +75,7 @@ function queryCityCodeRoute (cityObject, routeQuery){
     }
 
     routeQuery += ' ) ';
-    routeQuery += 'LIMIT 0,49 ;';
+    routeQuery += 'LIMIT 30 ;';
 
 
     return routeQuery;
@@ -114,17 +106,23 @@ function queryCityCodeStation (cityObject, stationQuery){
 }
 
 
-
+/**
+ *
+ * @param cityCd
+ * @param rid
+ * @param callback
+ *
+ * route Detail db access
+ */
 
 koreaDbObject.dbRouteDetail = function(cityCd, rid, callback){
 
-    console.log('routeDetail2');
 
     var routeDetailQuery = dbQuery.g_busquery.ROUTEDETAIL;
     //citycd, rid
     pool.getConnection(function(err, db){
         if(err){
-            errorHaldling.throw(5003, 'Database Select Error ');
+            throw err;
         }else{
             db.query(routeDetailQuery, [cityCd, rid], function(err, rows){
                 console.log('routeDetail3');
@@ -135,13 +133,23 @@ koreaDbObject.dbRouteDetail = function(cityCd, rid, callback){
 
 };
 
+/**
+ *
+ * @param cityCd
+ * @param sid
+ * @param callback
+ *
+ * station Detail db access
+ *
+ */
+
 koreaDbObject.dbStationDetail = function(cityCd, sid, callback){
 
     var stationDetailQuery = dbQuery.g_busquery.STATIONDETAIL;
     //cityCd, sid
     pool.getConnection(function(err, db){
         if(err){
-            errorHaldling.throw(5003, 'Database Select Error ');
+            throw err;
         }else{
             db.query(stationDetailQuery, [cityCd, sid], function(err, rows){
                 callback(rows);
@@ -154,13 +162,24 @@ koreaDbObject.dbAroundXY = function(cityCd, dbObject, callback){
     var getAroundQuery = dbQuery.g_busquery.AROUNDXY;
     pool.getConnection(function(err,db){
         if(err){
-            errorHaldling.throw(5003, 'Database Select Error ');
+            throw err;
         }else{
-            db.query(getAroundQuery,[dbObject[0].LATIX,dbObject[0].LATIX,dbObject[0].LONGY,cityCd, dbObject[0].LATIX,dbObject[0].LATIX,dbObject[0].LONGY,dbObject[0].LONGY, dbObject[0].LATIX,dbObject[0].LATIX,dbObject[0].LONGY], function(err,rows){
+            db.query(getAroundQuery,[cityCd, dbObject[0].LATIX,dbObject[0].LATIX,dbObject[0].LONGY,dbObject[0].LONGY, dbObject[0].LATIX,dbObject[0].LATIX,dbObject[0].LONGY], function(err,rows){
                 callback(rows);
             })
         }
     })
+};
+
+
+/**
+ *
+ * place Search db Access
+ *
+ */
+
+koreaDbObject.placeSearch = function(cityCd, sx, sy, ex, ey){
+
 };
 
 

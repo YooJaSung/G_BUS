@@ -60,17 +60,20 @@ sunchunObject.urlRouteRequest = function(dbObject, callback){
             var sunchun_bus_location_seq = [];
             var $ = cheerio.load(html);
             var $icon = $('.rmt_icon');
-            $icon.each(function(i){
-                if($(this).find('img').attr('src') === '/internet/images/route/icon_bus_sc02.gif' || $(this).find('img').attr('src') === '/internet/images/route/icon_bus_sc01.gif'){
-                    sunchun_bus_location_seq.push(i);
 
-                }
-            });
-
-            callback(sunchun_bus_location_seq);
-
+            if($icon.length === 0){
+                //잘못된 버스 번호 요청
+                callback(sunchun_bus_location_seq);
+            }else{
+                $icon.each(function(i){
+                    if($(this).find('img').attr('src') === '/internet/images/route/icon_bus_sc02.gif' || $(this).find('img').attr('src') === '/internet/images/route/icon_bus_sc01.gif'){
+                        sunchun_bus_location_seq.push(i*1+1);
+                    }
+                });
+                callback(sunchun_bus_location_seq);
+            }
         }else{
-            errorHaldling.throw(5001, 'Route URL Request Error');
+            throw error;
         }
     })
 
@@ -118,7 +121,7 @@ sunchunObject.urlStationRequest = function(dbObject, callback){
                 callback(sunchun_list);
 
             }else{
-                errorHaldling.throw(5002, 'Station URL Request Error');
+                throw error;
             }
         });
 

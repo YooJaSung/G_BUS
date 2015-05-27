@@ -23,6 +23,7 @@ var place = require('./routes/place/placeJs');
 var station = require('./routes/station/stationJs');
 var region = require('./routes/common/region.js');
 
+
 var app = express();
 
 // view engine setup
@@ -53,38 +54,45 @@ app.use('/', region);
 /**
  * show index page first get request
  */
+
 app.get('/', function (req, res) {
   res.sendFile(__dirname + '/index.html');
 });
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
+
   var err = new Error('page Not Found');
   err.status = 404;
   next(err);
+
 });
 
 // error handlers
-
 app.use(function errorHandler(err, req, res, next) {
 
-  console.log('error on request %d | %s | %s | %d', process.domain.id, req.method, req.url, err.status);
+  console.log('--------------------------------------------------------------------------\n');
+  console.log(err);
+  console.log('--------------------------------------------------------------------------\n');
 
-  console.log(err.stack);
+  console.log('error on request %s | %s | %d', req.method, req.url, err.status);
 
-  err.message = err.status == 500 ? ' Error -->  ' : err.message;
+  console.log('\n'+err.stack);
+  err.message = err.status == 500 ? 'Something bad happened. :(' : err.message;
 
-  res.status(err.status).send(err.message);
+  /*res.status(err.status).send(err.message);*/
+  res.send(err.message);
+
 });
-
-
-
 
 /**
  * create server & server running
  */
+
 http.createServer(app).listen(app.get('port'), function(){
-  console.log('G_BUS server running at 3000 port');
+
+  console.log('G_BUS server running at ' + app.get('port'));
+
 });
 
 module.exports = app;

@@ -43,19 +43,23 @@ jeonjuObject.urlRouteRequest = function(dbObject , callback){
             var parsed_data = xml2jsparser.toJson(xmldata, options);
             var routedata = parsed_data.RFC30[0].routeList[0].list;
 
-            for(var i in routedata){
-                var json_data = routedata[i].busNo[0];
-                if(json_data.$t !== undefined){
-                    jeonju_bus_location_seq.push(i);
+            if(routedata === undefined){
+                callback(jeonju_bus_location_seq);
+            }else{
+                for(var i in routedata){
+                    var json_data = routedata[i].busNo[0];
+                    if(json_data.$t !== undefined){
+                        jeonju_bus_location_seq.push(i);
+                    }
                 }
-
+                callback(jeonju_bus_location_seq);
             }
-            callback(jeonju_bus_location_seq);
+
+
         }else{
-            errorHaldling.throw(5001, 'Route URL Request Error');
+            throw error;
         }
     });
-
 };
 
 jeonjuObject.urlStationRequest = function(dbObject, callback){
@@ -96,7 +100,7 @@ jeonjuObject.urlStationRequest = function(dbObject, callback){
                 });
                 callback(jeonju_list);
             }else{
-                errorHaldling.throw(5002, 'Station URL Request Error');
+                throw error;
             }
         });
 };
