@@ -8,6 +8,7 @@ var request = require('request');
 var iconv = require('iconv');
 var cheerio = require('cheerio');
 var errorHaldling = require('../../utility/errorHandling.js');
+var commonBiz = require('../korea_common/common_biz.js');
 
 var seoulObject = {};
 
@@ -151,39 +152,54 @@ seoulObject.urlStationRequest = function (dbObject, callback) {
                 var $bl = $('.bl');
                 var $st = $bl.find('li[class=st]');
                 var $nm = $bl.find('li[class=nm]');
+                var $gd = $bl.find('li[class=gd]');
 
-                var daegu_list = [];
+                var daegu_arrive_list = [];
 
+                if($gd.length === 1){
 
-                //대구 버스정보 시스템은 '전', '전전' 으로 예상도착시간을 표시함.
-                $st.each(function () {
                     var temp = {};
-                    temp.route_no = $(this).find('span[class=marquee]').text();
-                    temp.arr_state = $(this).find('span[class=arr_state]').text();
-                    temp.cur_pos = $(this).find('span[class=cur_pos]').text();
+                    temp.arrive_time = "도착예정 버스가 없습니다";
+                    temp.routenm = "";
+                    temp.cur_pos = "";
+                    temp.routeid = "";
+                    daegu_arrive_list.push(temp);
 
-                    daegu_list.push(temp);
-                });
+                    callback(daegu_arrive_list);
 
-                $nm.each(function () {
-                    var temp = {};
-                    temp.route_no = $(this).find('span[class=marquee]').text();
-                    temp.arr_state = $(this).find('span[class=arr_state]').text();
-                    temp.cur_pos = $(this).find('span[class=cur_pos]').text();
+                }else{
+                    //대구 버스정보 시스템은 '전', '전전' 으로 예상도착시간을 표시함.
+                    $st.each(function () {
+                        var temp = {};
+                        temp.routenm = $(this).find('span[class=marquee]').first().text();
+                        temp.arrive_time = $(this).find('span[class=arr_state]').text();
+                        temp.cur_pos = $(this).find('span[class=marquee]').last().text();
+                        temp.routeid = commonBiz.findRouteid(dbObject, temp.routenm);
 
-                    daegu_list.push(temp);
-                });
+                        daegu_arrive_list.push(temp);
+                    });
 
-                callback(daegu_list);
+                    $nm.each(function () {
+                        var temp = {};
+                        temp.routenm = $(this).find('span[class=marquee]').first().text();
+                        temp.arrive_time = $(this).find('span[class=arr_state]').text();
+                        temp.cur_pos = $(this).find('span[class=marquee]').last().text();
+                        temp.routeid = commonBiz.findRouteid(dbObject, temp.routenm);
+
+                        daegu_arrive_list.push(temp);
+
+                    });
+
+                    callback(daegu_arrive_list);
+                }
+
             }else{
                 throw error;
             }
         }
     );
 
-
 };
-
 
 module.exports = seoulObject;
 

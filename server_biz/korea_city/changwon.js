@@ -12,11 +12,16 @@ var request = require('request');
 var jsdom = require('jsdom');
 
 var errorHaldling = require('../../utility/errorHandling.js');
+var commonBiz = require('../korea_common/common_biz.js');
+
+
 var changwonObject = {};
 
 var routeurl = "http://mbus.changwon.go.kr/mobile/busLocation.jsp";
 
 var stationurl = "http://mbus.changwon.go.kr/mobile/busArrStation.jsp";
+
+
 
 /**
  *
@@ -96,18 +101,21 @@ changwonObject.urlStationRequest = function (dbObject, callback) {
                     var document = window.document;
                     var $sub_a = $("table[class=box4]");
 
-                    var changwon_list = [];
+                    var changwon_arrive_list = [];
                     $sub_a.each(function () {
                         var temp = {};
-                        temp.route_no = $(this).find("span[class=bustype4]").text();
+                        temp.routenm = $(this).find("span[class=bustype4]").text();
                         var str = $(this).find("span[class=bustype7]").text();
                         var res = str.split("도착");
                         temp.arrive_time = res[0];
                         temp.cur_pos = res[1];
-                        changwon_list.push(temp);
+                        temp.routeid = commonBiz.findRouteid(dbObject, temp.routenm);
+
+
+                        changwon_arrive_list.push(temp);
                     });
 
-                    callback(changwon_list);
+                    callback(changwon_arrive_list);
                 }
             });
         } else {

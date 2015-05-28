@@ -7,7 +7,7 @@ var request = require('request');
 var xml2jsparser = require('xml2json');
 var iconv = require('iconv');
 var errorHaldling = require('../../utility/errorHandling.js');
-
+var commonBiz = require('../korea_common/common_biz.js');
 
 var jeonjuObject = {};
 
@@ -82,23 +82,38 @@ jeonjuObject.urlStationRequest = function(dbObject, callback){
 
                 var $table = $('.table_list');
                 var $tr = $table.find('tr');
-                var jeonju_list = [];
+                var jeonju_arrive_list = [];
 
                 $tr.each(function(i) {
                     if(i !== 0) {
                         var temp = {};
 
-                        temp.low_value = $(this).find('td:nth-child(1)').text();
-                        temp.route_name = $(this).find('td:nth-child(2)').text();
-                        temp.arrivetime = $(this).find('td:nth-child(4)').text();
-                        temp.remain_bstop = $(this).find('td:nth-child(5)').text();
-                        temp.curr_pos = $(this).find('td:nth-child(6)').text();
-                        temp.route_dir = $(this).children().last().text();
+                        temp.routenm = $(this).find('td:nth-child(2)').text();
+                        temp.arrive_time = $(this).find('td:nth-child(4)').text();
+                        temp.cur_pos = $(this).find('td:nth-child(5)').text();
+                        temp.routeid =  commonBiz.findRouteid(dbObject, temp.routenm);
 
-                        jeonju_list.push(temp);
+                        jeonju_arrive_list.push(temp);
                     }
                 });
-                callback(jeonju_list);
+                if(jeonju_arrive_list[0].routenm === "" && jeonju_arrive_list.length === 1 && jeonju_arrive_list[0].arrive_time === ""){
+
+                    /**
+                     * 버스없다고 다시 셋팅
+                     */
+
+                    var temp = {};
+                    temp.arrive_time = "도착예정 버스가 없습니다";
+                    temp.routenm = "";
+                    temp.cur_pos = "";
+                    temp.routeid = "";
+                    jeonju_arrive_list.push(temp);
+
+                    callback(jeonju_arrive_list);
+
+                }else{
+                    callback(jeonju_arrive_list);
+                }
             }else{
                 throw error;
             }

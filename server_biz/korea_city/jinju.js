@@ -11,6 +11,7 @@
 
 var request = require('request');
 var errorHaldling = require('../../utility/errorHandling.js');
+var commonBiz = require('../korea_common/common_biz.js');
 
 var jinjuObject = {};
 
@@ -90,14 +91,30 @@ jinjuObject.urlStationRequest = function(dbObject, callback){
             var jinju_bus_list = psd.AllBusArrivalInfoResult.AllBusArrivalInfo.MsgBody.BUSINFO.BusListInfo.list;
             var jinju_bus_curr = psd.AllBusArrivalInfoResult.AllBusArrivalInfo.MsgBody.BUSINFO.CurrentAllBusArrivalInfo.list;
 
-            for(var i in jinju_bus_curr) {
-                console.log("노선 번호 : "+jinju_bus_curr[i].lineNo);
-                console.log("노선 ID : "+jinju_bus_curr[i].routeId);
-                console.log("노선 위치 : "+ jinju_bus_curr[i].remainStopCnt + "전");
-                console.log("도착 예정 시간 : "+ jinju_bus_curr[i].remainTime+"초\n");
-            }
-            callback(jinju_bus_curr);
+            var jinju_arrive_list = [];
 
+
+            for(var i in jinju_bus_curr) {
+                var temp = {};
+                temp.arrive_time = commonBiz.changeTomin(jinju_bus_curr[i].remainTime);    //분 계산해줘야함
+                temp.routenm = jinju_bus_curr[i].lineNo;
+                temp.routeid = jinju_bus_curr[i].routeId;
+                temp.cur_pos = jinju_bus_curr[i].remainStopCnt;
+
+                jinju_arrive_list.push(temp);
+            }
+            if(jinju_arrive_list.length === 0){
+                var temp = {};
+                temp.arrive_time = "도착예정 버스가 없습니다";
+                temp.routenm = "";
+                temp.cur_pos = "";
+                temp.routeid = "";
+                jinju_arrive_list.push(temp);
+
+                callback(jinju_arrive_list);
+            }else {
+                callback(jinju_arrive_list);
+            }
         }else{
             throw error;
         }

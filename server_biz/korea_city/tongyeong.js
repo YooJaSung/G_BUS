@@ -11,6 +11,7 @@
 
 var request = require('request');
 var errorHaldling = require('../../utility/errorHandling.js');
+var commonBiz = require('../korea_common/common_biz.js');
 
 var tongyeongObject = {};
 
@@ -103,27 +104,19 @@ tongyeongObject.urlStationRequest = function(dbObject, callback){
             var $tbody = $table_wrap.find("tbody");
             var $tr = $tbody.find('tr');
 
-            var tongyeong_list = [];
+            var tongyeong_arrive_list = [];
 
             $tr.each(function(){
                 var temp = {};
 
-                /*console.log($(this).find('td').eq(0).text());
-                 console.log($(this).find('td').eq(1).text());
-                 console.log($(this).find('td').eq(2).text());
-                 console.log($(this).find('td').eq(3).text());
-                 console.log($(this).find('td').eq(4).text());*/
-
-                temp.route_name = $(this).find('td').eq(0).text().replace(/\s/gi, '');
-                temp.end_station = $(this).find('td').eq(1).text().replace(/\s/gi, '');
+                temp.routenm = $(this).find('td').eq(0).text().replace(/\s/gi, '');
                 temp.arrive_time = $(this).find('td').eq(2).text().replace(/\s/gi, '');
-                temp.cur_pos = $(this).find('td').eq(3).text().replace(/\s/gi, '');
-                temp.rest_bstop = $(this).find('td').eq(4).text().replace(/\s/gi, '');
+                temp.cur_pos = $(this).find('td').eq(4).text().replace(/\s/gi, '');
+                temp.routeid = commonBiz.findRouteid(dbObject, temp.routenm);
 
-                tongyeong_list.push(temp);
+                tongyeong_arrive_list.push(temp);
             });
-            console.log(tongyeong_list);
-            callback(tongyeong_list);
+            callback(tongyeong_arrive_list);
         }else{
             throw error;
         }

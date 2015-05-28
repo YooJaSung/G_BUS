@@ -133,17 +133,22 @@ sejongObject.urlStationRequest = function (dbObject, callback) {
         if (!error && response.statusCode == 200) {
             var parsed_json = JSON.parse(json);
             var sejong_list = parsed_json.busStopRouteList;
+            var sejong_arrive_list = [];
 
             for(var i in sejong_list){
-                console.log("노선 번호 : "+sejong_list[i].route_name);
-                console.log("노선 ID : "+ sejong_list[i].route_id);
-                console.log("예상 도착 시간 : "+sejong_list[i].provide_type);
-                console.log("현재 위치 : "+ sejong_list[i].rstop+"\n");
+                var temp = {};
+
+                temp.routenm = sejong_list[i].route_name;
+                temp.routeid = sejong_list[i].route_id;
+                temp.arrive_time = sejong_list[i].provide_type;
+                temp.cur_pos = sejong_list[i].rstop;
+
+                sejong_arrive_list.push(temp);
             }
-            callback(sejong_list);
+            callback(sejong_arrive_list);
 
         }else{
-            errorHaldling.throw(5002, 'Station URL Request Error');
+            throw error;
         }
     });
 

@@ -12,13 +12,13 @@
 var request = require('request');
 var cheerio = require('cheerio');
 var errorHaldling = require('../../utility/errorHandling.js');
+var commonBiz = require('../korea_common/common_biz.js');
 
 var mokpoObject = {};
 
 var routeurl = "http://bis.mokpo.go.kr/main/bus/bus_locationpop_line_frame.jsp";
 
 var stationurl = "http://bis.mokpo.go.kr/main/bus/bus_locationpop_pop.jsp";
-
 
 /**
  *
@@ -32,8 +32,6 @@ requestData.route.btype = "";
 
 requestData.station = {};
 requestData.station.stop_stdid = "";
-
-
 
 mokpoObject.urlRouteRequest = function(dbObject, callback){
 
@@ -73,7 +71,7 @@ mokpoObject.urlRouteRequest = function(dbObject, callback){
 };
 mokpoObject.urlStationRequest = function(dbObject, callback) {
 
-    requestData.station.stop_stdid = dbObject[0].stopid;
+    requestData.station.stop_stdid = dbObject[0].arsid;
 
     var url = stationurl + "?stop_stdid=" + requestData.station.stop_stdid;
 
@@ -90,27 +88,27 @@ mokpoObject.urlStationRequest = function(dbObject, callback) {
                 var $ = cheerio.load(utf8String);
                 var $table = $('.table_list');
                 var $tr = $table.find('tr');
-                var mokpo_list = [];
+                var mokpo_arrive_list = [];
 
                 $tr.each(function (i) {
                     if (i !== 0) {
 
                         var temp = {};
-                        temp.route_name = $(this).find('td:nth-child(1)').text();
+                        temp.routenm = $(this).find('td:nth-child(1)').text();
                         temp.curr_pos = $(this).find('td:nth-child(2)').text();
                         temp.arrive_time = $(this).children().last().text();
+                        temp.routeid = commonBiz.findRouteid(dbObject, commonBiz.splitSomething(temp.routenm,'-'));
 
-                        mokpo_list.push(temp);
+                        mokpo_arrive_list.push(temp);
                     }
                 });
 
-                callback(mokpo_list);
+                callback(mokpo_arrive_list);
 
             } else {
                 throw error;
             }
         });
-
 };
 
 module.exports = mokpoObject;

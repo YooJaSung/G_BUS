@@ -82,17 +82,32 @@ gwangjuObject.urlStationRequest = function(dbObject, callback){
 
             var psd = JSON.parse(json);
             var gwangju_list = psd.list;
+            var gwangju_arrive_list = [];
+
 
             for(var i in gwangju_list) {
-                console.log("노선 번호 : "+gwangju_list[i].LINE_NAME);
-                console.log("남은 정류장 갯수 : "+gwangju_list[i].REMAIN_STOP);
-                console.log("예상 도착 시간 : "+gwangju_list[i].REMAIN_MIN + "분");
-                console.log("현재 위치 : "+gwangju_list[i].BUSSTOP_NAME);
-                console.log("노선 ID : "+gwangju_list[i].LINE_ID + "\n");
+                var temp = {};
+                temp.arrive_time = gwangju_list[i].REMAIN_MIN;
+                temp.routenm = gwangju_list[i].LINE_NAME;
+                temp.routeid = gwangju_list[i].LINE_ID;
+                temp.cur_pos = gwangju_list[i].REMAIN_STOP;
+
+                gwangju_arrive_list.push(temp);
             }
 
-            callback(gwangju_list);
+            if(gwangju_arrive_list.length === 0){
+                var temp = {};
+                temp.arrive_time = "도착예정 버스가 없습니다";
+                temp.routenm = "";
+                temp.cur_pos = "";
+                temp.routeid = "";
 
+                gwangju_arrive_list.push(temp);
+
+                callback(gwangju_arrive_list);
+            }else{
+                callback(gwangju_arrive_list);
+            }
         }else{
             throw error;
         }

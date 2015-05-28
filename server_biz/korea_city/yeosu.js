@@ -12,6 +12,7 @@
 var request = require('request');
 var cheerio = require('cheerio');
 var errorHaldling = require('../../utility/errorHandling.js');
+var commonBiz = require('../korea_common/common_biz.js');
 
 var yeosuObject = {};
 
@@ -81,19 +82,34 @@ yeosuObject.urlStationRequest = function (dbObject, callback) {
             var $tr = $table.find('tr');
             var $td = $tr.find('.t_a_c');
 
-            var yeosu_list = [];
+            var yeosu_arrive_list = [];
 
             $tr.each(function () {
                 var temp = {};
 
                 if ($(this).find('td').attr('class') !== 'col t_a_c') {
-                    temp.route_name = $(this).find('td:nth-child(1)').text();
-                    temp.curr_pos = $(this).find('td:nth-child(2)').text();
+                    temp.routenm = $(this).find('td:nth-child(1)').text();
+                    temp.cur_pos = $(this).find('td:nth-child(2)').text();
                     temp.arrive_time = $(this).children().last().text();
-                    yeosu_list.push(temp);
+                    temp.routeid = commonBiz.findRouteid(dbObject, temp.routenm);
+                    yeosu_arrive_list.push(temp);
                 }
             });
-            callback(yeosu_list);
+            if(yeosu_arrive_list.length === 0){
+
+                var temp = {};
+                temp.arrive_time = "도착예정 버스가 없습니다";
+                temp.routenm = "";
+                temp.cur_pos = "";
+                temp.routeid = "";
+                yeosu_arrive_list.push(temp);
+
+                callback(yeosu_arrive_list);
+
+            }else{
+                callback(yeosu_arrive_list);
+            }
+
 
         } else {
             throw error;

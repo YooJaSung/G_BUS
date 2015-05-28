@@ -39,30 +39,31 @@ stationRouter.all('/stationDetail', function(req,res, next){
     nimble.series([
         function(DBCallback){
             koreaDb.dbStationDetail(cityCode, sid , function(stationDetailData){
-
                 dbObject = stationDetailData;
                 DBCallback();
             });
         },
-        function(urlCallback){
-            cityObject.urlStationRequest(dbObject, function(urlStationData){
-                urlStationObject = urlStationData;
-                urlCallback();
-            });
+        function(parallCallback){
+            nimble.parallel([
+                function(urlCallback){
+                    cityObject.urlStationRequest(dbObject, function(urlStationData){
+                        urlStationObject = urlStationData;
+                        urlCallback();
+                    });
+                },
+                function(aroundCallback){
+                    koreaDb.dbAroundXY(cityCode, dbObject, function(aroundxyData){
+                        aroundXY = aroundxyData;
+                        aroundCallback();
+                    });
+                }
+            ],parallCallback);
 
-        },
-        function(aroundCallback){
-            koreaDb.dbAroundXY(cityCode, dbObject, function(aroundxyData){
-                aroundXY = aroundxyData;
-                aroundCallback();
-            });
         },
         function(resCallback){
-
             stationObject.urlStationObject = urlStationObject;
             stationObject.dbObject = dbObject;
             stationObject.aroundXY = aroundXY;
-
             res.send(stationObject);
             resCallback();
         }

@@ -89,16 +89,29 @@ chungjuObject.urlStationRequest = function(dbObject, callback){
         if (!error && response.statusCode == 200) {
             var parsed_json = JSON.parse(json);
             var chungju_list = parsed_json.model;
+            var chungju_arrive_list = [];
 
             for(var i in chungju_list){
-                console.log("노선 번호 : "+ chungju_list[i].BUSROUTENO);
-                console.log("차량번호 : "+ chungju_list[i].VEHICLENO);
-                console.log("예상 도착 시간 : "+ chungju_list[i].PREDICTTRAVELTIME);
-                console.log("정류소 번호 : "+ chungju_list[i].BUSSTATIONID+"\n");
+                var temp = {};
+                temp.routenm = chungju_list[i].BUSROUTENO;
+                temp.routeid = chungju_list[i].BUSID;
+                temp.arrive_time = chungju_list[i].PREDICTTRAVELTIME;
+                temp.cur_pos = chungju_list[i].LOCATIONNO;
+                chungju_arrive_list.push(temp);
             }
 
-            callback(chungju_list);
+            if(chungju_arrive_list.length === 0){
+                var temp = {};
+                temp.arrive_time = "도착예정 버스가 없습니다";
+                temp.routenm = "";
+                temp.cur_pos = "";
+                temp.routeid = "";
+                chungju_arrive_list.push(temp);
 
+                callback(chungju_arrive_list);
+            }else{
+                callback(chungju_arrive_list);
+            }
         }else{
             throw error;
         }

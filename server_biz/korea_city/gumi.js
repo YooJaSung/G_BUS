@@ -12,6 +12,7 @@
 var request = require('request');
 var cheerio = require('cheerio');
 var errorHaldling = require('../../utility/errorHandling.js');
+var commonBiz = require('../korea_common/common_biz.js');
 
 var gumiObject = {};
 
@@ -97,19 +98,35 @@ gumiObject.urlStationRequest = function(dbObject, callback){
             if (!error && response.statusCode == 200) {
                 var $ = cheerio.load(html);
                 var $arrive_desc = $('.arrive_desc');
-                var gumi_list = [];
+                var gumi_arrive_list = [];
+
 
                 $arrive_desc.each(function(){
+
                     var temp = {};
-                    temp.route_no = $(this).find("BLINK[name='brtNo']").text();
+                    temp.routenm = $(this).find("BLINK[name='brtNo']").text();
                     temp.route_time = $(this).find("li[class='bus_state'] > span").text();
                     temp.cur_pos = $(this).children().last().text();
+                    temp.routeid = commonBiz.findRouteid(dbObject, temp.routenm);
 
-                    gumi_list.push(temp);
+
+                    gumi_arrive_list.push(temp);
                 });
 
-                console.log(gumi_list);
-                callback(gumi_list);
+                if(gumi_arrive_list.length === 0){
+                    var temp = {};
+                    temp.arrive_time = "도착예정 버스가 없습니다";
+                    temp.routenm = "";
+                    temp.cur_pos = "";
+                    temp.routeid = "";
+                    gumi_arrive_list.push(temp);
+
+                    callback(gumi_arrive_list);
+
+                }else{
+                    callback(gumi_arrive_list);
+                }
+
             }else{
                 throw error;
             }

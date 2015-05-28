@@ -13,6 +13,7 @@ var jsdom = require('jsdom');
 var iconv = require('iconv');
 var cheerio = require('cheerio');
 var errorHaldling = require('../../utility/errorHandling.js');
+var commonBiz = require('../korea_common/common_biz.js');
 
 var incheonObject = {};
 
@@ -76,7 +77,7 @@ incheonObject.urlStationRequest = function(dbObject, callback){
     var url = stationurl+"?keyword=" + requestData.station.keyword;
 
     request.get({
-        url: stationurl,
+        url: url,
         encoding: null
     }, function (error, response, body) {
         if (!error && response.statusCode == 200) {
@@ -91,23 +92,23 @@ incheonObject.urlStationRequest = function(dbObject, callback){
                     var $ = window.jQuery;
                     var $sub_a = $(".subMenu2 li");
 
-                    var incheon_list = [];
+                    var incheon_arrive_list = [];
 
                     $sub_a.each(function () {
                         var temp = {};
                         var str = $(this).text();
                         var res = str.split(" ");
 
-                        temp.route_no = res[0].replace(/\s/gi, '');
-                        temp.route_endstation = res[1].replace(/\s/gi, '');
+                        temp.routenm= res[0].replace(/\s/gi, '');
                         temp.arrive_time = res[2].replace(/\s/gi, '') + res[3].replace(/\s/gi, '');
                         temp.cur_pos = res[4].replace(/\s/gi, '') + res[5].replace(/\s/gi, '');
+                        temp.routeid = commonBiz.findRouteid(dbObject, temp.routenm);
 
-                        incheon_list.push(temp);
+                        incheon_arrive_list.push(temp);
 
                     });
 
-                    callback(incheon_list);
+                    callback(incheon_arrive_list);
                 }
             });
         }else{

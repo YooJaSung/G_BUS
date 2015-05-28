@@ -104,11 +104,34 @@ chunanObject.urlStationRequest = function(dbObject, callback){
             };
             var chunan_list = xml2jsparser.toJson(xmldata, options);
 
-            for(var x in arriveTime_list.found_item){
-                console.log(arriveTime_list.found_item[x].item);
+            var chunan_arrive_list = [];
+
+            for (var x in chunan_list.found_item[0].item) {
+
+                var temp = {};
+                if (chunan_list.found_item[0].item[x].remain_time != 'null') {
+                    temp.arrive_time = chunan_list.found_item[0].item[x].remain_time[0];
+                    temp.routenm = chunan_list.found_item[0].item[x].route_name[0];
+                    temp.cur_pos = chunan_list.found_item[0].item[x].remain_stop_count[0];
+                    temp.routeid = chunan_list.found_item[0].item[x].route_no[0];
+                    chunan_arrive_list.push(temp);
+                }
+            }
+            if(chunan_arrive_list.length === 0){
+                var temp = {};
+                temp.arrive_time = "도착예정 버스가 없습니다";
+                temp.routenm = "";
+                temp.cur_pos = "";
+                temp.routeid = "";
+
+                chunan_arrive_list.push(temp);
+
+                callback(chunan_arrive_list);
+            }else{
+                callback(chunan_arrive_list);
             }
 
-            callback(chunan_list);
+
 
         }
     });

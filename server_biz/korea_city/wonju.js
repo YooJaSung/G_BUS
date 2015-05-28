@@ -11,6 +11,7 @@
 
 var request = require('request');
 var errorHaldling = require('../../utility/errorHandling.js');
+var commonBiz = require('../korea_common/common_biz.js');
 
 var wonjuObject = {};
 
@@ -93,27 +94,32 @@ wonjuObject.urlStationRequest = function(dbObject, callback){
         if (!error && httpResponse.statusCode == 200) {
             var $ = cheerio.load(html);
             var $tr = $("tr");
-            var wonju_list = [];
+            var wonju_arrive_list = [];
 
-            var temp;
+
 
             $tr.each(function () {
+
                 var route_json = {};
+                var temp;
 
                 temp = $(this).find('span').text() + $(this).find('sub').text();
-                route_json.route_name = temp.replace(/\s/gi, '');
+                route_json.routenm = temp.replace(/\s/gi, '');
 
                 temp = $(this).find('td:nth-child(2)').text();
-                route_json.curr_pos = temp.replace(/\s/gi, '');
+                route_json.cur_pos = temp.replace(/\s/gi, '');
 
                 temp = $(this).find('td:nth-child(3)').text();
                 route_json.arrive_time = temp.replace(/\s/gi, '');
 
-                route_list.push(route_json);
+                route_json.routeid = commonBiz.findRouteid(dbObject, commonBiz.removeChar(route_json.routenm));
+
+                wonju_arrive_list.push(route_json);
 
             });
 
-            callback(wonju_list);
+            callback(wonju_arrive_list);
+
         }else{
             throw error;
         }

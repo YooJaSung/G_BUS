@@ -118,18 +118,21 @@ mysqlconfig.g_busquery.STATIONDETAIL =
     " WHERE RVS.CITYCD = ? AND RVS.SID = ?";
 
 mysqlconfig.g_busquery.AROUNDXY =
-    " SELECT sid, stopid, stopnm, arsid, latix AS aroundX, longy AS aroundY " +
-    " FROM STOPS " +
-    " WHERE CITYCD = ? " +
+    " SELECT sid, stopid, stopnm, arsid, latix AS aroundX, longy AS aroundY, S.citycd AS citycd, cityEnNm " +
+    " FROM STOPS S" +
+    " INNER JOIN CITY C ON S.CITYCD = C.CITYCD " +
+    " WHERE S.CITYCD = ? " +
     " AND LATIX BETWEEN ? -0.005  AND ? +0.005 " +
     " AND LONGY BETWEEN ? -0.005  AND ? + 0.005 " +
     " AND (acos(sin(radians(?)) * sin(radians(LATIX)) + " +
     " cos(radians(?)) * cos(radians(LATIX)) * " +
     " cos(radians(?) - radians(LONGY))) * 6378) BETWEEN 0.01 AND 0.5; ";
 
+
 /**
  *
  * database query setting
  */
+
 
 module.exports = mysqlconfig;

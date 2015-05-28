@@ -92,15 +92,19 @@ asanObject.urlStationRequest = function (dbObject, callback) {
 
             var psd = JSON.parse(json);
             var arriveTime_list = psd.busStopRouteList;
+            var asan_arrive_list = [];
 
 
             for (var i in arriveTime_list) {
-                console.log("노선명 : " + arriveTime_list[i].route_name);
-                console.log("노선 id : " + arriveTime_list[i].route_id);
-                console.log("예상 도착시간 : " + arriveTime_list[i].provide_type);
+                temp.arrive_time = asan_list[i].provide_type;
+                temp.routenm = asan_list[i].route_name;
+                temp.cur_pos = asan_list[i].rstop;
+                temp.routeid = asan_list[i].route_id;
+
+                asan_arrive_list.push(temp);
             }
 
-            callback(arriveTime_list);
+            callback(asan_arrive_list);
 
         } else {
             throw error;

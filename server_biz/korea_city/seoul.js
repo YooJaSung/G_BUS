@@ -17,6 +17,7 @@
 var request = require('request');
 var xml2jsparser = require('xml2json');
 var errorHaldling = require('../../utility/errorHandling.js');
+var commonBiz = require('../korea_common/common_biz.js');
 
 var seoulObject = {};
 
@@ -47,7 +48,10 @@ seoulObject.urlRouteRequest = function (dbObject, callback) {
      * 2. post or get 방식에 따라 request 까지 해준다.
      */
 
+
+
     requestData.route.busRouteId = dbObject[0].routeid;
+
 
     var url = routeurl + "&busRouteId=" + requestData.route.busRouteId;
 
@@ -81,13 +85,18 @@ seoulObject.urlRouteRequest = function (dbObject, callback) {
     });
 };
 seoulObject.urlStationRequest = function (dbObject, callback) {
+    var seoul_list = [];
+
+    if(dbObject[0].arsid === '0' || dbObject[0].arsid === 0){
+        callback(seoul_list);
+    }
 
     requestData.station.arsId = dbObject[0].arsid;
 
     var url = stationurl + "&arsId=" + requestData.station.arsId;
 
     request(url, function (error, response, body) {
-        var seoul_list = [];
+
         if (error) {
             throw error;
         }
@@ -107,7 +116,7 @@ seoulObject.urlStationRequest = function (dbObject, callback) {
                 var temp = {};
                 temp.routenm = stArr[i].rtNm[0];
                 temp.routeid = stArr[i].busRouteId[0];
-                temp.arrive_time = stArr[i].traTime1[0];
+                temp.arrive_time = commonBiz.changeTomin(stArr[i].traTime1[0]);
 
                 seoul_list.push(temp);
             }

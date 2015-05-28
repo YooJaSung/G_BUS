@@ -12,6 +12,7 @@
 var request = require('request');
 var cheerio = require('cheerio');
 var errorHaldling = require('../../utility/errorHandling.js');
+var commonBiz = require('../korea_common/common_biz.js');
 
 var gwangyangObject = {};
 
@@ -98,18 +99,20 @@ gwangyangObject.urlStationRequest = function(dbObject, callback){
                 var $ = cheerio.load(html);
                 var $table = $('table[class=resultTable]');
                 var $tr = $table.find('tr');
-                var gwangyang_list = [];
+                var gwangyang_arrive_list = [];
 
                 $tr.each(function(){
+
                     var temp = {};
-                    temp.route_name = $(this).find('td:nth-child(1)').text();
+
+                    temp.routenm = $(this).find('td:nth-child(1)').text();
                     temp.arrive_time = $(this).find('span').text();
-                    gwangyang_list.push(temp);
+                    temp.cur_pos = "";
+                    temp.routeid = commonBiz.findRouteid(dbObject, commonBiz.splitSomething(temp.routenm, '번'));
+                    gwangyang_arrive_list.push(temp);
                 });
 
-                console.log(gwangyang_list);
-
-                callback(gwangyang_list);
+                callback(gwangyang_arrive_list);
 
             }else{
                 throw error;
@@ -117,15 +120,6 @@ gwangyangObject.urlStationRequest = function(dbObject, callback){
         });
 
 };
-
-
-
-
-
-
-
-
-
 
 module.exports = gwangyangObject;
 

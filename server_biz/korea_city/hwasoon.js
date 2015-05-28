@@ -91,16 +91,31 @@ hwasoonObject.urlStationRequest = function(dbObject, callback){
 
             var psd = JSON.parse(json);
             var hwasoon_list = psd.list;
+            var hwasoon_arrive_list = [];
 
             for(var i in hwasoon_list) {
-                console.log("노선 번호 : "+hwasoon_list[i].LINE_NAME);
-                console.log("남은 정류장 갯수 : "+hwasoon_list[i].REMAIN_STOP);
-                console.log("예상 도착 시간 : "+hwasoon_list[i].REMAIN_MIN + "분");
-                console.log("현재 위치 : "+hwasoon_list[i].BUSSTOP_NAME);
-                console.log("노선 ID : "+hwasoon_list[i].LINE_ID + "\n");
-            }
+                var temp = {};
+                temp.arrive_time = hwasoon_list[i].REMAIN_MIN;
+                temp.cur_pos = hwasoon_list[i].REMAIN_STOP;
+                temp.routenm = hwasoon_list[i].LINE_NAME;
+                temp.routeid = hwasoon_list[i].LINE_ID ;
 
-            callback(hwasoon_list);
+                hwasoon_arrive_list.push(temp);
+            }
+            if(hwasoon_arrive_list.length === 0){
+
+                var temp = {};
+                temp.arrive_time = "도착예정 버스가 없습니다";
+                temp.routenm = "";
+                temp.cur_pos = "";
+                temp.routeid = "";
+
+                hwasoon_arrive_list.push(temp);
+
+                callback(hwasoon_arrive_list);
+            }else{
+                callback(hwasoon_arrive_list);
+            }
 
         }else{
             throw error;

@@ -100,16 +100,20 @@ busanObject.urlStationRequest = function (dbObject, callback) {
                 arrayNotation: true
             };
             var parsed_data = xml2jsparser.toJson(xmldata, options);
+            var busan_arrie_list = [];
 
             var busan_list = parsed_data.Buss;
 
             for (var x in arriveTime_list[0].bus) {
-                console.log("노선명 : " + arriveTime_list[0].bus[x].value0);
-                console.log("도착예정시간 : " + arriveTime_list[0].bus[x].value5);
-                console.log("노선 ID : " + arriveTime_list[0].bus[x].value6);
+                var temp = {};
+                temp.arrive_time = busan_list[0].bus[x].value5;
+                temp.routenm = busan_list[0].bus[x].value0; //한글깨짐 고쳐야 함
+                temp.routeid = busan_list[0].bus[x].value6;
+                temp.cur_pos = busan_list[0].bus[x].value4;
+                busan_arrie_list.push(temp);
             }
 
-            callback(busan_list);
+            callback(busan_arrie_list);
 
         } else {
             throw error;

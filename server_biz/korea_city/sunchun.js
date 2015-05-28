@@ -12,6 +12,7 @@
 var request = require('request');
 var cheerio = require('cheerio');
 var errorHaldling = require('../../utility/errorHandling.js');
+var commonBiz = require('../korea_common/common_biz.js');
 
 var sunchunObject = {};
 
@@ -103,22 +104,23 @@ sunchunObject.urlStationRequest = function(dbObject, callback){
                 var $ = cheerio.load(html);
                 var $table = $('table[class=resultTable]');
                 var $tr = $table.find('tr');
-                var sunchun_list = [];
+
+                var sunchun_arrive_list = [];
 
                 $tr.each(function(){
                     var temp = {};
 
-                    temp.route_name = $(this).find('td:nth-child(1)').text();
+                    temp.routenm = $(this).find('td:nth-child(1)').text();
                     var second_td = $(this).find('td:nth-child(2)');
-
                     temp.arrive_time = second_td.find('span:nth-child(1)').text();
-                    temp.curr_pos = second_td.children().last().text();
+                    temp.cur_pos = second_td.children().last().text();
+                    temp.routeid = commonBiz.findRouteid(dbObject, commonBiz.splitSomething(temp.routenm, '번'));
 
-                    sunchun_list.push(temp);
+                    sunchun_arrive_list.push(temp);
 
                 });
 
-                callback(sunchun_list);
+                callback(sunchun_arrive_list);
 
             }else{
                 throw error;
