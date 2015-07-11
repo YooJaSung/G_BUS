@@ -11,12 +11,13 @@
 
 var request = require('request');
 var cheerio = require('cheerio');
-var errorHaldling = require('../../utility/errorHandling.js');
 var commonBiz = require('../korea_common/common_biz.js');
 
 var gwangyangObject = {};
 
 var routeurl = "http://bis.gwangyang.go.kr:8282/internet/pgm/map/route/routeMap.jsp";
+var routemurl = "http://mbis.gwangyang.go.kr:8286/smart/search/routeResult.jsp";
+
 var stationurl = "http://mbis.gwangyang.go.kr:8286/search/arrivalList.jsp";
 
 /**
@@ -47,10 +48,11 @@ gwangyangObject.urlRouteRequest = function(dbObject, callback){
     requestData.route.upperBusRouteID = dbObject[0].routeid;
     requestData.route.busRouteID = dbObject[0].routedesc;
 
-    var url = routeurl + "?upperBusRouteID=" + requestData.route.upperBusRouteID +
+    var url = routemurl + "?search=yes&upperBusRouteID=" + requestData.route.upperBusRouteID +
             "&busRouteID=" + requestData.route.busRouteID;
 
-    request(url, function (error, response, html) {
+
+    /*request(url, function (error, response, html) {
         if (!error && response.statusCode == 200) {
             var gwangyang_bus_location_seq = [];
             var $ = cheerio.load(html);
@@ -68,6 +70,29 @@ gwangyangObject.urlRouteRequest = function(dbObject, callback){
                 });
                 callback(gwangyang_bus_location_seq);
             }
+        }else{
+            throw error;
+        }
+    })*/
+
+
+    request(url, function (error, response, html) {
+        if (!error && response.statusCode == 200) {
+            var gwangyang_bus_location_seq = [];
+            var up_seq = [];
+            var $ = cheerio.load(html);
+            var $tr = $('.resultDiv tr');
+
+            $tr.each(function(i){
+
+                if($(this).find('td[width=20]').find('img').attr('src') === '/smart/images/icon_bus.gif'){
+                    up_seq.push(i * 1 + 1);
+                }
+
+
+            });
+            gwangyang_bus_location_seq.push(up_seq);
+            callback(gwangyang_bus_location_seq);
         }else{
             throw error;
         }
@@ -106,14 +131,13 @@ gwangyangObject.urlStationRequest = function(dbObject, callback){
                     var temp = {};
 
                     temp.routenm = $(this).find('td:nth-child(1)').text();
-                    temp.arrive_time = $(this).find('span').text();
+                    temp.arrive_time = "약 " + $(this).find('span').text() + " 후 도착";
                     temp.cur_pos = "";
                     temp.routeid = commonBiz.findRouteid(dbObject, commonBiz.splitSomething(temp.routenm, '번'));
                     gwangyang_arrive_list.push(temp);
+
                 });
-
                 callback(gwangyang_arrive_list);
-
             }else{
                 throw error;
             }

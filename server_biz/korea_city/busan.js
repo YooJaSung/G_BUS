@@ -9,116 +9,121 @@
 // param -> optARSNO
 
 var request = require('request');
-var jsdom = require('jsdom');
-var errorHaldling = require('../../utility/errorHandling.js');
+var xml2jsparser = require('xml2json');
 
 var busanObject = {};
 
-var routeurl = "http://mits.busan.go.kr/bus_real.jsp";
-var stationurl = "http://bus.busan.go.kr/busanBIMS/Ajax/map_Arrival.asp";
-
-/**
- *
- * request data format
- */
+var routeurl = "http://61.43.246.153/openapi-data/service/busanBIMS/busInfoRoute?serviceKey=3Dk6D80iliB7j4NcdFAiIGHm2O3X7HXg8j27%2BTt7%2FOhxiAecZ%2FffBwSQZCjGcqzTlONzGeUh%2F17714ETt5z39Q%3D%3D";
+var stationurl = "http://61.43.246.153/openapi-data/service/busanBIMS/stopArr?serviceKey=3Dk6D80iliB7j4NcdFAiIGHm2O3X7HXg8j27%2BTt7%2FOhxiAecZ%2FffBwSQZCjGcqzTlONzGeUh%2F17714ETt5z39Q%3D%3D";
 
 var requestData = {};
 requestData.route = {};
-requestData.route.line_id = "";
+requestData.route.lineid = "";
 
 
 requestData.station = {};
-requestData.station.optARSNO = "";
+requestData.station.bstopid = "";
 
 
 busanObject.urlRouteRequest = function (dbObject, callback) {
+    requestData.route.lineid = dbObject[0].routeid;
+    var url = routeurl+"&lineid=" + requestData.route.lineid;
+    var trnseq = dbObject[0].trnseq;
 
-    requestData.route.line_id = dbObject[0].routeid;
+    request.get(url,
+        function(error, response, body){
 
-    var url = routeurl + "?line_id=" + requestData.route.line_id;
+            if(!error && response.statusCode==200){
+                var busan_bus_location_seq = [];
+                var up_seq = [];
+                var down_seq = [];
+                var xmldata = body;
+                var options = {
+                    object: true,
+                    sanitize: false,
+                    arrayNotation: true
+                };
 
-    request(url, function (error, response, body) {
-        if (!error && response.statusCode == 200) {
-            var busan_bus_location_seq = [];
-            jsdom.env({
-                html: body,
-                scripts: ['http://code.jquery.com/jquery-1.6.min.js'],
-                done: function (err, window) {
-                    //Use jQuery just as in a regular HTML page
-                    var $ = window.jQuery;
-                    var document = window.document;
-                    var $body = $('body');
-                    var $wrapper = $body.find('#wrapper');
-                    var $img = $wrapper.find('img');
+                var bus_location_data = xml2jsparser.toJson(xmldata, options);
 
-                    if ($img.length === 0) {
-                        // 잘못된 버스
-                        callback(busan_bus_location_seq);
-                    }
+                if(bus_location_data.response[0].body[0].items[0].length === undefined){
 
-                    else {
+                    busan_bus_location_seq.push(up_seq);
+                    busan_bus_location_seq.push(down_seq);
+                    callback(busan_bus_location_seq);
 
-                        $img.each(function (i) {
-                            if ($img[i].src === 'file://images/bus_real_green_GL_4045.png') {
-                                /*
-                                 sequence start at 1, real time bus location sequence save array and send to front
-                                 */
-                                console.log($img[i].src);
+                }else{
+                    var arr = bus_location_data.response[0].body[0].items[0].item;
 
-                                busan_bus_location_seq.push(i * 1 + 1);
+                    for(var i in arr){
+
+                        if(arr[i].carNo !== undefined){
+                            if(i < trnseq){
+                                up_seq.push(i*1+1);
+                            }else{
+                                down_seq.push(i*1+1);
                             }
-                        });
-                        console.log(busan_bus_location_seq);
-                        callback(busan_bus_location_seq);
+                        }
                     }
 
-
+                    busan_bus_location_seq.push(up_seq);
+                    busan_bus_location_seq.push(down_seq);
+                    callback(busan_bus_location_seq);
                 }
-            });
-        } else {
-            throw error;
-        }
-    });
-
-    /**
-     * 1. routeUrl 포멧을 db에서 선택한 데이터를 가지고 맞춰준다
-     * 2. post or get 방식에 따라 request 까지 해준다.
-     */
-
-};
-busanObject.urlStationRequest = function (dbObject, callback) {
-    requestData.station.optARSNO = dbObject[0].stopid;
-
-    var url = stationurl + "?optARSNO=" + requestData.station.optARSNO;
-
-    request(url, function (error, response, body) {
-        if (!error && response.statusCode == 200) {
-            var xmldata = body;
-            var options = {
-                object: true,
-                sanitize: false,
-                arrayNotation: true
-            };
-            var parsed_data = xml2jsparser.toJson(xmldata, options);
-            var busan_arrie_list = [];
-
-            var busan_list = parsed_data.Buss;
-
-            for (var x in arriveTime_list[0].bus) {
-                var temp = {};
-                temp.arrive_time = busan_list[0].bus[x].value5;
-                temp.routenm = busan_list[0].bus[x].value0; //한글깨짐 고쳐야 함
-                temp.routeid = busan_list[0].bus[x].value6;
-                temp.cur_pos = busan_list[0].bus[x].value4;
-                busan_arrie_list.push(temp);
+            }else{
+                throw error;
             }
 
-            callback(busan_arrie_list);
-
-        } else {
-            throw error;
         }
-    });
+    )
+};
+busanObject.urlStationRequest = function (dbObject, callback) {
+
+
+    requestData.station.bstopid = dbObject[0].stopid;
+
+    var url = stationurl+'&bstopid=' +  requestData.station.bstopid;
+
+    request.get(url,
+        function(error, response, body){
+            if(!error && response.statusCode == 200){
+                var busan_list = [];
+                var xmldata = body;
+                var options = {
+                    object: true,
+                    sanitize: false,
+                    arrayNotation: true
+                };
+                var bus_arr_data = xml2jsparser.toJson(xmldata, options);
+                if(bus_arr_data.response[0].body[0].items[0].length === undefined){
+
+                    callback(busan_list);
+
+
+                }else{
+                    var arr = bus_arr_data.response[0].body[0].items[0].item;
+
+                    for(var i in arr){
+
+                        var temp = {};
+                        temp.routeid = arr[i].lineid[0];
+                        temp.routenm = arr[i].lineNo[0];
+                        temp.arrive_time = '약 ' + arr[i].min[0] + '분 후 도착';
+                        temp.cur_pos = arr[i].station[0] + '정거장 전';
+                        busan_list.push(temp);
+
+                    }
+
+                    callback(busan_list);
+                }
+
+
+
+            }else{
+                throw error;
+            }
+        }
+    )
 };
 
 

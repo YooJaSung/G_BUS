@@ -11,12 +11,13 @@
 
 var request = require('request');
 var cheerio = require('cheerio');
-var errorHaldling = require('../../utility/errorHandling.js');
+
 var commonBiz = require('../korea_common/common_biz.js');
 
 var sunchunObject = {};
 
 var routeurl = "http://bis.sc.go.kr:8282/internet/pgm/map/route/routeMap.jsp";
+var routemurl = "http://mbis.sc.go.kr:8286/smart/search/routeResult.jsp";
 
 var stationurl = "http://mbis.sc.go.kr:8286/smart/search/arrivalList.jsp";
 
@@ -53,10 +54,10 @@ sunchunObject.urlRouteRequest = function(dbObject, callback){
     requestData.route.upperBusRouteID = dbObject[0].routeid;
     requestData.route.busRouteID = dbObject[0].routedesc;
 
-    var url = routeurl + "?upperBusRouteID=" + requestData.route.upperBusRouteID +
+    var url = routemurl + "?search=yes&upperBusRouteID=" + requestData.route.upperBusRouteID +
         "&busRouteID=" + requestData.route.busRouteID;
 
-    request(url, function (error, response, html) {
+    /*request(url, function (error, response, html) {
         if (!error && response.statusCode == 200) {
             var sunchun_bus_location_seq = [];
             var $ = cheerio.load(html);
@@ -76,7 +77,28 @@ sunchunObject.urlRouteRequest = function(dbObject, callback){
         }else{
             throw error;
         }
-    })
+    })*/
+    request(url, function (error, response, html) {
+        if (!error && response.statusCode == 200) {
+            var $ = cheerio.load(html);
+            var sunchun_bus_location_seq = [];
+            var up_seq = [];
+            var $tr = $('.resultDiv tr');
+
+            $tr.each(function(i){
+
+                if($(this).find('td[width=20]').find('img').attr('src') === '/smart/images/icon_bus.gif'){
+                    up_seq.push(i * 1 + 1);
+                }
+
+            });
+            sunchun_bus_location_seq.push(up_seq);
+            callback(sunchun_bus_location_seq);
+        }else{
+            throw error;
+        }
+    });
+
 
 };
 sunchunObject.urlStationRequest = function(dbObject, callback){
@@ -112,14 +134,14 @@ sunchunObject.urlStationRequest = function(dbObject, callback){
 
                     temp.routenm = $(this).find('td:nth-child(1)').text();
                     var second_td = $(this).find('td:nth-child(2)');
-                    temp.arrive_time = second_td.find('span:nth-child(1)').text();
+                    temp.arrive_time = "약 " + second_td.find('span:nth-child(1)').text() + "분 후 도착" ;
                     temp.cur_pos = second_td.children().last().text();
                     temp.routeid = commonBiz.findRouteid(dbObject, commonBiz.splitSomething(temp.routenm, '번'));
+
 
                     sunchun_arrive_list.push(temp);
 
                 });
-
                 callback(sunchun_arrive_list);
 
             }else{

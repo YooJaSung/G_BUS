@@ -11,7 +11,6 @@
 
 var request = require('request');
 var cheerio = require('cheerio');
-var errorHaldling = require('../../utility/errorHandling.js');
 var commonBiz = require('../korea_common/common_biz.js');
 
 var gumiObject = {};
@@ -29,8 +28,8 @@ var requestData = {};
 requestData.route = {};
 requestData.route.act = "srchBrtBusPos" ;
 requestData.route.brtId = "" ;
-requestData.route.brtDirection = "1" ;
-requestData.route.brtClass = "0" ;
+requestData.route.brtDirection = "" ;
+requestData.route.brtClass = "" ;
 requestData.route.menuCode = "1_12" ;
 
 
@@ -49,9 +48,10 @@ gumiObject.urlRouteRequest = function(dbObject, callback){
      * 1. routeUrl 포멧을 db에서 선택한 데이터를 가지고 맞춰준다
      * 2. post or get 방식에 따라 request 까지 해준다.
      */
-    requestData.route.brtId = dbObject[0].routenm;
-    requestData.route.brtDirection = dbObject[0].routeid;
-    requestData.route.brtClass = dbObject[0].routedesc;
+    requestData.route.brtId = dbObject[0].routeid;
+    var dirclass = dbObject[0].routedesc.split(':');
+    requestData.route.brtDirection = dirclass[0];
+    requestData.route.brtClass = dirclass[1];
 
     var url = routeurl+"?act=" + requestData.route.act +
             "&brtId=" + requestData.route.brtId +
@@ -64,17 +64,20 @@ gumiObject.urlRouteRequest = function(dbObject, callback){
             var gumi_bus_location_seq = [];
             var $ = cheerio.load(html);
             var $li = $('#list01_12 li');
+            var up_seq = [];
 
             if( $li.length === 0){
+                gumi_bus_location_seq.push(up_seq);
                 callback(gumi_bus_location_seq);
             }else{
                 $li.each(function(i){
                     console.log($(this).attr('class'));
                     if($(this).attr('class') === 'list_desc'){
-                        gumi_bus_location_seq.push(i);
+                        up_seq.push(i);
                     }
                 });
 
+                gumi_bus_location_seq.push(up_seq);
                 callback(gumi_bus_location_seq);
             }
         }else{
@@ -99,7 +102,6 @@ gumiObject.urlStationRequest = function(dbObject, callback){
                 var $ = cheerio.load(html);
                 var $arrive_desc = $('.arrive_desc');
                 var gumi_arrive_list = [];
-
 
                 $arrive_desc.each(function(){
 

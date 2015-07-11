@@ -40,11 +40,23 @@ koreaCommonBiz.changeTomin = function(time){
 };
 
 koreaCommonBiz.removeChar = function(beforeStr){
+
     var afterString = beforeStr.replace(/[^0-9]/gi, "");
 
     var finalString = removeSpace(afterString);
 
     return finalString;
+};
+
+koreaCommonBiz.makeCacheName = function(cityCodeObj, id){
+    var tempCacheName = "";
+
+    for(var i in cityCodeObj){
+        tempCacheName += cityCodeObj[i].cityCode;
+    }
+    tempCacheName += id;
+
+    return tempCacheName;
 };
 
 module.exports = koreaCommonBiz;

@@ -11,7 +11,6 @@
 var request = require('request');
 var jsdom = require('jsdom');
 
-var errorHaldling = require('../../utility/errorHandling.js');
 var commonBiz = require('../korea_common/common_biz.js');
 
 
@@ -58,6 +57,9 @@ changwonObject.urlRouteRequest = function (dbObject, callback) {
                     var $ = window.jQuery;
                     var document = window.document;
                     var $sub_a = $('.sub-content table tbody tr td a ');
+                    var trnseq = dbObject[0].trnseq;
+                    var up_seq = [];
+                    var down_seq = [];
 
                     if ($sub_a.length === 0) {
                         //잘못된 버스 번호 요청
@@ -69,11 +71,19 @@ changwonObject.urlRouteRequest = function (dbObject, callback) {
                              0에서 시작이기에 해당 시퀀스가 버스가 있는 위치
                              */
                             if ($(this).find('img').attr('src') === '../images/mobile/ico_bus_7.gif') {
-                                console.log($(this).find('img').attr('src'));
-                                changwon_bus_location_seq.push(i * 1 + 1);
-                            }
+                                var tseq = i*1+1;
 
+                                if(tseq < trnseq){
+                                    up_seq.push(tseq);
+                                }else{
+                                    down_seq.push(tseq);
+                                }
+                            }
                         });
+
+                        changwon_bus_location_seq.push(up_seq);
+                        changwon_bus_location_seq.push(down_seq);
+
                         callback(changwon_bus_location_seq);
                     }
                 }
@@ -88,7 +98,8 @@ changwonObject.urlRouteRequest = function (dbObject, callback) {
 changwonObject.urlStationRequest = function (dbObject, callback) {
 
     requestData.station.stationId = dbObject[0].stopid;
-    var url = stationurl + "stationId=" + requestData.station.stationId;
+    var url = stationurl + "?stationId=" + requestData.station.stationId;
+
 
     request(url, function (error, response, body) {
         if (!error && response.statusCode == 200) {
@@ -106,8 +117,9 @@ changwonObject.urlStationRequest = function (dbObject, callback) {
                         var temp = {};
                         temp.routenm = $(this).find("span[class=bustype4]").text();
                         var str = $(this).find("span[class=bustype7]").text();
+
                         var res = str.split("도착");
-                        temp.arrive_time = res[0];
+                        temp.arrive_time = res[0] + " 도착";
                         temp.cur_pos = res[1];
                         temp.routeid = commonBiz.findRouteid(dbObject, temp.routenm);
 

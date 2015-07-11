@@ -13,15 +13,26 @@ var bodyParser = require('body-parser');
 var http = require('http');
 var cors = require('cors');
 var domain = require('express-domain-middleware');
+
 /**
  *
- * http & cors & domain require
+ * routes
  */
 
 var route = require('./routes/route/routeJs');
 var place = require('./routes/place/placeJs');
 var station = require('./routes/station/stationJs');
-var region = require('./routes/common/region.js');
+var mailService = require('./routes/service/mailserviceJs');
+
+
+/**
+ * util
+ *
+ */
+
+var send_mail = require('./utility/mailService.js');
+
+
 
 
 var app = express();
@@ -37,7 +48,7 @@ app.set('view engine', 'ejs');
 app.use(cors());
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(domain);
@@ -49,39 +60,42 @@ app.use(domain);
 app.use('/', route);
 app.use('/', station);
 app.use('/', place);
-app.use('/', region);
+app.use('/', mailService);
 
 /**
  * show index page first get request
  */
 
 app.get('/', function (req, res) {
-  res.sendFile(__dirname + '/index.html');
+    res.sendFile(__dirname + '/index.html');
 });
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
-
-  var err = new Error('page Not Found');
-  err.status = 404;
-  next(err);
-
+app.use(function (req, res, next) {
+    var err = new Error('page Not Found');
+    err.status = 404;
+    next(err);
 });
 
 // error handlers
 app.use(function errorHandler(err, req, res, next) {
 
-  console.log('--------------------------------------------------------------------------\n');
-  console.log(err);
-  console.log('--------------------------------------------------------------------------\n');
+    console.log('--------------------------------------------------------------------------\n');
+    console.log(err);
+    console.log('--------------------------------------------------------------------------\n');
 
-  console.log('error on request %s | %s | %d', req.method, req.url, err.status);
+    console.log('error on request %s | %s | %d', req.method, req.url, err.status);
 
-  console.log('\n'+err.stack);
-  err.message = err.status == 500 ? 'Something bad happened. :(' : err.message;
+    console.log('\n' + err.stack);
 
-  /*res.status(err.status).send(err.message);*/
-  res.send(err.message);
+    err.message = err.status == 500 ? 'Something bad happened. :(' : err.message;
+    if (err.status != 404) {
+        var errordata = 'error status : ' + err.status + ' , error on request :  ' + process.domain.id + req.method + req.url + '   ,   error message : ' + err.message;
+
+        send_mail.sendEmail(errordata);
+    }
+
+    res.send(err.message);
 
 });
 
@@ -89,9 +103,9 @@ app.use(function errorHandler(err, req, res, next) {
  * create server & server running
  */
 
-http.createServer(app).listen(app.get('port'), function(){
+http.createServer(app).listen(app.get('port'), function () {
 
-  console.log('G_BUS server running at ' + app.get('port'));
+    console.log('G_BUS server running at ' + app.get('port'));
 
 });
 

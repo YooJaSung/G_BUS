@@ -7,10 +7,10 @@
 var request = require('request');
 var iconv = require('iconv');
 var cheerio = require('cheerio');
-var errorHaldling = require('../../utility/errorHandling.js');
+
 var commonBiz = require('../korea_common/common_biz.js');
 
-var seoulObject = {};
+var daeguObject = {};
 
 var routeurl = "http://m.businfo.go.kr/bp/m/realTime.do";
 
@@ -36,7 +36,7 @@ requestData.station.bsId = "";
 requestData.station.bsNm = "";
 
 
-seoulObject.urlRouteRequest = function (dbObject, callback) {
+daeguObject.urlRouteRequest = function (dbObject, callback) {
 
     /**
      * 1. routeUrl 포멧을 db에서 선택한 데이터를 가지고 맞춰준다
@@ -55,8 +55,8 @@ seoulObject.urlRouteRequest = function (dbObject, callback) {
 
     request(url, function (error, response, html) {
         if (!error && response.statusCode == 200) {
-            var daegu_bus_location_seq1 = [];
-            var daegu_bus_location_seq2 = [];
+            var up_seq = [];
+            var down_seq = [];
             var daegu_bus_location_seq = [];
             var $ = cheerio.load(html);
 
@@ -64,20 +64,25 @@ seoulObject.urlRouteRequest = function (dbObject, callback) {
             var $li = $('.bl li');
             if($li.length === 0) {
                 //잘못된 버스 검색
+                daegu_bus_location_seq.push(up_seq);
+                daegu_bus_location_seq.push(down_seq);
                 callback(daegu_bus_location_seq);
             }else{
+                console.log($li.length);
                 $li.each(function (i) {
-                    if ($(this).attr('class') === 'bloc_b') {
+                    var seq = undefined;
+                    if ($(this).attr('class') === 'bloc_b nsbus' || $(this).attr('class') === 'bloc_b') {
                         var temp = $(this).prev().find('span').text();
-                        var seq = temp.split('.');
+                        seq = temp.split('.');
                         /**
                          * .이전걸 짤라서 담기
                          */
-                        daegu_bus_location_seq1.push(seq[0]);
-                    }
 
+                        up_seq.push(seq[0]*1);
+
+                    }
                 });
-                daegu_bus_location_seq.push(daegu_bus_location_seq1);
+                daegu_bus_location_seq.push(up_seq);
 
                 var flfind = $('.r');
 
@@ -96,20 +101,19 @@ seoulObject.urlRouteRequest = function (dbObject, callback) {
                             var $ = cheerio.load(html);
                             var $li = $('.bl li');
                             if($li.length === 0){
-                                daegu_bus_location_seq.push(daegu_bus_location_seq2);
+
                             }else{
                                 $li.each(function (i) {
-                                    if ($(this).attr('class') === 'bloc_b') {
+                                    if ($(this).attr('class') === 'bloc_b nsbus' || $(this).attr('class') === 'bloc_b') {
                                         var temp = $(this).prev().find('span').text();
                                         var seq = temp.split('.');
                                         /**
                                          * .이전걸 짤라서 담기
                                          */
-                                        daegu_bus_location_seq2.push(seq[0]);
+                                        down_seq.push(seq);
                                     }
                                 });
-                                daegu_bus_location_seq.push(daegu_bus_location_seq2);
-
+                                daegu_bus_location_seq.push(down_seq);
                                 callback(daegu_bus_location_seq);
                             }
                         }
@@ -125,7 +129,7 @@ seoulObject.urlRouteRequest = function (dbObject, callback) {
         }
     });
 };
-seoulObject.urlStationRequest = function (dbObject, callback) {
+daeguObject.urlStationRequest = function (dbObject, callback) {
 
 
     requestData.station.act = "arrInfo";
@@ -134,7 +138,9 @@ seoulObject.urlStationRequest = function (dbObject, callback) {
 
     var url = stationurl + "?act=" + requestData.station.act +
             "&bsId=" + requestData.station.bsId +
-            "&bsNm=" + requestData.station.bsNm;
+            "&bsNm=";
+
+    console.log(url);
 
     request.get({
             uri: url,
@@ -182,7 +188,7 @@ seoulObject.urlStationRequest = function (dbObject, callback) {
                     $nm.each(function () {
                         var temp = {};
                         temp.routenm = $(this).find('span[class=marquee]').first().text();
-                        temp.arrive_time = $(this).find('span[class=arr_state]').text();
+                        temp.arrive_time = "약 " + $(this).find('span[class=arr_state]').text() + " 후 도착";
                         temp.cur_pos = $(this).find('span[class=marquee]').last().text();
                         temp.routeid = commonBiz.findRouteid(dbObject, temp.routenm);
 
@@ -201,6 +207,6 @@ seoulObject.urlStationRequest = function (dbObject, callback) {
 
 };
 
-module.exports = seoulObject;
+module.exports = daeguObject;
 
 

@@ -13,22 +13,26 @@
 var koreaDbObject = {};
 var dbQuery = require('../../server_config/mysql/mysql_config.js');
 var pool = require('../../server_config/mysql/DBConnect.js');
-var errorHaldling = require('../../utility/errorHandling.js');
 
 koreaDbObject.routeSearch = function(cityObject, routeNm, callback){
 
-
     var routeQuery = dbQuery.g_busquery.ROUTESEARCH;
 
-    var routeStr = queryCityCodeRoute(cityObject, routeQuery);
+    var citycds = queryCityCode(cityObject);
 
     pool.getConnection(function(err, db){
        if(err){
            throw err;
        }else{
-            db.query(routeStr, ["%"+routeNm+"%"], function(err, rows){
+            db.query(routeQuery, [citycds, routeNm], function(err, rows){
+                if(err){
+                    throw err;
 
-                callback(rows);
+                }else{
+                    db.release();
+                    console.log('Route_Search DB Result');
+                    callback(rows);
+                }
             })
        }
     });
@@ -37,14 +41,21 @@ koreaDbObject.routeSearch = function(cityObject, routeNm, callback){
 koreaDbObject.stationSearch = function(cityObject, stationNm, callback){
 
     var stationQuery = dbQuery.g_busquery.STATIONSEARCH;
-    var stationStr = queryCityCodeStation(cityObject, stationQuery);
+    var citycds = queryCityCode(cityObject);
 
     pool.getConnection(function(err, db){
         if(err){
             throw err;
         }else{
-            db.query(stationStr, ["%"+stationNm+"%"], function(err, rows){
-                callback(rows);
+            db.query(stationQuery, [citycds, stationNm], function(err, rows){
+                if(err){
+                    throw err;
+
+                }else{
+                    db.release();
+                    console.log('Station_Search DB Result');
+                    callback(rows);
+                }
             })
         }
     });
@@ -52,57 +63,25 @@ koreaDbObject.stationSearch = function(cityObject, stationNm, callback){
 
 };
 
-function queryCityCodeRoute (cityObject, routeQuery){
-    routeQuery += ' AND ( ';
 
-    /**
-     * cityObject 반복문을 통해 추가해주기
-     * cityObject 숫자에 맞춰 마지막 index에서는 OR 없게 한다
-     */
+function queryCityCode (cityObject){
 
 
+    var citycds = '';
 
-
-    console.log(cityObject.length);
     for(var i in cityObject){
+
+
         if(i < cityObject.length -1 ){
-            routeQuery += "R.CITYCD = " + cityObject[i].cityCode + " OR ";
+            citycds += cityObject[i].cityCode + " , ";
         }
         else{
-            routeQuery += "R.CITYCD = " + cityObject[i].cityCode;
+            citycds += "S.citycd = " + cityObject[i].cityCode;
         }
 
     }
 
-    routeQuery += ' ) ';
-    routeQuery += 'LIMIT 30 ;';
-
-
-    return routeQuery;
-}
-
-function queryCityCodeStation (cityObject, stationQuery){
-
-
-    stationQuery += ' AND ( ' ;
-    /**
-     * cityObject 반복문을 통해 str 추가
-     * cityObject 숫자에 맞춰 마지막 index에서는 OR 없게 한다
-     */
-
-    for(var i in cityObject){
-        if(i < cityObject.length -1 ){
-            stationQuery += "S.citycd = " + cityObject[i].cityCode + " OR ";
-        }
-        else{
-            stationQuery += "S.citycd = " + cityObject[i].cityCode;
-        }
-
-    }
-
-    stationQuery += ' ) ;';
-
-    return stationQuery;
+    return citycds;
 }
 
 
@@ -125,8 +104,16 @@ koreaDbObject.dbRouteDetail = function(cityCd, rid, callback){
             throw err;
         }else{
             db.query(routeDetailQuery, [cityCd, rid], function(err, rows){
-                console.log('routeDetail3');
-                callback(rows);
+
+                if(err){
+                    throw err;
+
+                }else{
+                    db.release();
+                    console.log('Route_Detail DB Result');
+                    callback(rows);
+                }
+
             })
         }
     });
@@ -152,7 +139,15 @@ koreaDbObject.dbStationDetail = function(cityCd, sid, callback){
             throw err;
         }else{
             db.query(stationDetailQuery, [cityCd, sid], function(err, rows){
-                callback(rows);
+
+                if(err){
+                    throw err;
+
+                }else{
+                    db.release();
+                    console.log('Station_Detail DB Result');
+                    callback(rows);
+                }
             })
         }
     });
@@ -164,8 +159,17 @@ koreaDbObject.dbAroundXY = function(cityCd, dbObject, callback){
         if(err){
             throw err;
         }else{
-            db.query(getAroundQuery,[cityCd, dbObject[0].LATIX,dbObject[0].LATIX,dbObject[0].LONGY,dbObject[0].LONGY, dbObject[0].LATIX,dbObject[0].LATIX,dbObject[0].LONGY], function(err,rows){
-                callback(rows);
+            db.query(getAroundQuery,[cityCd,dbObject[0].LATIX,dbObject[0].LONGY], function(err,rows){
+
+                if(err){
+                    throw err;
+
+                }else{
+                    db.release();
+                    console.log('Station_Search AroundXY DB REsult');
+                    callback(rows);
+                }
+
             })
         }
     })
@@ -178,11 +182,25 @@ koreaDbObject.dbAroundXY = function(cityCd, dbObject, callback){
  *
  */
 
-koreaDbObject.placeSearch = function(cityCd, sx, sy, ex, ey){
+koreaDbObject.placeSearch = function( sx, sy, ex, ey ,callback){
+    var placeSearchQuery = dbQuery.g_busquery.PLACESEARCH;
+
+    pool.getConnection(function(err, db){
+       if(err){
+           throw err;
+       }else{
+           db.query(placeSearchQuery,[sx, sy, ex, ey], function(err, rows){
+               if(err){
+                   throw err;
+
+               }else{
+                   db.release();
+                   callback(rows);
+               }
+           })
+       }
+    });
 
 };
-
-
-
 
 module.exports = koreaDbObject;

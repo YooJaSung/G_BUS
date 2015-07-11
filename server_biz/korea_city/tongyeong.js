@@ -10,8 +10,14 @@
 //   station param -> prmOperation=getStationInfo, prmStationName=인코딩, prmStationID
 
 var request = require('request');
-var errorHaldling = require('../../utility/errorHandling.js');
+var cheerio = require('cheerio');
+
+var iconv = require('iconv');
+
+
 var commonBiz = require('../korea_common/common_biz.js');
+
+
 
 var tongyeongObject = {};
 
@@ -24,6 +30,7 @@ var stationurl = "http://bms.tongyeong.go.kr/stationInfo.do";
  *
  * request data format
  */
+
 
 var requestData = {};
 requestData.route = {};
@@ -43,6 +50,9 @@ tongyeongObject.urlRouteRequest = function(dbObject, callback){
      * 2. post or get 방식에 따라 request 까지 해준다.
      */
 
+
+    ;
+
     requestData.route.prmRouteID = dbObject[0].routeid;
     request.post({
         url: routeurl,
@@ -53,33 +63,49 @@ tongyeongObject.urlRouteRequest = function(dbObject, callback){
         }
     }, function (error, response, html) {
         var tongyeong_bus_location_seq = [];
+        var tongyeong_bus_location_temp = [];
+        var up_seq = [];
         if (!error && response.statusCode == 200) {
-            var $ = cheerio.load(html);
-            var $td = $('.routeLineH');
-            if($td.length === 0){
-                //잘못된 버스 번호
-                callback(tongyeong_bus_location_seq);
-            }else{
-                //images/businfo/popup02/popup_02_bus.gif 그냥버스1
-                //images/businfo/popup02/popup_02_bus02.gif 그냥버스2
-                //images/businfo/popup02/popup_02_bus02_low.gif 저상버스2
-                //images/businfo/popup02/popup_02_bus_low.gif 저상버스1
-                //총 4개의 이미지
-                $td.each(function(i){
-                    if($(this).find('img').attr('src') === 'images/businfo/popup02/popup_02_bus02.gif' || $(this).find('img').attr('src') === 'images/businfo/popup02/popup_02_bus02_low.gif'  || $(this).find('img').attr('src') === 'images/businfo/popup02/popup_02_bus.gif'  || $(this).find('img').attr('src') === 'images/businfo/popup02/popup_02_bus_low.gif'){
-                        tongyeong_bus_location_seq.push(i);
-                    }
-                });
-                callback(tongyeong_bus_location_seq);
-            }
+            var ic = new iconv.Iconv('EUC-KR', 'UTF-8//TRANSLIT//IGNORE');
+            var buf = ic.convert(html);
+            var utf8String = buf.toString('UTF-8');
 
-        }else{
+            var $ = cheerio.load(utf8String);
+            var $img = $('.routeLineH > img');
+            var $tdname = $('.name');
+
+            $img.each(function (i) {
+
+                if ($(this).attr('src') === 'images/businfo/popup02/popup_02_bus02.gif' || $(this).attr('src') === 'images/businfo/popup02/popup_02_bus02_low.gif'  || $(this).attr('src') === 'images/businfo/popup02/popup_02_bus.gif'  || $(this).attr('src') === 'images/businfo/popup02/popup_02_bus_low.gif') {
+
+                    tongyeong_bus_location_temp.push(i*1+1);
+
+                    //seq -1해주셈
+                }
+            });
+
+            for(var i in tongyeong_bus_location_temp){
+
+                $tdname.each(function(j){
+                    if(tongyeong_bus_location_temp[i] === j+1){
+                        up_seq.push(biz.splitSomething($(this).text(), ' '));
+                        // space 로 split 해서 저장
+                        return false;
+                    }
+                })
+            }
+            tongyeong_bus_location_seq.push(up_seq);
+
+            callback(tongyeong_bus_location_seq);
+
+        } else {
             throw error;
         }
     });
 };
 
 tongyeongObject.urlStationRequest = function(dbObject, callback){
+
 
     requestData.station.prmStationID = dbObject[0].stopid;
     request.post({

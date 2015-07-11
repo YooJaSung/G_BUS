@@ -6,8 +6,9 @@ var request = require('request');
 
 var xml2jsparser = require('xml2json');
 var iconv = require('iconv');
-var errorHaldling = require('../../utility/errorHandling.js');
 var commonBiz = require('../korea_common/common_biz.js');
+var cheerio = require('cheerio');
+
 
 var jeonjuObject = {};
 
@@ -34,6 +35,7 @@ jeonjuObject.urlRouteRequest = function(dbObject , callback){
     request(url, function (error, response, body) {
         if (!error && response.statusCode == 200) {
             var jeonju_bus_location_seq = [];
+            var up_seq = [];
             var xmldata = body;
             var options = {
                 object: true,
@@ -44,6 +46,7 @@ jeonjuObject.urlRouteRequest = function(dbObject , callback){
             var routedata = parsed_data.RFC30[0].routeList[0].list;
 
             if(routedata === undefined){
+                jeonju_bus_location_seq.push(up_seq);
                 callback(jeonju_bus_location_seq);
             }else{
                 for(var i in routedata){
@@ -52,6 +55,7 @@ jeonjuObject.urlRouteRequest = function(dbObject , callback){
                         jeonju_bus_location_seq.push(i);
                     }
                 }
+                jeonju_bus_location_seq.push(up_seq);
                 callback(jeonju_bus_location_seq);
             }
 

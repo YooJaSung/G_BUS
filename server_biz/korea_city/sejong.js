@@ -11,14 +11,15 @@
 //   station param -> busStopId
 
 var request = require('request');
-var errorHaldling = require('../../utility/errorHandling.js');
+
+var nimble = require('nimble');
+
 
 var sejongObject = {};
 
 var routeurl_first = "http://mbis.sejong.go.kr/web/traffic/searchBusRealLocationDetail";
 
 var routeurl_second = "http://mbis.sejong.go.kr/mobile/traffic/searchBusRouteDetail";
-
 
 var stationurl = "http://mbis.sejong.go.kr/mobile/traffic/searchBusStopRoute";
 
@@ -60,64 +61,90 @@ sejongObject.urlRouteRequest = function (dbObject, callback) {
     var routename = [];
     var routerealbusloc = [];
     var sejong_bus_location_seq = [];
-
-    request.post({
-        url: routeurl_first,
-        form: {
-            busRouteId: requestData.route.busRouteId
-        }
-    }, function (error, response, json) {
-        if (!error && response.statusCode == 200) {
+    var trnseq = dbObject[0].trnseq;
+    var up_seq = [];
+    var down_seq = [];
 
 
-            var parsed = JSON.parse(json);
-
-            if(parsed.busRealLocList.length === 0){
-                //잘못된 버스번호
-                //실시간 정보 없을때도
-                callback(sejong_bus_location_seq);
-            }else{
-                for (var x in parsed) {
-                    routerealbusloc.push(parsed[x]);
+    nimble.series([
+        function(locCallback){
+            request.post({
+                url: routeurl_first,
+                form: {
+                    busRouteId: requestData.route.busRouteId
                 }
-            }
-        } else {
-            throw error;
-        }
-    });
-    request.post({
-        url: routeurl_second,
-        form: {
-            busRouteId: requestData.route.busRouteId
-        }
-    }, function (error, response, json) {
-        if (!error && response.statusCode == 200) {
-            var parsed = JSON.parse(json);
+            }, function (error, response, json) {
+                if (!error && response.statusCode == 200) {
 
-            for (var x in parsed) {
-                routename.push(parsed[x]);
-            }
-            var routedata = routename[0];
-            var busloc = routerealbusloc[0];
 
-            for (var i in routedata) {
-                /*console.log(routedata[i]);*/
+                    var parsed = JSON.parse(json);
 
-                for (var j in busloc) {
-                    if (routedata[i].stop_id === busloc[j].stop_id) {
+                    if(parsed.busRealLocList.length === 0){
+                        //잘못된 버스번호
+                        //실시간 정보 없을때도
 
-                        sejong_bus_location_seq.push(i*1+1);
+                        sejong_bus_location_seq.push(up_seq);
+                        sejong_bus_location_seq.push(down_seq);
+                        callback(sejong_bus_location_seq);
+                        locCallback();
+                    }else{
+                        for (var x in parsed) {
+                            routerealbusloc.push(parsed[x]);
+                        }
+                        locCallback();
                     }
+                } else {
+                    throw error;
                 }
-            }
+            });
+        },
+        function(routeCallback){
+
+            request.post({
+                url: routeurl_second,
+                form: {
+                    busRouteId: requestData.route.busRouteId
+                }
+            }, function (error, response, json) {
+                if (!error && response.statusCode == 200) {
+                    var parsed = JSON.parse(json);
+                    for (var x in parsed) {
+                        routename.push(parsed[x]);
+                    }
+                    var routedata = routename[0];
+                    var busloc = routerealbusloc[0];
+
+
+                    for (var i in routedata) {
+
+                        for (var j in busloc) {
+                            if (routedata[i].stop_id === busloc[j].stop_id) {
+
+                                sejong_bus_location_seq.push(i*1+1);
+                                if((i*1+1)< trnseq){
+                                    up_seq.push(i*1+1);
+                                }else{
+                                    down_seq.push(i*1+1);
+                                }
+                            }
+                        }
+                    }
+                    routeCallback();
+
+                } else {
+                    throw error;
+                }
+            });
+        },
+        function(resCallback){
+            sejong_bus_location_seq.push(up_seq);
+            sejong_bus_location_seq.push(down_seq);
+
             callback(sejong_bus_location_seq);
-
-        } else {
-            throw error;
+            resCallback();
         }
-    });
+    ]);
 };
-
 
 
 sejongObject.urlStationRequest = function (dbObject, callback) {
@@ -140,7 +167,7 @@ sejongObject.urlStationRequest = function (dbObject, callback) {
 
                 temp.routenm = sejong_list[i].route_name;
                 temp.routeid = sejong_list[i].route_id;
-                temp.arrive_time = sejong_list[i].provide_type;
+                temp.arrive_time = sejong_list[i].provide_type + " 도착";
                 temp.cur_pos = sejong_list[i].rstop;
 
                 sejong_arrive_list.push(temp);

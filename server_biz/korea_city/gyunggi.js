@@ -13,7 +13,6 @@
 
 var request = require('request');
 var xml2jsparser = require('xml2json');
-var errorHaldling = require('../../utility/errorHandling.js');
 
 var gyunggiObject = {};
 
@@ -23,13 +22,6 @@ var routeurl = "http://openapi.gbis.go.kr/ws/rest/buslocationservice?" +
 var stationurl = "http://openapi.gbis.go.kr/ws/rest/busarrivalservice/station?" +
     "serviceKey=3Dk6D80iliB7j4NcdFAiIGHm2O3X7HXg8j27%2BTt7%2FOhxiAecZ%2FffBwSQZCjGcqzTlONzGeUh%2F17714ETt5z39Q%3D%3D";
 
-var pool = require('../../server_config/mysql/DBConnect.js');
-var mysqlConfig = require('../../server_config/mysql/mysql_config.js');
-
-/**
- *
- * request data format
- */
 
 var requestData = {};
 requestData.route = {};
@@ -51,8 +43,11 @@ gyunggiObject.urlRouteRequest = function (dbObject, callback) {
     var url = routeurl + "&routeId=" + requestData.route.routeId;
 
     request(url, function (error, response, body) {
-
+        var bus_loc_temp = [];
         var gyunggi_bus_location_seq = [];
+        var up_seq = [];
+        var down_seq = [];
+        var trnseq = dbObject[0].trnseq;
 
         if (error) {
             throw error;
@@ -68,19 +63,31 @@ gyunggiObject.urlRouteRequest = function (dbObject, callback) {
             var result = xml2jsparser.toJson(xmldata, options);
             if (result.response[0].msgBody === undefined) {
 
+                gyunggi_bus_location_seq.push(up_seq);
+                gyunggi_bus_location_seq.push(down_seq);
                 callback(gyunggi_bus_location_seq);
+
             }
             else {
                 var tempre = result.response[0].msgBody[0];
                 var locarr = tempre.busLocationList;
 
                 for (var i in locarr) {
+                    console.log(locarr[i]);
                     var seq = locarr[i].stationSeq[0];
-                    seq = seq*1+1;
-                    gyunggi_bus_location_seq.push(seq);
-                }
-                callback(gyunggi_bus_location_seq);
+                    if(seq < trnseq){
+                        seq = seq*1+1;
+                        up_seq.push(seq);
+                    }else{
+                        seq = seq*1+1;
+                        down_seq.push(seq);
+                    }
 
+                }
+
+                gyunggi_bus_location_seq.push(up_seq);
+                gyunggi_bus_location_seq.push(down_seq);
+                callback(gyunggi_bus_location_seq);
             }
         }
     });
@@ -120,7 +127,7 @@ gyunggiObject.urlStationRequest = function (dbObject, callback) {
                     var temp = {};
                     var routenm = findRoutenm(stArr[i].routeId[0], dbObject);
                     temp.routenm = routenm;
-                    temp.arrive_time = stArr[i].predictTime1[0];
+                    temp.arrive_time = "약 "+ stArr[i].predictTime1[0] + "분 후 도착";
                     temp.routeid = stArr[i].routeId[0];
 
                     gyunggi_list.push(temp);

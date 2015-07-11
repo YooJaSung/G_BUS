@@ -9,6 +9,12 @@
 //   http://m.bus.gjcity.net/mobile/busArriveInfoList
 //   station param -> BUSSTOP_ID
 
+
+/**
+ * 안댐안댐 안댐
+ * @type {Request|exports}
+ */
+
 var request = require('request');
 var errorHaldling = require('../../utility/errorHandling.js');
 
@@ -37,7 +43,7 @@ gwangjuObject.urlRouteRequest = function(dbObject, callback){
      * 1. routeUrl 포멧을 db에서 선택한 데이터를 가지고 맞춰준다
      * 2. post or get 방식에 따라 request 까지 해준다.
      */
-    requestData.route.LINE_ID = dbObject[0].routeid;
+    /*requestData.route.LINE_ID = dbObject[0].routeid;
 
     var url = routeurl + "?LINE_ID=" +  requestData.route.LINE_ID;
 
@@ -45,6 +51,7 @@ gwangjuObject.urlRouteRequest = function(dbObject, callback){
         if (!error && response.statusCode == 200) {
             var gwangju_bus_location_seq = [];
             var parsed = JSON.parse(json);
+            console.log(parsed);
             var arr = [];
             for(var x in parsed){
                 arr.push(parsed[x]);
@@ -65,12 +72,16 @@ gwangjuObject.urlRouteRequest = function(dbObject, callback){
         }else{
             throw error;
         }
-    });
+    });*/
+    var gwangju_bus_location_seq = [];
+    var up_seq = [];
+    gwangju_bus_location_seq.push(up_seq);
+    callback(gwangju_bus_location_seq);
 
 };
 gwangjuObject.urlStationRequest = function(dbObject, callback){
 
-    requestData.station.BUSSTOP_ID = dbObject[0].stopid;
+    /*requestData.station.BUSSTOP_ID = dbObject[0].stopid;
 
     request.post({
         url: stationurl,
@@ -87,7 +98,7 @@ gwangjuObject.urlStationRequest = function(dbObject, callback){
 
             for(var i in gwangju_list) {
                 var temp = {};
-                temp.arrive_time = gwangju_list[i].REMAIN_MIN;
+                temp.arrive_time = "약 " + gwangju_list[i].REMAIN_MIN + "분 후 도착";
                 temp.routenm = gwangju_list[i].LINE_NAME;
                 temp.routeid = gwangju_list[i].LINE_ID;
                 temp.cur_pos = gwangju_list[i].REMAIN_STOP;
@@ -111,7 +122,10 @@ gwangjuObject.urlStationRequest = function(dbObject, callback){
         }else{
             throw error;
         }
-    });
+    });*/
+
+    var gwangju_list = [];
+    callback(gwangju_list);
 
 };
 

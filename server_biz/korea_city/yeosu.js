@@ -11,7 +11,7 @@
 
 var request = require('request');
 var cheerio = require('cheerio');
-var errorHaldling = require('../../utility/errorHandling.js');
+
 var commonBiz = require('../korea_common/common_biz.js');
 
 var yeosuObject = {};
@@ -44,20 +44,25 @@ yeosuObject.urlRouteRequest = function (dbObject, callback) {
 
     var url = routeurl + "?busRouteID=" + requestData.route.busRouteID;
 
+
+
     request(url, function (error, response, html) {
         if (!error && response.statusCode == 200) {
             var yeosu_bus_location_seq = [];
+            var up_seq = [];
             var $ = cheerio.load(html);
             var $td = $('td[width="20"]');
             if ($td.length === 0) {
                 //잘못된 버스 번호 요청
+                yeosu_bus_location_seq.push(up_seq);
                 callback(yeosu_bus_location_seq);
             } else {
                 $td.each(function (i) {
                     if ($(this).find('img').attr('src') === 'images/icon_bus.gif') {
-                        yeosu_bus_location_seq.push(i*1+1);
+                        up_seq.push(i*1+1);
                     }
                 });
+                yeosu_bus_location_seq.push(up_seq);
                 callback(yeosu_bus_location_seq);
             }
         } else {
@@ -90,7 +95,7 @@ yeosuObject.urlStationRequest = function (dbObject, callback) {
                 if ($(this).find('td').attr('class') !== 'col t_a_c') {
                     temp.routenm = $(this).find('td:nth-child(1)').text();
                     temp.cur_pos = $(this).find('td:nth-child(2)').text();
-                    temp.arrive_time = $(this).children().last().text();
+                    temp.arrive_time = "약 " + $(this).children().last().text() + " 도착";
                     temp.routeid = commonBiz.findRouteid(dbObject, temp.routenm);
                     yeosu_arrive_list.push(temp);
                 }

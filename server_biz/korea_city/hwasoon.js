@@ -10,7 +10,6 @@
 //   station param -> BUSSTOP_ID
 
 var request = require('request');
-var errorHaldling = require('../../utility/errorHandling.js');
 
 var hwasoonObject = {};
 
@@ -51,10 +50,12 @@ hwasoonObject.urlRouteRequest = function(dbObject, callback){
         }
     }, function (error, response, json) {
         var hwasoon_bus_location_seq = [];
+        var up_seq = [];
         if (!error && response.statusCode == 200) {
 
             var parsed = JSON.parse(json);
             var arr = [];
+
             for(var x in parsed){
                 arr.push(parsed[x]);
             }
@@ -62,13 +63,15 @@ hwasoonObject.urlRouteRequest = function(dbObject, callback){
 
             if(jsondata.length === 0){
                 //잘못된 버스번호
+                hwasoon_bus_location_seq.push(up_seq);
                 callback(hwasoon_bus_location_seq);
             }else{
                 for(var i in jsondata){
                     if(jsondata[i].CARNO !== null ){
-                        hwasoon_bus_location_seq.push(i*1+1);
+                        up_seq.push(i*1+1);
                     }
                 }
+                hwasoon_bus_location_seq.push(up_seq);
                 callback(hwasoon_bus_location_seq);
             }
         }else{
@@ -95,7 +98,7 @@ hwasoonObject.urlStationRequest = function(dbObject, callback){
 
             for(var i in hwasoon_list) {
                 var temp = {};
-                temp.arrive_time = hwasoon_list[i].REMAIN_MIN;
+                temp.arrive_time = "약 " + hwasoon_list[i].REMAIN_MIN + "분 후 도착";
                 temp.cur_pos = hwasoon_list[i].REMAIN_STOP;
                 temp.routenm = hwasoon_list[i].LINE_NAME;
                 temp.routeid = hwasoon_list[i].LINE_ID ;

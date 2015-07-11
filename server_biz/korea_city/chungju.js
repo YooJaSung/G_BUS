@@ -11,7 +11,6 @@
 //   station param -> sid
 
 var request = require('request');
-var errorHaldling = require('../../utility/errorHandling.js');
 
 var chungjuObject = {};
 
@@ -50,6 +49,7 @@ chungjuObject.urlRouteRequest = function(dbObject, callback){
     }, function (error, response, json) {
         if (!error && response.statusCode == 200) {
             var chungju_bus_location_seq = [];
+            var up_seq = [];
 
             var parsed = JSON.parse(json);
             var arr = [];
@@ -64,9 +64,10 @@ chungjuObject.urlRouteRequest = function(dbObject, callback){
             }else{
                 for(var i in jsondata){
                     if(jsondata[i].busType !== ' '){
-                        chungju_bus_location_seq.push(i*1+1);
+                        up_seq.push(i*1+1);
                     }
                 }
+                chungju_bus_location_seq.push(up_seq);
                 callback(chungju_bus_location_seq);
             }
 
@@ -74,8 +75,8 @@ chungjuObject.urlRouteRequest = function(dbObject, callback){
             throw error;
         }
     });
-
 };
+
 chungjuObject.urlStationRequest = function(dbObject, callback){
 
     requestData.station.sid = dbObject[0].stopid;
@@ -95,7 +96,7 @@ chungjuObject.urlStationRequest = function(dbObject, callback){
                 var temp = {};
                 temp.routenm = chungju_list[i].BUSROUTENO;
                 temp.routeid = chungju_list[i].BUSID;
-                temp.arrive_time = chungju_list[i].PREDICTTRAVELTIME;
+                temp.arrive_time = "약 " + chungju_list[i].PREDICTTRAVELTIME;
                 temp.cur_pos = chungju_list[i].LOCATIONNO;
                 chungju_arrive_list.push(temp);
             }

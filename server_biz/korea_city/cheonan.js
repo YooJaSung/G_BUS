@@ -10,7 +10,6 @@
 
 var request = require('request');
 var xml2jsparser = require('xml2json');
-var errorHaldling = require('../../utility/errorHandling.js');
 
 var chunanObject = {};
 
@@ -56,6 +55,7 @@ chunanObject.urlRouteRequest = function(dbObject, callback){
             throw err;
         } else {
             var chunan_bus_location_seq = [];
+            var up_seq = [];
             var xmldata = body;
             var options = {
                 object: true,
@@ -68,14 +68,16 @@ chunanObject.urlRouteRequest = function(dbObject, callback){
 
             if(bus_location_data === undefined){
                 //잘못된 버스 번호
-                callback(chunan_bus_location_seq);
+                callback(chunan_bus_location_seq.push(up_seq));
             }else{
                 for (var i in bus_location_data_item) {
                     if (bus_location_data_item[i].bus_name[0] !== 'null') {
-                        console.log(bus_location_data_item[i].stop_seq[0]);
-                        chunan_bus_location_seq.push(bus_location_data_item[i].stop_seq[0]);
+                        up_seq.push(bus_location_data_item[i].stop_seq[0]);
                     }
                 }
+
+                chunan_bus_location_seq.push(up_seq);
+
                 callback(chunan_bus_location_seq);
             }
         }
@@ -110,7 +112,7 @@ chunanObject.urlStationRequest = function(dbObject, callback){
 
                 var temp = {};
                 if (chunan_list.found_item[0].item[x].remain_time != 'null') {
-                    temp.arrive_time = chunan_list.found_item[0].item[x].remain_time[0];
+                    temp.arrive_time = "약 " + chunan_list.found_item[0].item[x].remain_time[0] + "분 후 도착";
                     temp.routenm = chunan_list.found_item[0].item[x].route_name[0];
                     temp.cur_pos = chunan_list.found_item[0].item[x].remain_stop_count[0];
                     temp.routeid = chunan_list.found_item[0].item[x].route_no[0];

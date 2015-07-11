@@ -16,7 +16,7 @@
 
 var request = require('request');
 var xml2jsparser = require('xml2json');
-var errorHaldling = require('../../utility/errorHandling.js');
+
 var commonBiz = require('../korea_common/common_biz.js');
 
 var seoulObject = {};
@@ -58,6 +58,8 @@ seoulObject.urlRouteRequest = function (dbObject, callback) {
 
     request(url, function (error, response, body) {
         var seoul_bus_location_seq = [];
+        var up_seq = [];
+        var down_seq = [];
         if (error) {
             throw error;
         }
@@ -76,8 +78,10 @@ seoulObject.urlRouteRequest = function (dbObject, callback) {
             for(var i in locArr){
                 var seq = locArr[i].sectOrd[0];
                 seq = seq*1+1;
-                seoul_bus_location_seq.push(seq);
+                up_seq.push(seq);
             }
+
+            seoul_bus_location_seq.push(up_seq);
 
             callback(seoul_bus_location_seq);
 
@@ -108,6 +112,7 @@ seoulObject.urlStationRequest = function (dbObject, callback) {
                 sanitize: false,
                 arrayNotation: true
             };
+
             var result = xml2jsparser.toJson(xmldata, options);
 
             var tempre = result.ServiceResult[0].msgBody[0];
@@ -116,8 +121,7 @@ seoulObject.urlStationRequest = function (dbObject, callback) {
                 var temp = {};
                 temp.routenm = stArr[i].rtNm[0];
                 temp.routeid = stArr[i].busRouteId[0];
-                temp.arrive_time = commonBiz.changeTomin(stArr[i].traTime1[0]);
-
+                temp.arrive_time = "약 " + commonBiz.changeTomin(stArr[i].traTime1[0]) + "후 도착";
                 seoul_list.push(temp);
             }
             callback(seoul_list);

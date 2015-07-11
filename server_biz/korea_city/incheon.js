@@ -12,7 +12,7 @@ var request = require('request');
 var jsdom = require('jsdom');
 var iconv = require('iconv');
 var cheerio = require('cheerio');
-var errorHaldling = require('../../utility/errorHandling.js');
+
 var commonBiz = require('../korea_common/common_biz.js');
 
 var incheonObject = {};
@@ -43,9 +43,11 @@ incheonObject.urlRouteRequest = function(dbObject, callback){
     requestData.route.keyword = dbObject[0].routeid;
 
     var url = routeurl + "?keyword=" + requestData.route.keyword;
+    var up_seq = [];
+    var down_seq = [];
+
 
     request(url , function (error, response, html) {
-
 
         if (!error && response.statusCode == 200) {
             var incheon_bus_location_seq = [];
@@ -58,12 +60,15 @@ incheonObject.urlRouteRequest = function(dbObject, callback){
             }else{
                 $a.each(function (i) {
                     if ($(this).find('span img').attr('src') === '/images/bus_icon.png') {
-                        console.log(i);
-                        incheon_bus_location_seq.push(i*1+1);
+                        up_seq.push(i*1+1);
                     }
                 });
+
+                incheon_bus_location_seq.push(up_seq);
+
                 callback(incheon_bus_location_seq);
             }
+
         }else{
             throw error;
         }
@@ -100,7 +105,7 @@ incheonObject.urlStationRequest = function(dbObject, callback){
                         var res = str.split(" ");
 
                         temp.routenm= res[0].replace(/\s/gi, '');
-                        temp.arrive_time = res[2].replace(/\s/gi, '') + res[3].replace(/\s/gi, '');
+                        temp.arrive_time = "약 " + res[2].replace(/\s/gi, '') + res[3].replace(/\s/gi, '') + "후 도착";
                         temp.cur_pos = res[4].replace(/\s/gi, '') + res[5].replace(/\s/gi, '');
                         temp.routeid = commonBiz.findRouteid(dbObject, temp.routenm);
 

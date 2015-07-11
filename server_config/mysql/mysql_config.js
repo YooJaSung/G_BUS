@@ -9,13 +9,13 @@ var mysqlconfig = {};
 mysqlconfig.database = {};
 
 
+
 /**
  *
  * connection setting
  */
-mysqlconfig.g_busquery = {};
 
-mysqlconfig.g_busquery.temp = "";
+mysqlconfig.g_busquery = {};
 
 /*
  #####################################################################
@@ -38,7 +38,8 @@ mysqlconfig.g_busquery.temp = "";
  */
 
 mysqlconfig.g_busquery.ROUTESEARCH =
-    "SELECT R.citycd, R.rid, R.routeid, R.routenm, R.routesubnm" +
+    'call globus_v2.routeSearch(?,?);';     // citycds, routenm
+    /*"SELECT R.citycd, R.rid, R.routeid, R.routenm, R.routesubnm" +
     " , ST.STOPNM AS ststopnm " +
     " , ED.STOPNM AS edstopnm " +
     " , C.cityEnNm " +
@@ -46,7 +47,7 @@ mysqlconfig.g_busquery.ROUTESEARCH =
     " INNER JOIN CITY C ON R.CITYCD = C.CITYCD "+
     " LEFT OUTER JOIN STOPS ST  ON R.CITYCD = ST.CITYCD AND R.STSTOPSID = ST.SID " +
     " LEFT OUTER JOIN STOPS ED  ON R.CITYCD = ED.CITYCD AND R.EDSTOPSID = ED.SID " +
-    " WHERE R.ROUTENM LIKE ? ";
+    " WHERE R.ROUTENM LIKE ? ";*/
 
 /*
  #####################################################################
@@ -61,9 +62,10 @@ mysqlconfig.g_busquery.ROUTESEARCH =
  */
 
 mysqlconfig.g_busquery.ROUTEDETAIL =
-    " SELECT RVS.citycd, RVS.seq " +
+    'call globus_v2.routeSearchDetail(?, ?);';  // citycd , rid
+   /* " SELECT RVS.citycd, RVS.seq " +
     " , R.rid,R.routeid, R.routenm, R.routedesc, R.trnsid " +
-    " , S.sid, S.stopid, S.stopnm " +
+    " , S.sid, S.stopid, S.stopnm, S.arsid " +
     " , R.term, R.firsttm, R.lasttm " +
     " , if(locate('가상',S.stopnm)!=0, '0','1') as vFlag "+
     " , R.ststopnm, R.edstopnm " +
@@ -72,7 +74,7 @@ mysqlconfig.g_busquery.ROUTEDETAIL =
     " ON RVS.CITYCD = R.CITYCD AND RVS.RID = R.RID "+
     " INNER JOIN STOPS S " +
     " ON RVS.CITYCD = S.CITYCD AND RVS.SID = S.SID " +
-    " WHERE RVS.CITYCD = ? AND RVS.RID = ?; ";
+    " WHERE RVS.CITYCD = ? AND RVS.RID = ?; ";*/
 
 
 /*
@@ -87,11 +89,15 @@ mysqlconfig.g_busquery.ROUTEDETAIL =
  */
 
 mysqlconfig.g_busquery.STATIONSEARCH =
-    " SELECT S.citycd, sid, stopnm, stopid, arsid, S.latiX, S.longY " +
-    " , C.cityEnNm " +
-    " FROM STOPS S " +
-    " INNER JOIN CITY C ON S.CITYCD = C.CITYCD "+
-    " WHERE stopnm like ? ";
+    'call globus_v2.stationSearch(?,?);';   // citycds, stopnm
+
+
+
+/*" SELECT S.citycd, sid, stopnm, stopid, arsid, S.latiX, S.longY " +
+" , C.cityEnNm " +
+" FROM STOPS S " +
+" INNER JOIN CITY C ON S.CITYCD = C.CITYCD "+
+" WHERE stopnm like ? ";*/
 
 
 /*
@@ -106,8 +112,10 @@ mysqlconfig.g_busquery.STATIONSEARCH =
  #####################################################################
  */
 
+
 mysqlconfig.g_busquery.STATIONDETAIL =
-    " SELECT distinct RVS.citycd, RVS.seq " +
+    'call globus_v2.stationDetailSearch(?,?);'; // citycd , sid
+    /*" SELECT distinct RVS.citycd, RVS.seq " +
     " , R.rid, R.routeid, R.routedesc, R.routenm, R.routesubnm " +
     " , RVS.sid, S.stopid, S.stopnm, S.arsid, S.stopdesc, S.LATIX, S.LONGY " +
     " FROM ROUTEVIASTOP RVS " +
@@ -115,10 +123,11 @@ mysqlconfig.g_busquery.STATIONDETAIL =
     " ON RVS.CITYCD = R.CITYCD AND RVS.RID = R.RID " +
     " INNER JOIN STOPS S " +
     " ON RVS.CITYCD = S.CITYCD AND RVS.SID = S.SID " +
-    " WHERE RVS.CITYCD = ? AND RVS.SID = ?";
+    " WHERE RVS.CITYCD = ? AND RVS.SID = ?";*/
 
 mysqlconfig.g_busquery.AROUNDXY =
-    " SELECT sid, stopid, stopnm, arsid, latix AS aroundX, longy AS aroundY, S.citycd AS citycd, cityEnNm " +
+    ' call globus_v2.aroundStationSearch(?,?,?);'; // citycd, x,y
+    /*" SELECT sid, stopid, stopnm, arsid, latix AS aroundX, longy AS aroundY, S.citycd AS citycd, cityEnNm " +
     " FROM STOPS S" +
     " INNER JOIN CITY C ON S.CITYCD = C.CITYCD " +
     " WHERE S.CITYCD = ? " +
@@ -126,13 +135,27 @@ mysqlconfig.g_busquery.AROUNDXY =
     " AND LONGY BETWEEN ? -0.005  AND ? + 0.005 " +
     " AND (acos(sin(radians(?)) * sin(radians(LATIX)) + " +
     " cos(radians(?)) * cos(radians(LATIX)) * " +
-    " cos(radians(?) - radians(LONGY))) * 6378) BETWEEN 0.01 AND 0.5; ";
+    " cos(radians(?) - radians(LONGY))) * 6378) BETWEEN 0.01 AND 0.5; ";*/
 
-
-/**
- *
- * database query setting
+/*
+ #####################################################################
+ ##	SERVICENAME : PLACE SEARCH       								##
+ ##	DESC : 	해당 정류장을 지나는 노선 목록을 제공한다. 						##
+ ##																	##
+ ##	REQ :	SX, SY, EX, EY  								        ##
+ ##	RES :	sid, fstopid, fstopnm, fstopdesc, frid, frouteid        ##
+ ##         froutenm , trnsid, trnstopid, trnstopnm, trnstopdesc    ##
+ ##         erid AS trrid, erouteid AS trrouteid ,                  ##
+ ##         eroutenm AS trroutenm , estopid, estopnm, estopdesc     ##
+ ##         erid, erouteid, eroutenm                                ##
+ ##                                                                 ##
+ ##		 															##
+ #####################################################################
  */
+
+mysqlconfig.g_busquery.PLACESEARCH =
+    " CALL SEARCHPATH( ?, ?, ? ,? ); ";
+
 
 
 module.exports = mysqlconfig;

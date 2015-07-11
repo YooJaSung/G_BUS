@@ -10,7 +10,9 @@
 //   station param -> stop_id
 
 var request = require('request');
-var errorHaldling = require('../../utility/errorHandling.js');
+var cheerio = require('cheerio');
+
+
 var commonBiz = require('../korea_common/common_biz.js');
 
 var wonjuObject = {};
@@ -54,6 +56,8 @@ wonjuObject.urlRouteRequest = function(dbObject, callback){
         if (!error && response.statusCode == 200) {
 
             var wonju_bus_location_seq = [];
+            var up_seq = [];
+
 
 
             var parsed = JSON.parse(json);
@@ -69,9 +73,11 @@ wonjuObject.urlRouteRequest = function(dbObject, callback){
                 callback(wonju_bus_location_seq);
             }else{
                 for(var i in jsondata){
-                    wonju_bus_location_seq.push(jsondata[i].LATEST_STOP_ORD);
+                    up_seq.push((jsondata[i].LATEST_STOP_ORD)*1);
                 }
-                wonju_bus_location_seq.sort();
+                up_seq.sort();
+
+                wonju_bus_location_seq.push(up_seq);
                 callback(wonju_bus_location_seq);
             }
         }else{
@@ -95,8 +101,6 @@ wonjuObject.urlStationRequest = function(dbObject, callback){
             var $ = cheerio.load(html);
             var $tr = $("tr");
             var wonju_arrive_list = [];
-
-
 
             $tr.each(function () {
 

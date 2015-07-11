@@ -9,7 +9,6 @@
 //   station param -> busStopId
 
 var request = require('request');
-var errorHaldling = require('../../utility/errorHandling.js');
 
 
 var asanObject = {};
@@ -52,6 +51,11 @@ asanObject.urlRouteRequest = function (dbObject, callback) {
     }, function (error, httpResponse, json) {
 
         var asan_bus_location_seq = [];
+        var asan_bus_location_temp = [];
+        var up_seq = [];
+        var down_seq = [];
+        var trnseq = dbObject[0].trnseq;
+
         if (error) {
             throw error;
         } else {
@@ -71,10 +75,28 @@ asanObject.urlRouteRequest = function (dbObject, callback) {
                 /**
                  * +1 된 값
                  */
-                asan_bus_location_seq.push(findRouteSeq(jsondata[i].stop_id, dbObject));
+                asan_bus_location_temp.push(findRouteSeq(jsondata[i].stop_id, dbObject));
             }
-            callback(asan_bus_location_seq);
 
+            if(trnseq === null || trnseq === dbObject.length){
+                up_seq = asan_bus_location_temp;
+                asan_bus_location_seq.push(up_seq);
+                callback(asan_bus_location_seq);
+
+
+            }else{
+                for(var i in asan_bus_location_temp){
+                    if(asan_bus_location_temp[i] < trnseq){
+                        up_seq.push(asan_bus_location_temp[i]);
+                    }else{
+                        down_seq.push(asan_bus_location_temp[i]);
+                    }
+                }
+
+                asan_bus_location_seq.push(up_seq);
+                asan_bus_location_seq.push(down_seq);
+                callback(asan_bus_location_seq);
+            }
         }
     });
 };
@@ -91,12 +113,13 @@ asanObject.urlStationRequest = function (dbObject, callback) {
         if (!error && response.statusCode == 200) {
 
             var psd = JSON.parse(json);
-            var arriveTime_list = psd.busStopRouteList;
+            var asan_list = psd.busStopRouteList;
             var asan_arrive_list = [];
 
 
-            for (var i in arriveTime_list) {
-                temp.arrive_time = asan_list[i].provide_type;
+            for (var i in asan_list) {
+                var temp = {};
+                temp.arrive_time = asan_list[i].provide_type + " 도착";
                 temp.routenm = asan_list[i].route_name;
                 temp.cur_pos = asan_list[i].rstop;
                 temp.routeid = asan_list[i].route_id;
@@ -123,7 +146,6 @@ function findRouteSeq(stopid, dbObject) {
 
         if (dbObject[i].stopid === stopid) {
             seq = dbObject[i].seq;
-            seq = seq * 1 + 1;
             break;
         }
     }

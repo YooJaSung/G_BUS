@@ -10,7 +10,7 @@
 //   station param -> stop_id
 
 var request = require('request');
-var errorHaldling = require('../../utility/errorHandling.js');
+
 var commonBiz = require('../korea_common/common_biz.js');
 
 var jinjuObject = {};
@@ -49,6 +49,7 @@ jinjuObject.urlRouteRequest = function(dbObject , callback){
         }
     }, function (error, response, json) {
         var jinju_bus_location_seq = [];
+        var up_seq = [];
         if (!error && response.statusCode == 200) {
 
             var parsed = JSON.parse(json);
@@ -56,14 +57,16 @@ jinjuObject.urlRouteRequest = function(dbObject , callback){
             for(var x in parsed){
                 arr.push(parsed[x]);
             }
-
             var jsondata = arr[2];
+
             if(jsondata === undefined){
+                jinju_bus_location_seq.push(up_seq);
                 callback(jinju_bus_location_seq);
             }else{
                 for(var i in jsondata){
-                    jinju_bus_location_seq.push(findRouteSeq(dbObject,jsondata[i].BrtId));
+                    up_seq.push(findRouteSeq(dbObject,jsondata[i].Stop_ID));
                 }
+                jinju_bus_location_seq.push(up_seq);
                 callback(jinju_bus_location_seq);
             }
         }else{
@@ -75,7 +78,7 @@ jinjuObject.urlRouteRequest = function(dbObject , callback){
 
 jinjuObject.urlStationRequest = function(dbObject, callback){
 
-    requestData.station.stop_id = dbObject[0].stopid;
+    requestData.station.stop_id = dbObject[0].arsid;
 
     request.post({
         url: stationurl,
@@ -88,15 +91,15 @@ jinjuObject.urlStationRequest = function(dbObject, callback){
 
             //jinju_bus_list --> 해당 정류소에 정차하는 모든 노선
             //jinju_bus_curr --> 현재 도착 예정 노선
-            var jinju_bus_list = psd.AllBusArrivalInfoResult.AllBusArrivalInfo.MsgBody.BUSINFO.BusListInfo.list;
+            /*var jinju_bus_list = psd.AllBusArrivalInfoResult.AllBusArrivalInfo.MsgBody.BUSINFO.BusListInfo.list;*/
+
             var jinju_bus_curr = psd.AllBusArrivalInfoResult.AllBusArrivalInfo.MsgBody.BUSINFO.CurrentAllBusArrivalInfo.list;
 
             var jinju_arrive_list = [];
 
-
             for(var i in jinju_bus_curr) {
                 var temp = {};
-                temp.arrive_time = commonBiz.changeTomin(jinju_bus_curr[i].remainTime);    //분 계산해줘야함
+                temp.arrive_time = "약 " + commonBiz.changeTomin(jinju_bus_curr[i].remainTime) + " 후 도착";    //분 계산해줘야함
                 temp.routenm = jinju_bus_curr[i].lineNo;
                 temp.routeid = jinju_bus_curr[i].routeId;
                 temp.cur_pos = jinju_bus_curr[i].remainStopCnt;
@@ -105,7 +108,7 @@ jinjuObject.urlStationRequest = function(dbObject, callback){
             }
             if(jinju_arrive_list.length === 0){
                 var temp = {};
-                temp.arrive_time = "도착예정 버스가 없습니다";
+                temp.arrive_time = "";
                 temp.routenm = "";
                 temp.cur_pos = "";
                 temp.routeid = "";
@@ -121,12 +124,13 @@ jinjuObject.urlStationRequest = function(dbObject, callback){
     });
 };
 
-function findRouteSeq(dbObject, BrtId){
+function findRouteSeq(dbObject, Stop_ID){
+
     var seq;
     for(var i in dbObject){
-        if(dbObject[i].stopid === BrtId){
-            seq = i;
-            seq = seq*1+1;
+
+        if(dbObject[i].arsid === Stop_ID){
+            seq = dbObject[i].seq;
             break;
         }
     }
