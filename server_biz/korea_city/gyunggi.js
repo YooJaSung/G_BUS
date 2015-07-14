@@ -38,7 +38,9 @@ gyunggiObject.urlRouteRequest = function (dbObject, callback) {
      * 2. post or get 방식에 따라 request 까지 해준다.
      */
 
-    requestData.route.routeId = dbObject[0].routeid;
+    var dbTemp = dbObject[0];
+
+    requestData.route.routeId = dbTemp[0].routeid;
 
     var url = routeurl + "&routeId=" + requestData.route.routeId;
 
@@ -47,7 +49,7 @@ gyunggiObject.urlRouteRequest = function (dbObject, callback) {
         var gyunggi_bus_location_seq = [];
         var up_seq = [];
         var down_seq = [];
-        var trnseq = dbObject[0].trnseq;
+        var trnseq = dbTemp[0].trnseq;
 
         if (error) {
             throw error;
@@ -75,11 +77,11 @@ gyunggiObject.urlRouteRequest = function (dbObject, callback) {
                 for (var i in locarr) {
                     console.log(locarr[i]);
                     var seq = locarr[i].stationSeq[0];
-                    if(seq < trnseq){
+                    if(seq <= trnseq){
                         seq = seq*1+1;
                         up_seq.push(seq);
                     }else{
-                        seq = seq*1+1;
+                        seq = seq*1+1-trnseq;
                         down_seq.push(seq);
                     }
 
@@ -94,7 +96,10 @@ gyunggiObject.urlRouteRequest = function (dbObject, callback) {
 };
 gyunggiObject.urlStationRequest = function (dbObject, callback) {
 
-    requestData.station.stationId = dbObject[0].stopid;
+    var dbTemp = dbObject[0];
+
+
+    requestData.station.stationId = dbTemp[0].stopid;
 
 
     var url = stationurl + "&stationId=" + requestData.station.stationId;
@@ -125,10 +130,11 @@ gyunggiObject.urlStationRequest = function (dbObject, callback) {
 
                 for(var i in stArr){
                     var temp = {};
-                    var routenm = findRoutenm(stArr[i].routeId[0], dbObject);
+                    var routenm = findRoutenm(stArr[i].routeId[0], dbTemp);
                     temp.routenm = routenm;
                     temp.arrive_time = "약 "+ stArr[i].predictTime1[0] + "분 후 도착";
                     temp.routeid = stArr[i].routeId[0];
+                    temp.cur_pos = stArr[i].LocationNo1[0];
 
                     gyunggi_list.push(temp);
                 }
@@ -141,13 +147,13 @@ gyunggiObject.urlStationRequest = function (dbObject, callback) {
 
 };
 
-function findRoutenm(routeid,dbObject){
+function findRoutenm(routeid,dbTemp){
 
     var reRoutenm = undefined;
-    for(var i in dbObject){
-        if(dbObject[i].routeid === routeid){
+    for(var i in dbTemp){
+        if(dbTemp[i].routeid === routeid){
 
-            reRoutenm = dbObject[i].routenm;
+            reRoutenm = dbTemp[i].routenm;
 
         }
     }

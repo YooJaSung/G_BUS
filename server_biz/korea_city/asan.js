@@ -41,7 +41,9 @@ asanObject.urlRouteRequest = function (dbObject, callback) {
      * 1. routeUrl 포멧을 db에서 선택한 데이터를 가지고 맞춰준다
      * 2. post or get 방식에 따라 request 까지 해준다.
      */
-    requestData.route.busRouteId = dbObject[0].routeid;
+
+    var dbTemp = dbObject[0];
+    requestData.route.busRouteId = dbTemp[0].routeid;
 
     request.post({
         url: 'http://bus.asan.go.kr/mobile/traffic/searchBusRealLocationDetail',
@@ -54,7 +56,7 @@ asanObject.urlRouteRequest = function (dbObject, callback) {
         var asan_bus_location_temp = [];
         var up_seq = [];
         var down_seq = [];
-        var trnseq = dbObject[0].trnseq;
+        var trnseq = dbTemp[0].trnseq;
 
         if (error) {
             throw error;
@@ -75,10 +77,10 @@ asanObject.urlRouteRequest = function (dbObject, callback) {
                 /**
                  * +1 된 값
                  */
-                asan_bus_location_temp.push(findRouteSeq(jsondata[i].stop_id, dbObject));
+                asan_bus_location_temp.push(findRouteSeq(jsondata[i].stop_id, dbTemp));
             }
 
-            if(trnseq === null || trnseq === dbObject.length){
+            if(trnseq === null || trnseq === dbTemp.length){
                 up_seq = asan_bus_location_temp;
                 asan_bus_location_seq.push(up_seq);
                 callback(asan_bus_location_seq);
@@ -86,10 +88,10 @@ asanObject.urlRouteRequest = function (dbObject, callback) {
 
             }else{
                 for(var i in asan_bus_location_temp){
-                    if(asan_bus_location_temp[i] < trnseq){
-                        up_seq.push(asan_bus_location_temp[i]);
+                    if(asan_bus_location_temp[i] <= trnseq){
+                        up_seq.push(asan_bus_location_temp[i]*1);
                     }else{
-                        down_seq.push(asan_bus_location_temp[i]);
+                        down_seq.push((asan_bus_location_temp[i]*1) - trnseq);
                     }
                 }
 
@@ -102,7 +104,10 @@ asanObject.urlRouteRequest = function (dbObject, callback) {
 };
 asanObject.urlStationRequest = function (dbObject, callback) {
 
-    requestData.station.busStopId = dbObject[0].stopid;
+
+    var dbTemp = dbObject[0];
+
+    requestData.station.busStopId = dbTemp[0].stopid;
 
     request.post({
         url: 'http://bus.asan.go.kr/mobile/traffic/searchBusStopRoute',
@@ -136,16 +141,16 @@ asanObject.urlStationRequest = function (dbObject, callback) {
 
 };
 
-function findRouteSeq(stopid, dbObject) {
+function findRouteSeq(stopid, dbTemp) {
     var seq = undefined;
 
-    for (var i in dbObject) {
+    for (var i in dbTemp) {
         /**
          * urlarr에 있는 stopid와 db에 stopnm을 비교하여 seq저장
          */
 
-        if (dbObject[i].stopid === stopid) {
-            seq = dbObject[i].seq;
+        if (dbTemp[i].stopid === stopid) {
+            seq = dbTemp[i].seq;
             break;
         }
     }

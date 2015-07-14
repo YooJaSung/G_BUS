@@ -40,7 +40,10 @@ jinjuObject.urlRouteRequest = function(dbObject , callback){
      * 2. post or get 방식에 따라 request 까지 해준다.
      */
 
-    requestData.route.brt_id = dbObject[0].routeid;
+    var dbTemp = dbObject[0];
+
+
+    requestData.route.brt_id = dbTemp[0].routeid;
 
     request.post({
         url: routeurl,
@@ -64,7 +67,7 @@ jinjuObject.urlRouteRequest = function(dbObject , callback){
                 callback(jinju_bus_location_seq);
             }else{
                 for(var i in jsondata){
-                    up_seq.push(findRouteSeq(dbObject,jsondata[i].Stop_ID));
+                    up_seq.push(findRouteSeq(dbTemp,jsondata[i].Stop_ID));
                 }
                 jinju_bus_location_seq.push(up_seq);
                 callback(jinju_bus_location_seq);
@@ -78,7 +81,9 @@ jinjuObject.urlRouteRequest = function(dbObject , callback){
 
 jinjuObject.urlStationRequest = function(dbObject, callback){
 
-    requestData.station.stop_id = dbObject[0].arsid;
+    var dbTemp = dbObject[0];
+
+    requestData.station.stop_id = dbTemp[0].arsid;
 
     request.post({
         url: stationurl,
@@ -124,13 +129,13 @@ jinjuObject.urlStationRequest = function(dbObject, callback){
     });
 };
 
-function findRouteSeq(dbObject, Stop_ID){
+function findRouteSeq(dbTemp, Stop_ID){
 
     var seq;
-    for(var i in dbObject){
+    for(var i in dbTemp){
 
-        if(dbObject[i].arsid === Stop_ID){
-            seq = dbObject[i].seq;
+        if(dbTemp[i].arsid === Stop_ID){
+            seq = dbTemp[i].seq;
             break;
         }
     }

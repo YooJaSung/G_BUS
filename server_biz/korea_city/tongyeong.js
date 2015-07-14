@@ -51,9 +51,9 @@ tongyeongObject.urlRouteRequest = function(dbObject, callback){
      */
 
 
-    ;
+    var dbTemp = dbObject[0];
 
-    requestData.route.prmRouteID = dbObject[0].routeid;
+    requestData.route.prmRouteID = dbTemp[0].routeid;
     request.post({
         url: routeurl,
         form: {
@@ -107,7 +107,8 @@ tongyeongObject.urlRouteRequest = function(dbObject, callback){
 tongyeongObject.urlStationRequest = function(dbObject, callback){
 
 
-    requestData.station.prmStationID = dbObject[0].stopid;
+    var dbTemp = dbObject[0];
+    requestData.station.prmStationID = dbTemp[0].stopid;
     request.post({
         url: stationurl,
         encoding: null,
@@ -138,7 +139,7 @@ tongyeongObject.urlStationRequest = function(dbObject, callback){
                 temp.routenm = $(this).find('td').eq(0).text().replace(/\s/gi, '');
                 temp.arrive_time = $(this).find('td').eq(2).text().replace(/\s/gi, '');
                 temp.cur_pos = $(this).find('td').eq(4).text().replace(/\s/gi, '');
-                temp.routeid = commonBiz.findRouteid(dbObject, temp.routenm);
+                temp.routeid = commonBiz.findRouteid(dbTemp, temp.routenm);
 
                 tongyeong_arrive_list.push(temp);
             });

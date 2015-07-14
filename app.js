@@ -24,15 +24,12 @@ var place = require('./routes/place/placeJs');
 var station = require('./routes/station/stationJs');
 var mailService = require('./routes/service/mailserviceJs');
 
-
 /**
  * util
  *
  */
 
 var send_mail = require('./utility/mailService.js');
-
-
 
 
 var app = express();

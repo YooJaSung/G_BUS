@@ -44,7 +44,8 @@ wonjuObject.urlRouteRequest = function(dbObject, callback){
      * 2. post or get 방식에 따라 request 까지 해준다.
      */
 
-    requestData.route.route_id = dbObject[0].routeid ;
+    var dbTemp = dbObject[0];
+    requestData.route.route_id = dbTemp[0].routeid ;
 
 
     request.post({
@@ -89,7 +90,8 @@ wonjuObject.urlRouteRequest = function(dbObject, callback){
 };
 wonjuObject.urlStationRequest = function(dbObject, callback){
 
-    requestData.station.stop_id = dbObject[0].stopid;
+    var dbTemp = dbObject[0];
+    requestData.station.stop_id = dbTemp[0].stopid;
 
     request.post({
         url: stationurl,
@@ -116,10 +118,9 @@ wonjuObject.urlStationRequest = function(dbObject, callback){
                 temp = $(this).find('td:nth-child(3)').text();
                 route_json.arrive_time = temp.replace(/\s/gi, '');
 
-                route_json.routeid = commonBiz.findRouteid(dbObject, commonBiz.removeChar(route_json.routenm));
+                route_json.routeid = commonBiz.findRouteid(dbTemp, commonBiz.removeChar(route_json.routenm));
 
                 wonju_arrive_list.push(route_json);
-
             });
 
             callback(wonju_arrive_list);

@@ -27,7 +27,10 @@ requestData.station.stop_stdid = "";
 
 jeonjuObject.urlRouteRequest = function(dbObject , callback){
 
-    requestData.route.brtStdid = dbObject[0].routeid;
+    var dbTemp = dbObject[0];
+
+
+    requestData.route.brtStdid = dbTemp[0].routeid;
 
     var url = routeurl + "&brtStdid=" + requestData.route.brtStdid +
         "&lKey=" + requestData.route.lKey;
@@ -68,7 +71,9 @@ jeonjuObject.urlRouteRequest = function(dbObject , callback){
 
 jeonjuObject.urlStationRequest = function(dbObject, callback){
 
-    requestData.station.stop_stdid = dbObject[0].stopid;
+    var dbTemp = dbObject[0];
+
+    requestData.station.stop_stdid = dbTemp[0].stopid;
 
     var url = stationurl + "?stop_stdid=" + requestData.station.stop_stdid;
 
@@ -95,7 +100,7 @@ jeonjuObject.urlStationRequest = function(dbObject, callback){
                         temp.routenm = $(this).find('td:nth-child(2)').text();
                         temp.arrive_time = $(this).find('td:nth-child(4)').text();
                         temp.cur_pos = $(this).find('td:nth-child(5)').text();
-                        temp.routeid =  commonBiz.findRouteid(dbObject, temp.routenm);
+                        temp.routeid =  commonBiz.findRouteid(dbTemp, temp.routenm);
 
                         jeonju_arrive_list.push(temp);
                     }

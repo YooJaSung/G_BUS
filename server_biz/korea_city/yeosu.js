@@ -40,7 +40,9 @@ yeosuObject.urlRouteRequest = function (dbObject, callback) {
      * 2. post or get 방식에 따라 request 까지 해준다.
      */
 
-    requestData.route.busRouteID = dbObject[0].routeid;
+    var dbTemp = dbObject[0];
+
+    requestData.route.busRouteID = dbTemp[0].routeid;
 
     var url = routeurl + "?busRouteID=" + requestData.route.busRouteID;
 
@@ -72,7 +74,9 @@ yeosuObject.urlRouteRequest = function (dbObject, callback) {
 };
 yeosuObject.urlStationRequest = function (dbObject, callback) {
 
-    requestData.station.sId = dbObject[0].stopid;
+    var dbTemp = dbObject[0];
+
+    requestData.station.sId = dbTemp[0].stopid;
 
     request.post({
         url: stationurl,
@@ -96,7 +100,7 @@ yeosuObject.urlStationRequest = function (dbObject, callback) {
                     temp.routenm = $(this).find('td:nth-child(1)').text();
                     temp.cur_pos = $(this).find('td:nth-child(2)').text();
                     temp.arrive_time = "약 " + $(this).children().last().text() + " 도착";
-                    temp.routeid = commonBiz.findRouteid(dbObject, temp.routenm);
+                    temp.routeid = commonBiz.findRouteid(dbTemp, temp.routenm);
                     yeosu_arrive_list.push(temp);
                 }
             });
@@ -114,13 +118,10 @@ yeosuObject.urlStationRequest = function (dbObject, callback) {
             }else{
                 callback(yeosu_arrive_list);
             }
-
-
         } else {
             throw error;
         }
     });
-
 };
 
 module.exports = yeosuObject;

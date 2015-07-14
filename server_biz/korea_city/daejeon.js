@@ -42,8 +42,10 @@ requestData.station.stationId = "";
 
 daejeonObject.urlRouteRequest = function (dbObject, callback) {
 
-    requestData.route.routeCd = dbObject[0].routeid;
-    requestData.route.routeNo = dbObject[0].routenm;
+    var dbTemp = dbObject[0];
+
+    requestData.route.routeCd = dbTemp[0].routeid;
+    requestData.route.routeNo = dbTemp[0].routenm;
     requestData.route.runWay = '';
     var up_seq = [];
     var down_seq = [];
@@ -113,7 +115,8 @@ daejeonObject.urlRouteRequest = function (dbObject, callback) {
 
 daejeonObject.urlStationRequest = function (dbObject, callback) {
 
-    requestData.station.stationId = dbObject[0].stopid;
+    var dbTemp = dbObject[0];
+    requestData.station.stationId = dbTemp[0].stopid;
     var url = stationurl+'?stationId='+requestData.station.stationId;
 
     request(url, function (error, response, html) {
@@ -130,7 +133,7 @@ daejeonObject.urlStationRequest = function (dbObject, callback) {
                 temp.routenm = $(this).find('td:nth-child(1)').text();
                 temp.arrive_time = '약 '+$(this).find('td:nth-child(2)').text();
                 temp.cur_pos = $(this).find('td:nth-child(3)').text();
-                temp.routeid = commonBiz.findRouteid(dbObject, temp.routenm);
+                temp.routeid = commonBiz.findRouteid(dbTemp, temp.routenm);
 
                 daejeon_list.push(temp);
             });

@@ -48,8 +48,9 @@ chuncheonObject.urlRouteRequest = function(dbObject, callback){
      * 2. post or get 방식에 따라 request 까지 해준다.
      */
 
-    requestData.route.prmRouteName = dbObject[0].routenm;
-    requestData.route.prmRouteID = dbObject[0].routeid;
+    var dbTemp = dbObject[0];
+    requestData.route.prmRouteName = dbTemp[0].routenm;
+    requestData.route.prmRouteID = dbTemp[0].routeid;
 
     var formdata = 'prmOperation='+requestData.route.prmOperation +'&prmRouteName='+requestData.route.prmRouteName+'&prmRouteID='+requestData.route.prmRouteID;
 
@@ -66,7 +67,7 @@ chuncheonObject.urlRouteRequest = function(dbObject, callback){
             var $ = cheerio.load(html);
             var $td = $('td[class=routeLineH]');
             var $tdname = $('td[class=name]');
-            var trnseq = dbObject[0].trnseq;
+            var trnseq = dbTemp[0].trnseq;
 
             $td.each(function(i){
                 if($(this).find('img').attr('src') === '../images/bus/icon_bus2.gif' || $(this).find('img').attr('src') === '../images/bus/icon_bus1.gif' ){
@@ -79,10 +80,10 @@ chuncheonObject.urlRouteRequest = function(dbObject, callback){
 
                 $tdname.each(function(j){
                     if(chuncheon_bus_location_temp[i] === j+1){
-                        if(commonBiz.splitSomething($(this).text(), ' ')*1 < trnseq){
+                        if(commonBiz.splitSomething($(this).text(), ' ')*1 <= trnseq){
                             up_seq.push(commonBiz.splitSomething($(this).text(), ' ') * 1);
                         }else{
-                            down_seq.push(commonBiz.splitSomething($(this).text(), ' ') * 1);
+                            down_seq.push(commonBiz.splitSomething($(this).text(), ' ') * 1 - trnseq);
                         }
                         // space 로 split 해서 저장
                         return false;
@@ -109,8 +110,10 @@ chuncheonObject.urlRouteRequest = function(dbObject, callback){
 };
 chuncheonObject.urlStationRequest = function(dbObject, callback){
 
-    requestData.station.prmStationName = dbObject[0].stopnm;
-    requestData.station.prmStationID = dbObject[0].stopid;
+
+    var dbTemp = dbObject[0];
+    requestData.station.prmStationName = dbTemp[0].stopnm;
+    requestData.station.prmStationID = dbTemp[0].stopid;
 
     request.post({
         uri: stationurl,
@@ -138,8 +141,8 @@ chuncheonObject.urlStationRequest = function(dbObject, callback){
 
                     route_json.routenm = $(this).find('td[width=90]').text();
                     route_json.arrive_time = '약 ' + $(this).find('td:nth-child(3)').text() + ' 후 도착';
-                    route_json.bus_loca = $(this).find('td[width=107]').text();
-                    route_json.routeid = commonBiz.findRouteid(dbObject, route_json.routenm);
+                    route_json.cur_pos = $(this).find('td[width=107]').text();
+                    route_json.routeid = commonBiz.findRouteid(dbTemp, route_json.routenm);
 
                     chuncheon_list.push(route_json);
                 }

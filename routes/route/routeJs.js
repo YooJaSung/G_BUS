@@ -5,7 +5,7 @@
 var express = require('express');
 var routeRouter = express.Router();
 var nimble = require('nimble');
-var errorHandling = require('../../utility/errorHandling.js');
+
 
 var koreaDb = require('../../server_biz/korea_common/korea_db.js');
 var koreaCommonBiz = require('../../server_biz/korea_common/common_biz.js');
@@ -29,8 +29,8 @@ routeRouter.all('/routeSearch', function (req, res, next) {
      */
 
      var getdata = req.body.data;
-     var routeNm = getdata.routeNm;
-     var cityCodeObj = getdata.cityObject;
+     var routeNm = getdata.routenm;
+     var cityCodeObj = getdata.cityobject;
 
     var cacheName  = koreaCommonBiz.makeCacheName(cityCodeObj, routeNm);
 
@@ -55,21 +55,22 @@ routeRouter.all('/routeSearch', function (req, res, next) {
            throw err;
        }
     });
-
 });
+
 
 routeRouter.all('/routeDetail', function (req, res, next) {
 
     var getdata = req.body.data;
-    var cityEnNm = getdata.cityEnNm;
+    var cityEnNm = getdata.cityennm;
     var rid = getdata.rid;
-    var cityCode = getdata.cityCode;
+    var cityCode = getdata.citycode;
 
     var cityDir = "../../server_biz/korea_city/" + cityEnNm + ".js";
     var cityObject = require(cityDir);
 
     var dbObject = undefined;
     var urlRouteObject = undefined;
+    var timetempObject = undefined;
     var routeObject = {};
 
     /**
@@ -91,10 +92,15 @@ routeRouter.all('/routeDetail', function (req, res, next) {
                 urlCallback();
             });
         },
+        function(timeCallback){
+            timetempObject = koreaCommonBiz.makeTimeObject(dbObject);
+            timeCallback();
+        },
         function(resCallback){
 
             routeObject.urlRouteObject = urlRouteObject;
             routeObject.dbObject = dbObject;
+            routeObject.timeObject = timetempObject;
             console.log('Route_Deatil Response Nimble');
             res.send(routeObject);
 

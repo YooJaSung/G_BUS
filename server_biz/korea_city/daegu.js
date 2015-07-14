@@ -43,9 +43,11 @@ daeguObject.urlRouteRequest = function (dbObject, callback) {
      * 2. post or get 방식에 따라 request 까지 해준다.
      */
 
+    var dbTemp = dbObject[0];
+
     requestData.route.act = "posInfo";
-    requestData.route.roId = dbObject[0].routeid;
-    requestData.route.roNo = dbObject[0].routenm;
+    requestData.route.roId = dbTemp[0].routeid;
+    requestData.route.roNo = dbTemp[0].routenm;
     requestData.route.moveDir = "1";
 
     var url = routeurl + "?act=" + requestData.route.act +
@@ -132,9 +134,11 @@ daeguObject.urlRouteRequest = function (dbObject, callback) {
 daeguObject.urlStationRequest = function (dbObject, callback) {
 
 
+
+    var dbTemp = dbObject[0];
     requestData.station.act = "arrInfo";
-    requestData.station.bsId = dbObject[0].stopid;
-    requestData.station.bsNm = dbObject[0].stopnm;
+    requestData.station.bsId = dbTemp[0].stopid;
+    requestData.station.bsNm = dbTemp[0].stopnm;
 
     var url = stationurl + "?act=" + requestData.station.act +
             "&bsId=" + requestData.station.bsId +
@@ -180,7 +184,7 @@ daeguObject.urlStationRequest = function (dbObject, callback) {
                         temp.routenm = $(this).find('span[class=marquee]').first().text();
                         temp.arrive_time = $(this).find('span[class=arr_state]').text();
                         temp.cur_pos = $(this).find('span[class=marquee]').last().text();
-                        temp.routeid = commonBiz.findRouteid(dbObject, temp.routenm);
+                        temp.routeid = commonBiz.findRouteid(dbTemp, temp.routenm);
 
                         daegu_arrive_list.push(temp);
                     });
@@ -190,7 +194,7 @@ daeguObject.urlStationRequest = function (dbObject, callback) {
                         temp.routenm = $(this).find('span[class=marquee]').first().text();
                         temp.arrive_time = "약 " + $(this).find('span[class=arr_state]').text() + " 후 도착";
                         temp.cur_pos = $(this).find('span[class=marquee]').last().text();
-                        temp.routeid = commonBiz.findRouteid(dbObject, temp.routenm);
+                        temp.routeid = commonBiz.findRouteid(dbTemp, temp.routenm);
 
                         daegu_arrive_list.push(temp);
 

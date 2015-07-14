@@ -45,8 +45,12 @@ gwangyangObject.urlRouteRequest = function(dbObject, callback){
      * 1. routeUrl 포멧을 db에서 선택한 데이터를 가지고 맞춰준다
      * 2. post or get 방식에 따라 request 까지 해준다.
      */
-    requestData.route.upperBusRouteID = dbObject[0].routeid;
-    requestData.route.busRouteID = dbObject[0].routedesc;
+
+
+    var dbTemp = dbObject[0];
+
+    requestData.route.upperBusRouteID = dbTemp[0].routeid;
+    requestData.route.busRouteID = dbTemp[0].routedesc;
 
     var url = routemurl + "?search=yes&upperBusRouteID=" + requestData.route.upperBusRouteID +
             "&busRouteID=" + requestData.route.busRouteID;
@@ -101,8 +105,11 @@ gwangyangObject.urlRouteRequest = function(dbObject, callback){
 };
 gwangyangObject.urlStationRequest = function(dbObject, callback){
 
-    requestData.station.stationID = dbObject[0].stopid;
-    requestData.station.nodeID = dbObject[0].stopdesc;
+
+    var dbTemp = dbObject[0];
+
+    requestData.station.stationID = dbTemp[0].stopid;
+    requestData.station.nodeID = dbTemp[0].stopdesc;
     requestData.station.bitFlag = "0";
     requestData.station.toNodeName = "";
     requestData.station.mobile_no = "";
@@ -133,7 +140,7 @@ gwangyangObject.urlStationRequest = function(dbObject, callback){
                     temp.routenm = $(this).find('td:nth-child(1)').text();
                     temp.arrive_time = "약 " + $(this).find('span').text() + " 후 도착";
                     temp.cur_pos = "";
-                    temp.routeid = commonBiz.findRouteid(dbObject, commonBiz.splitSomething(temp.routenm, '번'));
+                    temp.routeid = commonBiz.findRouteid(dbTemp, commonBiz.splitSomething(temp.routenm, '번'));
                     gwangyang_arrive_list.push(temp);
 
                 });

@@ -40,7 +40,9 @@ incheonObject.urlRouteRequest = function(dbObject, callback){
      * 2. post or get 방식에 따라 request 까지 해준다.
      */
 
-    requestData.route.keyword = dbObject[0].routeid;
+    var dbTemp = dbObject[0];
+
+    requestData.route.keyword = dbTemp[0].routeid;
 
     var url = routeurl + "?keyword=" + requestData.route.keyword;
     var up_seq = [];
@@ -77,7 +79,9 @@ incheonObject.urlRouteRequest = function(dbObject, callback){
 
 incheonObject.urlStationRequest = function(dbObject, callback){
 
-    requestData.station.keyword = dbObject[0].stopid;
+
+    var dbTemp = dbObject[0];
+    requestData.station.keyword = dbTemp[0].stopid;
 
     var url = stationurl+"?keyword=" + requestData.station.keyword;
 
@@ -107,7 +111,7 @@ incheonObject.urlStationRequest = function(dbObject, callback){
                         temp.routenm= res[0].replace(/\s/gi, '');
                         temp.arrive_time = "약 " + res[2].replace(/\s/gi, '') + res[3].replace(/\s/gi, '') + "후 도착";
                         temp.cur_pos = res[4].replace(/\s/gi, '') + res[5].replace(/\s/gi, '');
-                        temp.routeid = commonBiz.findRouteid(dbObject, temp.routenm);
+                        temp.routeid = commonBiz.findRouteid(dbTemp, temp.routenm);
 
                         incheon_arrive_list.push(temp);
 

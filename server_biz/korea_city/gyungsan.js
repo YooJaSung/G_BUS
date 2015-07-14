@@ -41,6 +41,9 @@ requestData.station = {};
 
 gyungsanObject.urlRouteRequest = function (dbObject, callback) {
 
+    var dbTemp = dbObject[0];
+
+
     var up_seq = [];
     var down_seq= [];
     var gyungsan_bus_location_seq = [];
@@ -51,9 +54,9 @@ gyungsanObject.urlRouteRequest = function (dbObject, callback) {
                 function(upCallback){
 
                     requestData.route.menu = '1';
-                    requestData.route.bsLineId = dbObject[0].routeid;
+                    requestData.route.bsLineId = dbTemp[0].routeid;
                     requestData.route.busStopId = '';
-                    requestData.route.bsLineNo = dbObject[0].routenm;
+                    requestData.route.bsLineNo = dbTemp[0].routenm;
                     requestData.route.busStopNm = '';
                     requestData.route.busDirectCD = '1';
 
@@ -81,9 +84,9 @@ gyungsanObject.urlRouteRequest = function (dbObject, callback) {
                 function(downCallback){
 
                     requestData.route.menu = '1';
-                    requestData.route.bsLineId = dbObject[0].routeid;
+                    requestData.route.bsLineId = dbTemp[0].routeid;
                     requestData.route.busStopId = '';
-                    requestData.route.bsLineNo = dbObject[0].routenm;
+                    requestData.route.bsLineNo = dbTemp[0].routenm;
                     requestData.route.busStopNm = '';
                     requestData.route.busDirectCD = '0';
 
@@ -133,6 +136,9 @@ gyungsanObject.urlRouteRequest = function (dbObject, callback) {
 
 };
 gyungsanObject.urlStationRequest = function (dbObject, callback) {
+
+
+
 
     var gyungsan_list = [];
 

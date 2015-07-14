@@ -73,10 +73,10 @@ function queryCityCode (cityObject){
 
 
         if(i < cityObject.length -1 ){
-            citycds += cityObject[i].cityCode + " , ";
+            citycds += cityObject[i].citycode + " , ";
         }
         else{
-            citycds += "S.citycd = " + cityObject[i].cityCode;
+            citycds +=  cityObject[i].citycode;
         }
 
     }
@@ -155,11 +155,13 @@ koreaDbObject.dbStationDetail = function(cityCd, sid, callback){
 
 koreaDbObject.dbAroundXY = function(cityCd, dbObject, callback){
     var getAroundQuery = dbQuery.g_busquery.AROUNDXY;
+
+    var dbTemp = dbObject[0];
     pool.getConnection(function(err,db){
         if(err){
             throw err;
         }else{
-            db.query(getAroundQuery,[cityCd,dbObject[0].LATIX,dbObject[0].LONGY], function(err,rows){
+            db.query(getAroundQuery,[cityCd,dbTemp[0].latix,dbTemp[0].longy], function(err,rows){
 
                 if(err){
                     throw err;

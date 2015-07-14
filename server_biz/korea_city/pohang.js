@@ -42,8 +42,10 @@ requestData.station.bStopid = '';
 
 pohangObject.urlRouteRequest = function (dbObject, callback) {
 
-    requestData.route.routeId  = dbObject[0].routeid;
-    var url = routeurl+'?routeId=' + requestData.route.routeId
+    var dbTemp = dbObject[0];
+
+    requestData.route.routeId  = dbTemp[0].routeid;
+    var url = routeurl+'?routeId=' + requestData.route.routeId;
 
     request(url, function (error, response, html) {
         if (!error && response.statusCode == 200) {
@@ -57,7 +59,7 @@ pohangObject.urlRouteRequest = function (dbObject, callback) {
 
                 if($(this).find('img').attr('src') === '../images/busLineInfo/icon_busCar.png'){
 
-                    up_seq.push(findRouteSeq($(this).prev().text(), dbObject));
+                    up_seq.push(findRouteSeq($(this).prev().text(), dbTemp));
 
                 }
             });
@@ -67,7 +69,7 @@ pohangObject.urlRouteRequest = function (dbObject, callback) {
             $temp.each(function(){
                 if($(this).find('img').attr('src') === '../images/busLineInfo/icon_busCar.png'){
 
-                    down_seq.push(findRouteSeq($(this).prev().text(), dbObject));
+                    down_seq.push(findRouteSeq($(this).prev().text(), dbTemp));
 
                 }
             });
@@ -81,8 +83,9 @@ pohangObject.urlRouteRequest = function (dbObject, callback) {
 };
 pohangObject.urlStationRequest = function (dbObject, callback) {
 
+    var dbTemp = dbObject[0];
 
-    requestData.station.bStopid = dbObject[0].stopid;
+    requestData.station.bStopid = dbTemp[0].stopid;
 
     request.post({
         url: stationurl,
@@ -125,16 +128,16 @@ pohangObject.urlStationRequest = function (dbObject, callback) {
 };
 
 
-function findRouteSeq(stopnm, dbObject) {
+function findRouteSeq(stopnm, dbTemp) {
     var seq = undefined;
 
-    for (var i in dbObject) {
+    for (var i in dbTemp) {
         /**
          * urlarr에 있는 stopid와 db에 stopnm을 비교하여 seq저장
          */
 
-        if (dbObject[i].stopnm === stopnm) {
-            seq = dbObject[i].seq;
+        if (dbTemp[i].stopnm === stopnm) {
+            seq = dbTemp[i].seq;
             break;
         }
     }

@@ -40,7 +40,10 @@ hwasoonObject.urlRouteRequest = function(dbObject, callback){
      * 1. routeUrl 포멧을 db에서 선택한 데이터를 가지고 맞춰준다
      * 2. post or get 방식에 따라 request 까지 해준다.
      */
-    requestData.route.LINE_ID = dbObject[0].routeid;
+
+    var dbTemp = dbObject[0];
+
+    requestData.route.LINE_ID = dbTemp[0].routeid;
 
 
     request.post({
@@ -82,7 +85,10 @@ hwasoonObject.urlRouteRequest = function(dbObject, callback){
 };
 hwasoonObject.urlStationRequest = function(dbObject, callback){
 
-    requestData.station.BUSSTOP_ID = dbObject[0].stopid;
+    var dbTemp = dbObject[0];
+
+
+    requestData.station.BUSSTOP_ID = dbTemp[0].stopid;
 
     request.post({
         url: stationurl,

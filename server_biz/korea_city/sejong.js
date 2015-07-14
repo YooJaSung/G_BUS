@@ -56,12 +56,14 @@ sejongObject.urlRouteRequest = function (dbObject, callback) {
      * 2. post or get 방식에 따라 request 까지 해준다.
      */
 
-    requestData.route.busRouteId = dbObject[0].routeid;
+    var dbTemp = dbObject[0];
+
+    requestData.route.busRouteId = dbTemp[0].routeid;
 
     var routename = [];
     var routerealbusloc = [];
     var sejong_bus_location_seq = [];
-    var trnseq = dbObject[0].trnseq;
+    var trnseq = dbTemp[0].trnseq;
     var up_seq = [];
     var down_seq = [];
 
@@ -121,10 +123,10 @@ sejongObject.urlRouteRequest = function (dbObject, callback) {
                             if (routedata[i].stop_id === busloc[j].stop_id) {
 
                                 sejong_bus_location_seq.push(i*1+1);
-                                if((i*1+1)< trnseq){
+                                if((i*1+1)<= trnseq){
                                     up_seq.push(i*1+1);
                                 }else{
-                                    down_seq.push(i*1+1);
+                                    down_seq.push((i*1+1)-trnseq);
                                 }
                             }
                         }
@@ -149,7 +151,9 @@ sejongObject.urlRouteRequest = function (dbObject, callback) {
 
 sejongObject.urlStationRequest = function (dbObject, callback) {
 
-    requestData.station.busStopId = dbObject[0].stopid;
+    var dbTemp = dbObject[0];
+
+    requestData.station.busStopId = dbTemp[0].stopid;
 
     request.post({
         url: stationurl,

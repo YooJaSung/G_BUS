@@ -49,8 +49,9 @@ seoulObject.urlRouteRequest = function (dbObject, callback) {
      */
 
 
+    var dbTemp = dbObject[0];
 
-    requestData.route.busRouteId = dbObject[0].routeid;
+    requestData.route.busRouteId = dbTemp[0].routeid;
 
 
     var url = routeurl + "&busRouteId=" + requestData.route.busRouteId;
@@ -89,13 +90,16 @@ seoulObject.urlRouteRequest = function (dbObject, callback) {
     });
 };
 seoulObject.urlStationRequest = function (dbObject, callback) {
+
+    var dbTemp = dbObject[0];
+
     var seoul_list = [];
 
-    if(dbObject[0].arsid === '0' || dbObject[0].arsid === 0){
+    if(dbTemp[0].arsid === '0' || dbTemp[0].arsid === 0){
         callback(seoul_list);
     }
 
-    requestData.station.arsId = dbObject[0].arsid;
+    requestData.station.arsId = dbTemp[0].arsid;
 
     var url = stationurl + "&arsId=" + requestData.station.arsId;
 
@@ -122,6 +126,7 @@ seoulObject.urlStationRequest = function (dbObject, callback) {
                 temp.routenm = stArr[i].rtNm[0];
                 temp.routeid = stArr[i].busRouteId[0];
                 temp.arrive_time = "약 " + commonBiz.changeTomin(stArr[i].traTime1[0]) + "후 도착";
+                temp.cur_pos = stArr[i].stationNm1[0];
                 seoul_list.push(temp);
             }
             callback(seoul_list);

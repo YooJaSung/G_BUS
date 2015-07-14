@@ -59,4 +59,36 @@ koreaCommonBiz.makeCacheName = function(cityCodeObj, id){
     return tempCacheName;
 };
 
+koreaCommonBiz.makeTimeObject = function(dbObject){
+    var dbTemp = dbObject[0];
+    var temp = {};
+
+    temp.dayedcon = dbTemp[0].dayedcon;
+    temp.dayedstopfirsttm = dbTemp[0].dayedstopfirsttm;
+    temp.dayedstoplasttm = dbTemp[0].dayedstoplasttm;
+
+    temp.daystcon = dbTemp[0].daystcon;
+    temp.dayststopfirsttm = dbTemp[0].dayststopfirsttm;
+    temp.dayststoplasttm = dbTemp[0].dayststoplasttm;
+
+    temp.satedcon = dbTemp[0].satedcon;
+    temp.satedstopfirsttm = dbTemp[0].satedstopfirsttm;
+    temp.satedstoplasttm = dbTemp[0].satedstoplasttm;
+
+    temp.satstcon = dbTemp[0].satstcon;
+    temp.satststopfirsttm = dbTemp[0].satststopfirsttm;
+    temp.satststoplasttm = dbTemp[0].satststoplasttm;
+
+    temp.sunedcon = dbTemp[0].sunedcon;
+    temp.sunedstopfirsttm = dbTemp[0].sunedstopfirsttm;
+    temp.sunedstoplasttm = dbTemp[0].sunedstoplasttm;
+
+    temp.sunstcon = dbTemp[0].sunstcon;
+    temp.sunststopfirsttm = dbTemp[0].sunststopfirsttm;
+    temp.sunststoplasttm = dbTemp[0].sunststoplasttm;
+
+    return temp;
+
+};
+
 module.exports = koreaCommonBiz;

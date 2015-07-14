@@ -40,7 +40,10 @@ requestData.station.stationId = '';
 
 jejuObject.urlRouteRequest = function (dbObject, callback) {
 
-    requestData.route.routeId = dbObject[0].routeid;
+    var dbTemp = dbObject[0];
+
+
+    requestData.route.routeId = dbTemp[0].routeid;
 
     request.post({
         url: routeurl,
@@ -65,7 +68,7 @@ jejuObject.urlRouteRequest = function (dbObject, callback) {
 
             for (var i in jsondata) {
 
-                up_seq.push(findRouteSeq(jsondata[i].currStationId, dbObject));
+                up_seq.push(findRouteSeq(jsondata[i].currStationId, dbTemp));
 
             }
 
@@ -81,7 +84,9 @@ jejuObject.urlRouteRequest = function (dbObject, callback) {
 
 jejuObject.urlStationRequest = function (dbObject, callback) {
 
-    requestData.station.stationId = dbObject[0].stopid;
+    var dbTemp = dbObject[0];
+
+    requestData.station.stationId = dbTemp[0].stopid;
 
     request.post({
         url: stationurl,
@@ -106,8 +111,7 @@ jejuObject.urlStationRequest = function (dbObject, callback) {
                 temp.routenm = $(this).find('td:nth-child(1)').text();
                 temp.arrive_time = '약' +  $(this).find('td:nth-child(2)').text() + ' 후 도착';
                 temp.cur_pos = $(this).find('td:nth-child(3)').text();
-                temp.routeid = commonBiz.findRouteid(dbObject, temp.routenm);
-
+                temp.routeid = commonBiz.findRouteid(dbTemp, temp.routenm);
 
                 jeju_list.push(temp);
 
@@ -121,16 +125,16 @@ jejuObject.urlStationRequest = function (dbObject, callback) {
 };
 
 
-function findRouteSeq(stopid, dbObject) {
+function findRouteSeq(stopid, dbTemp) {
     var seq = undefined;
 
-    for (var i in dbObject) {
+    for (var i in dbTemp) {
         /**
          * urlarr에 있는 stopid와 db에 stopnm을 비교하여 seq저장
          */
 
-        if (dbObject[i].stopid === stopid) {
-            seq = dbObject[i].seq;
+        if (dbTemp[i].stopid === stopid) {
+            seq = dbTemp[i].seq;
             break;
         }
     }

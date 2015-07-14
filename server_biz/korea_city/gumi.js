@@ -48,8 +48,10 @@ gumiObject.urlRouteRequest = function(dbObject, callback){
      * 1. routeUrl 포멧을 db에서 선택한 데이터를 가지고 맞춰준다
      * 2. post or get 방식에 따라 request 까지 해준다.
      */
-    requestData.route.brtId = dbObject[0].routeid;
-    var dirclass = dbObject[0].routedesc.split(':');
+
+    var dbTemp = dbObject[0];
+    requestData.route.brtId = dbTemp[0].routeid;
+    var dirclass = dbTemp[0].routedesc.split(':');
     requestData.route.brtDirection = dirclass[0];
     requestData.route.brtClass = dirclass[1];
 
@@ -88,7 +90,10 @@ gumiObject.urlRouteRequest = function(dbObject, callback){
 };
 gumiObject.urlStationRequest = function(dbObject, callback){
 
-    requestData.station.stopId = dbObject[0].stopid;
+    var dbTemp = dbObject[0];
+
+
+    requestData.station.stopId = dbTemp[0].stopid;
 
     var url = stationurl + "?act=" + requestData.station.act +
             "&stopId=" + requestData.station.stopId +
@@ -109,7 +114,7 @@ gumiObject.urlStationRequest = function(dbObject, callback){
                     temp.routenm = $(this).find("BLINK[name='brtNo']").text();
                     temp.route_time = $(this).find("li[class='bus_state'] > span").text();
                     temp.cur_pos = $(this).children().last().text();
-                    temp.routeid = commonBiz.findRouteid(dbObject, temp.routenm);
+                    temp.routeid = commonBiz.findRouteid(dbTemp, temp.routenm);
 
 
                     gumi_arrive_list.push(temp);

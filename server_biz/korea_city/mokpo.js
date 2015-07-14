@@ -36,12 +36,16 @@ requestData.station.stop_stdid = "";
 
 mokpoObject.urlRouteRequest = function(dbObject, callback){
 
+
+
     /**
      * 1. routeUrl 포멧을 db에서 선택한 데이터를 가지고 맞춰준다
      * 2. post or get 방식에 따라 request 까지 해준다.
      */
 
-    requestData.route.inp_brt_stdid = dbObject[0].routeid;
+    var dbTemp = dbObject[0]
+
+    requestData.route.inp_brt_stdid = dbTemp[0].routeid;
 
     var url = routeurl+"?inp_brt_stdid="+requestData.route.inp_brt_stdid+
             "&btype=";
@@ -75,7 +79,10 @@ mokpoObject.urlRouteRequest = function(dbObject, callback){
 };
 mokpoObject.urlStationRequest = function(dbObject, callback) {
 
-    requestData.station.stop_stdid = dbObject[0].arsid;
+    var dbTemp = dbObject[0];
+
+
+    requestData.station.stop_stdid = dbTemp[0].arsid;
 
     var url = stationurl + "?stop_stdid=" + requestData.station.stop_stdid;
 
@@ -101,7 +108,7 @@ mokpoObject.urlStationRequest = function(dbObject, callback) {
                         temp.routenm = $(this).find('td:nth-child(1)').text();
                         temp.curr_pos = $(this).find('td:nth-child(2)').text();
                         temp.arrive_time = "약 " + $(this).children().last().text() + "후 도착" ;
-                        temp.routeid = commonBiz.findRouteid(dbObject, commonBiz.splitSomething(temp.routenm,'-'));
+                        temp.routeid = commonBiz.findRouteid(dbTemp, commonBiz.splitSomething(temp.routenm,'-'));
 
                         mokpo_arrive_list.push(temp);
                     }

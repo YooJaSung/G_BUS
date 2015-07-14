@@ -50,9 +50,11 @@ sunchunObject.urlRouteRequest = function(dbObject, callback){
      * 2. post or get 방식에 따라 request 까지 해준다.
      */
 
+    var dbTemp = dbObject[0];
 
-    requestData.route.upperBusRouteID = dbObject[0].routeid;
-    requestData.route.busRouteID = dbObject[0].routedesc;
+
+    requestData.route.upperBusRouteID = dbTemp[0].routeid;
+    requestData.route.busRouteID = dbTemp[0].routedesc;
 
     var url = routemurl + "?search=yes&upperBusRouteID=" + requestData.route.upperBusRouteID +
         "&busRouteID=" + requestData.route.busRouteID;
@@ -103,8 +105,11 @@ sunchunObject.urlRouteRequest = function(dbObject, callback){
 };
 sunchunObject.urlStationRequest = function(dbObject, callback){
 
-    requestData.station.stationID = dbObject[0].stopid;
-    requestData.station.nodeID = dbObject[0].stopdesc;
+    var dbTemp = dbObject[0];
+
+
+    requestData.station.stationID = dbTemp[0].stopid;
+    requestData.station.nodeID = dbTemp[0].stopdesc;
     requestData.station.bitFlag = "1";
     requestData.station.toNodeName = "";
     requestData.station.mobile_no = "";
@@ -136,7 +141,7 @@ sunchunObject.urlStationRequest = function(dbObject, callback){
                     var second_td = $(this).find('td:nth-child(2)');
                     temp.arrive_time = "약 " + second_td.find('span:nth-child(1)').text() + "분 후 도착" ;
                     temp.cur_pos = second_td.children().last().text();
-                    temp.routeid = commonBiz.findRouteid(dbObject, commonBiz.splitSomething(temp.routenm, '번'));
+                    temp.routeid = commonBiz.findRouteid(dbTemp, commonBiz.splitSomething(temp.routenm, '번'));
 
 
                     sunchun_arrive_list.push(temp);

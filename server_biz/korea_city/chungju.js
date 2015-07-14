@@ -39,7 +39,9 @@ chungjuObject.urlRouteRequest = function(dbObject, callback){
      * 2. post or get 방식에 따라 request 까지 해준다.
      */
 
-    requestData.route.routeid = dbObject[0].routeid;
+
+    var dbTemp = dbObject[0];
+    requestData.route.routeid = dbTemp[0].routeid;
 
     request.post({
         url: routeurl,
@@ -79,7 +81,9 @@ chungjuObject.urlRouteRequest = function(dbObject, callback){
 
 chungjuObject.urlStationRequest = function(dbObject, callback){
 
-    requestData.station.sid = dbObject[0].stopid;
+
+    var dbTemp = dbObject[0];
+    requestData.station.sid = dbTemp[0].stopid;
 
     request.post({
         url: stationurl,

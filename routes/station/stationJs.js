@@ -23,8 +23,8 @@ var myCache = new nodeCache(
 stationRouter.all('/stationSearch', function(req,res, next){
 
     var getdata = req.body.data;
-    var stationNm = getdata.stationNm;
-    var cityCodeObj = getdata.cityObject;
+    var stationNm = getdata.stationnm;
+    var cityCodeObj = getdata.cityobject;
 
 
     var cacheName  = koreaCommonBiz.makeCacheName(cityCodeObj, stationNm);
@@ -59,9 +59,9 @@ stationRouter.all('/stationSearch', function(req,res, next){
 stationRouter.all('/stationDetail', function(req,res, next){
 
     var getdata = req.body.data;
-    var cityEnNm = getdata.cityEnNm;
+    var cityEnNm = getdata.cityennm;
     var sid = getdata.sid;
-    var cityCode = getdata.cityCode;
+    var cityCode = getdata.citycode;
 
     var cityDir = "../../server_biz/korea_city/" + cityEnNm + ".js";
     var cityObject = require(cityDir);
@@ -85,7 +85,6 @@ stationRouter.all('/stationDetail', function(req,res, next){
                     cityObject.urlStationRequest(dbObject, function(urlStationData){
                         console.log('Station_Detail URL Nimble');
                         urlStationObject = urlStationData;
-
                         urlCallback();
                     });
                 },

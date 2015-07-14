@@ -26,9 +26,14 @@ requestData.station.bstopid = "";
 
 
 busanObject.urlRouteRequest = function (dbObject, callback) {
-    requestData.route.lineid = dbObject[0].routeid;
+
+
+    var dbTemp = dbObject[0];
+
+
+    requestData.route.lineid = dbTemp[0].routeid;
     var url = routeurl+"&lineid=" + requestData.route.lineid;
-    var trnseq = dbObject[0].trnseq;
+    var trnseq = dbTemp[0].trnseq;
 
     request.get(url,
         function(error, response, body){
@@ -58,10 +63,10 @@ busanObject.urlRouteRequest = function (dbObject, callback) {
                     for(var i in arr){
 
                         if(arr[i].carNo !== undefined){
-                            if(i < trnseq){
+                            if((i*1+1) <= trnseq){
                                 up_seq.push(i*1+1);
                             }else{
-                                down_seq.push(i*1+1);
+                                down_seq.push((i*1+1)-trnseq);
                             }
                         }
                     }
@@ -80,7 +85,8 @@ busanObject.urlRouteRequest = function (dbObject, callback) {
 busanObject.urlStationRequest = function (dbObject, callback) {
 
 
-    requestData.station.bstopid = dbObject[0].stopid;
+    var dbTemp = dbObject[0];
+    requestData.station.bstopid = dbTemp[0].stopid;
 
     var url = stationurl+'&bstopid=' +  requestData.station.bstopid;
 

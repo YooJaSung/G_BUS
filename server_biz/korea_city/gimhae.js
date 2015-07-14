@@ -44,7 +44,9 @@ gimhaeObject.urlRouteRequest = function(dbObject, callback){
      *
      */
 
-    requestData.route.txtKeyword = dbObject[0].routeid;
+
+    var dbTemp = dbObject[0];
+    requestData.route.txtKeyword = dbTemp[0].routeid;
 
     var url = routeurl +'&'+ requestData.route.txtKeyword;
     var gimhae_bus_location_seq = [];
@@ -85,6 +87,8 @@ gimhaeObject.urlRouteRequest = function(dbObject, callback){
 
 gimhaeObject.urlStationRequest = function(dbObject, callback){
 
+    var dbTemp = dbObject[0];
+
     requestData.station.txtKeyword = dbObject[0].stopid;
     var url = stationurl + '&' + requestData.station.txtKeyword;
 
@@ -110,7 +114,8 @@ gimhaeObject.urlStationRequest = function(dbObject, callback){
                     var firsttemp = {};
                     firsttemp.routenm = firstAttrTemp['0'].value;
                     firsttemp.arrive_time = firstAttrTemp['3'].value;
-                    firsttemp.routeid = commonBiz.findRouteid(dbObject, firsttemp.routenm);
+                    firsttemp.routeid = commonBiz.findRouteid(dbTemp, firsttemp.routenm);
+                    firsttemp.cur_pos = '';
                     gimhae_arrive_list.push(firsttemp);
 
                     for(var i = elementLength-1 ; i>2 ; i--){
@@ -120,7 +125,8 @@ gimhaeObject.urlStationRequest = function(dbObject, callback){
                         var temp = {};
                         temp.routenm = attrTemp['0'].value;
                         temp.arrive_time = attrTemp['3'].value;
-                        temp.routeid = commonBiz.findRouteid(dbObject, temp.routenm);
+                        temp.routeid = commonBiz.findRouteid(dbTemp, temp.routenm);
+                        temp.cur_pos = '';
                         gimhae_arrive_list.push(temp);
                         lastElement = preElement;
                     }

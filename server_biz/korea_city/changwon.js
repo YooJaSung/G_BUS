@@ -42,7 +42,8 @@ changwonObject.urlRouteRequest = function (dbObject, callback) {
      * 2. post or get 방식에 따라 request 까지 해준다.
      */
 
-    requestData.route.routeId = dbObject[0].routeid;
+    var dbTemp = dbObject[0];
+    requestData.route.routeId = dbTemp[0].routeid;
 
     var url = routeurl + "?routeId=" + requestData.route.routeId;
 
@@ -57,7 +58,7 @@ changwonObject.urlRouteRequest = function (dbObject, callback) {
                     var $ = window.jQuery;
                     var document = window.document;
                     var $sub_a = $('.sub-content table tbody tr td a ');
-                    var trnseq = dbObject[0].trnseq;
+                    var trnseq = dbTemp[0].trnseq;
                     var up_seq = [];
                     var down_seq = [];
 
@@ -73,10 +74,10 @@ changwonObject.urlRouteRequest = function (dbObject, callback) {
                             if ($(this).find('img').attr('src') === '../images/mobile/ico_bus_7.gif') {
                                 var tseq = i*1+1;
 
-                                if(tseq < trnseq){
+                                if(tseq <= trnseq){
                                     up_seq.push(tseq);
                                 }else{
-                                    down_seq.push(tseq);
+                                    down_seq.push(tseq-trnseq);
                                 }
                             }
                         });
@@ -97,7 +98,8 @@ changwonObject.urlRouteRequest = function (dbObject, callback) {
 };
 changwonObject.urlStationRequest = function (dbObject, callback) {
 
-    requestData.station.stationId = dbObject[0].stopid;
+    var dbTemp = dbObject[0];
+    requestData.station.stationId = dbTemp[0].stopid;
     var url = stationurl + "?stationId=" + requestData.station.stationId;
 
 
@@ -121,7 +123,7 @@ changwonObject.urlStationRequest = function (dbObject, callback) {
                         var res = str.split("도착");
                         temp.arrive_time = res[0] + " 도착";
                         temp.cur_pos = res[1];
-                        temp.routeid = commonBiz.findRouteid(dbObject, temp.routenm);
+                        temp.routeid = commonBiz.findRouteid(dbTemp, temp.routenm);
 
 
                         changwon_arrive_list.push(temp);

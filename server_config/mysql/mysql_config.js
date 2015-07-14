@@ -9,7 +9,6 @@ var mysqlconfig = {};
 mysqlconfig.database = {};
 
 
-
 /**
  *
  * connection setting

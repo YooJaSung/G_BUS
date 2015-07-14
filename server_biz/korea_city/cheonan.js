@@ -39,8 +39,11 @@ chunanObject.urlRouteRequest = function(dbObject, callback){
      * 2. post or get 방식에 따라 request 까지 해준다.
      */
 
-    requestData.route.route_class = dbObject[0].routedesc;
-    requestData.route.route_no = dbObject[0].routenm;
+
+    var dbTemp = dbObject[0];
+
+    requestData.route.route_class = dbTemp[0].routedesc;
+    requestData.route.route_no = dbTemp[0].routenm;
 
 
 
@@ -87,7 +90,9 @@ chunanObject.urlRouteRequest = function(dbObject, callback){
 };
 chunanObject.urlStationRequest = function(dbObject, callback){
 
-    requestData.station.stop_no = dbObject[0].stopid;
+
+    var dbTemp = dbObject[0];
+    requestData.station.stop_no = dbTemp[0].stopid;
 
     request.post({
         url: stationurl,

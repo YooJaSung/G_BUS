@@ -52,9 +52,12 @@ requestData.station.txtStationName = '';
 
 geojeObject.urlRouteRequest = function (dbObject, callback) {
 
-    requestData.route.searchLineId = dbObject[0].routeid;
+    var dbTemp = dbObject[0];
+
+
+    requestData.route.searchLineId = dbTemp[0].routeid;
     requestData.route.searchBusStopId = '';
-    requestData.route.searchRoute = dbObject[0].routenm;
+    requestData.route.searchRoute = dbTemp[0].routenm;
     request.post({
         url: routeurl,
         form: {
@@ -105,9 +108,12 @@ geojeObject.urlRouteRequest = function (dbObject, callback) {
 
 geojeObject.urlStationRequest = function (dbObject, callback) {
 
-    requestData.station.searchBusStopName = dbObject[0].stopnm;
+
+    var dbTemp = dbObject[0];
+
+    requestData.station.searchBusStopName = dbTemp[0].stopnm;
     requestData.station.searchType = 'search';
-    requestData.station.searchBusStopId = dbObject[0].stopid;
+    requestData.station.searchBusStopId = dbTemp[0].stopid;
     requestData.station.txtStationName = '';
 
     request.post({
@@ -149,7 +155,7 @@ geojeObject.urlStationRequest = function (dbObject, callback) {
 
                 temp.arrive_time = text_arr[1];
 
-                temp.routeid = commonBiz.findRouteid(dbObject, temp.routenm);
+                temp.routeid = commonBiz.findRouteid(dbTemp, temp.routenm);
 
                 geoje_list.push(temp);
             });

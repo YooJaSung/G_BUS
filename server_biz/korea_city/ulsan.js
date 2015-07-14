@@ -56,21 +56,23 @@ ulsanObject.urlRouteRequest = function (dbObject, callback) {
      * 4. 1번 인덱스가 있다면 down_seq를 요청하기
      */
 
-    var descArr = dbObject[0].routedesc.split('^');
+    var dbTemp = dbObject[0];
+
+    var descArr = dbTemp[0].routedesc.split('^');
     var ulsan_bus_location_seq = [];
     var up_seq = [];
     var down_seq = [];
 
     nimble.series([
         function(upCallback){
-            requestData.route.brtNo = dbObject[0].routenm;
+            requestData.route.brtNo = dbTemp[0].routenm;
             var stringArray = splitColon(descArr[0]);
 
             //routedesc x:x:x:x 2 번과 4번짜르기 class = 2번째 direction = 4번째
             requestData.route.brtDirection = stringArray[0];
             requestData.route.brtClass = stringArray[1];
 
-            requestData.route.brtId = dbObject[0].routeid;
+            requestData.route.brtId = dbTemp[0].routeid;
 
             var url = routeurl + "?brtNo=" + requestData.route.brtNo +
                 "&brtDirection=" + requestData.route.brtDirection +
@@ -110,14 +112,14 @@ ulsanObject.urlRouteRequest = function (dbObject, callback) {
             if(descArr[1] === '' ){
                 downCallback();
             }else{
-                requestData.route.brtNo = dbObject[0].routenm;
+                requestData.route.brtNo = dbTemp[0].routenm;
                 var stringArray = splitColon(descArr[1]);
 
                 //routedesc x:x:x:x 2 번과 4번짜르기 class = 2번째 direction = 4번째
                 requestData.route.brtDirection = stringArray[0];
                 requestData.route.brtClass = stringArray[1];
 
-                requestData.route.brtId = dbObject[0].routeid;
+                requestData.route.brtId = dbTemp[0].routeid;
 
                 var url = routeurl + "?brtNo=" + requestData.route.brtNo +
                     "&brtDirection=" + requestData.route.brtDirection +
@@ -168,18 +170,21 @@ ulsanObject.urlRouteRequest = function (dbObject, callback) {
 ulsanObject.urlStationRequest = function (dbObject, callback) {
 
     var ulsan_list = [];
+
     var j=0;
 
-    for (var i in dbObject) {
+    var dbTemp = dbObject[0];
 
-        requestData.station.brtNo = dbObject[i].routenm;
-        var stringArray = splitColon(dbObject[i].routedesc);
+    for (var i in dbTemp) {
+
+        requestData.station.brtNo = dbTemp[i].routenm;
+        var stringArray = splitColon(dbTemp[i].routedesc);
         requestData.station.brtDirection = stringArray[3];
         requestData.station.brtClass = stringArray[1];
-        requestData.station.bnodeOldid = dbObject[i].stopdesc;
-        requestData.station.stopServiceid = dbObject[i].arsid;
+        requestData.station.bnodeOldid = dbTemp[i].stopdesc;
+        requestData.station.stopServiceid = dbTemp[i].arsid;
         requestData.station.stopName = "";
-        requestData.station.brtId = dbObject[i].routeid;
+        requestData.station.brtId = dbTemp[i].routeid;
 
         var url = stationurl + "?brtNo=" + requestData.station.brtNo +
             "&brtDirection=" + requestData.station.brtDirection +
@@ -190,11 +195,11 @@ ulsanObject.urlStationRequest = function (dbObject, callback) {
             "&brtId=" + requestData.station.brtId;
 
 
-        requestUlsan(dbObject[i], url, function (tempData) {
+        requestUlsan(dbTemp[i], url, function (tempData) {
             console.log(tempData);
             ulsan_list.push(tempData);
             j++;
-            if(j == dbObject.length){
+            if(j == dbTemp.length){
                 callback(ulsan_list);
             }
         });
@@ -226,6 +231,7 @@ function requestUlsan(dbObj, url, endCallback){
                 }else{
                     temp.arrive_time = arr_temp[0];
                 }
+                temp.cur_pos = '';
                 endCallback(temp);
 
             } else {
