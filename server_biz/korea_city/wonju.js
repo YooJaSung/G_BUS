@@ -44,7 +44,12 @@ wonjuObject.urlRouteRequest = function(dbObject, callback){
      * 2. post or get 방식에 따라 request 까지 해준다.
      */
 
-    var dbTemp = dbObject[0];
+
+    var wonju_bus_location_seq = [];
+    var up_seq = [];
+    wonju_bus_location_seq.push(up_seq);
+    callback(wonju_bus_location_seq);
+    /*var dbTemp = dbObject[0];
     requestData.route.route_id = dbTemp[0].routeid ;
 
 
@@ -85,12 +90,12 @@ wonjuObject.urlRouteRequest = function(dbObject, callback){
             throw error;
         }
 
-    });
+    });*/
 
 };
 wonjuObject.urlStationRequest = function(dbObject, callback){
 
-    var dbTemp = dbObject[0];
+    /*var dbTemp = dbObject[0];
     requestData.station.stop_id = dbTemp[0].stopid;
 
     request.post({
@@ -128,8 +133,10 @@ wonjuObject.urlStationRequest = function(dbObject, callback){
         }else{
             throw error;
         }
-    });
+    });*/
+    var wonju_arrive_list = [];
 
+    callback(wonju_arrive_list);
 };
 
 module.exports = wonjuObject;

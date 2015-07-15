@@ -23,6 +23,5 @@ placeRouter.post('/placeSearch', function(req,res,next){
 
 });
 
-
 module.exports = placeRouter;
 
