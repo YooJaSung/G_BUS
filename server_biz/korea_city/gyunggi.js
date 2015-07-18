@@ -1,15 +1,7 @@
-/**
- * route & arrive 모두 여기서 포멧팅
- * 1. url 설정(url config)
- * 2. 요청 변수 설정
- * 3. module.exports 로 외부에서 사용가능하도록 만들어줄 예정
- */
-
 
 /**
  * Created by airnold on 15. 4. 24..
  */
-
 
 var request = require('request');
 var xml2jsparser = require('xml2json');
@@ -27,16 +19,10 @@ var requestData = {};
 requestData.route = {};
 requestData.route.routeId = "";
 
-
 requestData.station = {};
 requestData.station.stationId = "";
 
 gyunggiObject.urlRouteRequest = function (dbObject, callback) {
-
-    /**
-     * 1. routeUrl 포멧을 db에서 선택한 데이터를 가지고 맞춰준다
-     * 2. post or get 방식에 따라 request 까지 해준다.
-     */
 
     var dbTemp = dbObject[0];
 
@@ -134,30 +120,28 @@ gyunggiObject.urlStationRequest = function (dbObject, callback) {
                     temp.routenm = routenm;
                     temp.arrive_time = "약 "+ stArr[i].predictTime1[0] + "분 후 도착";
                     temp.routeid = stArr[i].routeId[0];
-                    temp.cur_pos = stArr[i].LocationNo1[0];
-
+                    if(stArr[i].LocationNo1 === undefined){
+                        temp.cur_pos = '';
+                    }else{
+                        temp.cur_pos = stArr[i].LocationNo1[0];
+                    }
                     gyunggi_list.push(temp);
                 }
                 callback(gyunggi_list);
-
             }
-
         }
     });
-
 };
+
 
 function findRoutenm(routeid,dbTemp){
 
     var reRoutenm = undefined;
     for(var i in dbTemp){
         if(dbTemp[i].routeid === routeid){
-
             reRoutenm = dbTemp[i].routenm;
-
         }
     }
-
     return reRoutenm;
 }
 

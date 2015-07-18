@@ -2,12 +2,6 @@
  * Created by airnold on 15. 4. 24..
  */
 
-// get method // html
-//   http://bis.mokpo.go.kr/main/bus/bus_locationpop_line_frame.jsp
-    //   route param -> inp_brt_stdid, btype = 없음
-// html data
-//   http://bis.mokpo.go.kr/main/bus/bus_locationpop_pop.jsp
-//   station param -> stop_stdid
 
 var request = require('request');
 var cheerio = require('cheerio');
@@ -37,13 +31,7 @@ requestData.station.stop_stdid = "";
 mokpoObject.urlRouteRequest = function(dbObject, callback){
 
 
-
-    /**
-     * 1. routeUrl 포멧을 db에서 선택한 데이터를 가지고 맞춰준다
-     * 2. post or get 방식에 따라 request 까지 해준다.
-     */
-
-    var dbTemp = dbObject[0]
+    var dbTemp = dbObject[0];
 
     requestData.route.inp_brt_stdid = dbTemp[0].routeid;
 
@@ -105,10 +93,10 @@ mokpoObject.urlStationRequest = function(dbObject, callback) {
                     if (i !== 0) {
 
                         var temp = {};
-                        temp.routenm = $(this).find('td:nth-child(1)').text();
-                        temp.curr_pos = $(this).find('td:nth-child(2)').text();
+                        temp.routenm = $(this).find('td:nth-child(1)').text().split(' - ')[0];
+                        temp.cur_pos = $(this).find('td:nth-child(2)').text();
                         temp.arrive_time = "약 " + $(this).children().last().text() + "후 도착" ;
-                        temp.routeid = commonBiz.findRouteid(dbTemp, commonBiz.splitSomething(temp.routenm,'-'));
+                        temp.routeid = commonBiz.findRouteid(dbTemp, temp.routenm);
 
                         mokpo_arrive_list.push(temp);
                     }
@@ -123,5 +111,3 @@ mokpoObject.urlStationRequest = function(dbObject, callback) {
 };
 
 module.exports = mokpoObject;
-
-

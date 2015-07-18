@@ -26,11 +26,9 @@ var mailService = require('./routes/service/mailserviceJs');
 
 /**
  * util
- *
  */
 
 var send_mail = require('./utility/mailService.js');
-
 
 var app = express();
 
@@ -90,9 +88,10 @@ app.use(function errorHandler(err, req, res, next) {
         var errordata = 'error status : ' + err.status + ' , error on request :  ' + process.domain.id + req.method + req.url + '   ,   error message : ' + err.message;
 
         send_mail.sendEmail(errordata);
+        res.send('Internal Server Error' + err.status);
+    }else{
+        res.send('page not found Server Error' + err.status);
     }
-
-    res.send(err.message);
 
 });
 

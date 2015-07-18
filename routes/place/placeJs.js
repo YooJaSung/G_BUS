@@ -12,7 +12,7 @@ placeRouter.post('/placeSearch', function(req,res,next){
     var getdata = req.body.data;
 
     var sx = getdata.sx;
-    var sy = getdata.ex;
+    var sy = getdata.sy;
 
     var ex = getdata.ex;
     var ey = getdata.ey;

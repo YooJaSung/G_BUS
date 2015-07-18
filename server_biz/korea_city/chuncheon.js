@@ -2,14 +2,9 @@
  * Created by airnold on 15. 4. 24..
  */
 
-// post method // html
-//   http://its.cheonan.go.kr/include/bis/RouteStation.jsp
-//   route param -> route_no, route_class
-//   http://its.cheonan.go.kr/include/bis/PredictInfo.jsp
-//   station param -> stop_no
-
 var request = require('request');
 var cheerio = require('cheerio');
+var iconv = require('iconv');
 
 var commonBiz = require('../korea_common/common_biz.js');
 
@@ -19,6 +14,7 @@ var chuncheonObject = {};
 var routeurl = "http://www.chbis.kr/serviceRoute.do";
 
 var stationurl = "http://www.chbis.kr/stationInfo.do";
+
 
 
 
@@ -33,8 +29,6 @@ requestData.route.prmRouteName = "" ;
 requestData.route.prmRouteID = "" ;
 
 
-
-
 requestData.station = {};
 requestData.station.prmOperation = "getStationInfo";
 requestData.station.prmStationName = "";
@@ -43,10 +37,6 @@ requestData.station.prmStationID = "";
 
 chuncheonObject.urlRouteRequest = function(dbObject, callback){
 
-    /**
-     * 1. routeUrl 포멧을 db에서 선택한 데이터를 가지고 맞춰준다
-     * 2. post or get 방식에 따라 request 까지 해준다.
-     */
 
     var dbTemp = dbObject[0];
     requestData.route.prmRouteName = dbTemp[0].routenm;
@@ -85,7 +75,7 @@ chuncheonObject.urlRouteRequest = function(dbObject, callback){
                         }else{
                             down_seq.push(commonBiz.splitSomething($(this).text(), ' ') * 1 - trnseq);
                         }
-                        // space 로 split 해서 저장
+
                         return false;
                     }
                 })
@@ -94,7 +84,7 @@ chuncheonObject.urlRouteRequest = function(dbObject, callback){
             chuncheon_bus_location_seq.push(up_seq);
             chuncheon_bus_location_seq.push(down_seq);
 
-            console.log(chuncheon_bus_location_seq);
+            callback(chuncheon_bus_location_seq);
 
 
 
@@ -103,9 +93,6 @@ chuncheonObject.urlRouteRequest = function(dbObject, callback){
             throw error;
         }
     })
-
-
-
 
 };
 chuncheonObject.urlStationRequest = function(dbObject, callback){
@@ -137,14 +124,21 @@ chuncheonObject.urlStationRequest = function(dbObject, callback){
             $tr.each(function () {
 
                 if ($(this).find('td').attr('class') == 'text_12_08 padding_6_0_6_0' && $(this).find('td').attr('width') == '90') {
-                    var route_json = {};
+                    var temp = {};
 
-                    route_json.routenm = $(this).find('td[width=90]').text();
-                    route_json.arrive_time = '약 ' + $(this).find('td:nth-child(3)').text() + ' 후 도착';
-                    route_json.cur_pos = $(this).find('td[width=107]').text();
-                    route_json.routeid = commonBiz.findRouteid(dbTemp, route_json.routenm);
+                    temp.routenm = $(this).find('td[width=90]').text();
 
-                    chuncheon_list.push(route_json);
+                    if($(this).find('td:nth-child(3)').text() === '-'){
+                        temp.arrive_time = '잠시 후 도착';
+                        temp.cur_pos = '';
+                    }else{
+                        temp.arrive_time = '약 ' + $(this).find('td:nth-child(3)').text() + ' 후 도착';
+                        temp.cur_pos = $(this).find('td[width=107]').text();
+                    }
+
+                    temp.routeid = commonBiz.findRouteid(dbTemp, temp.routenm);
+
+                    chuncheon_list.push(temp);
                 }
             });
 

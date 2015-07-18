@@ -71,6 +71,9 @@ stationRouter.all('/stationDetail', function(req,res, next){
     var aroundXY = undefined;
     var stationObject = {};
 
+
+
+
     nimble.series([
         function(DBCallback){
             koreaDb.dbStationDetail(cityCode, sid , function(stationDetailData){

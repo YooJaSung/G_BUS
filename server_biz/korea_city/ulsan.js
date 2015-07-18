@@ -2,19 +2,9 @@
  * Created by airnold on 15. 4. 24..
  */
 
-//   get method // html
-//   http://m.its.ulsan.kr/m/001/001/content2.do
-//   route param -> brtNo, brtDirection, brtClass, brtId
-
-//   http://m.its.ulsan.kr/m/001/001/arrInfo.do
-//   station param -> brtNo, brtDirection, brtClass, bnodeOldid, stopServiceid, stopName, brtId
-
 var request = require('request');
 var cheerio = require('cheerio');
 var nimble = require('nimble');
-
-
-
 
 var ulsanObject = {};
 
@@ -43,22 +33,11 @@ requestData.station.stopName = "";
 requestData.station.brtId = "";
 
 ulsanObject.urlRouteRequest = function (dbObject, callback) {
-
-    /**
-     * 1. routeUrl 포멧을 db에서 선택한 데이터를 가지고 맞춰준다
-     * 2. post or get 방식에 따라 request 까지 해준다.
-     */
-
-    /**
-     * 1. routedesc ^로 짜르기
-     * 2. 0번 인덱스 값으로 요청 날리기
-     * 3. 1번 인덱스가 비었다면 그대로 callback
-     * 4. 1번 인덱스가 있다면 down_seq를 요청하기
-     */
-
     var dbTemp = dbObject[0];
 
     var descArr = dbTemp[0].routedesc.split('^');
+
+    console.log(dbTemp[0].routedesc);
     var ulsan_bus_location_seq = [];
     var up_seq = [];
     var down_seq = [];
@@ -68,7 +47,6 @@ ulsanObject.urlRouteRequest = function (dbObject, callback) {
             requestData.route.brtNo = dbTemp[0].routenm;
             var stringArray = splitColon(descArr[0]);
 
-            //routedesc x:x:x:x 2 번과 4번짜르기 class = 2번째 direction = 4번째
             requestData.route.brtDirection = stringArray[0];
             requestData.route.brtClass = stringArray[1];
 
@@ -87,9 +65,8 @@ ulsanObject.urlRouteRequest = function (dbObject, callback) {
                     var $li = $('.nx li');
 
                     if ($li.length === 0) {
-                        // 잘못된 버스번호
-                        ulsan_bus_location_seq.push(up_seq);
-                        callback(ulsan_bus_location_seq);
+
+
                         upCallback();
                     } else {
                         $li.each(function (i) {
@@ -99,7 +76,7 @@ ulsanObject.urlRouteRequest = function (dbObject, callback) {
                                 up_seq.push(i * 1 + 1);
                             }
                         });
-                        ulsan_bus_location_seq.push(up_seq);
+
                         upCallback();
                     }
 
@@ -109,13 +86,12 @@ ulsanObject.urlRouteRequest = function (dbObject, callback) {
             });
         },
         function(downCallback){
-            if(descArr[1] === '' ){
+            if(descArr[1] === undefined ){
                 downCallback();
             }else{
                 requestData.route.brtNo = dbTemp[0].routenm;
                 var stringArray = splitColon(descArr[1]);
 
-                //routedesc x:x:x:x 2 번과 4번짜르기 class = 2번째 direction = 4번째
                 requestData.route.brtDirection = stringArray[0];
                 requestData.route.brtClass = stringArray[1];
 
@@ -135,8 +111,7 @@ ulsanObject.urlRouteRequest = function (dbObject, callback) {
 
                         if ($li.length === 0) {
                             // 잘못된 버스번호
-                            ulsan_bus_location_seq.push(down_seq);
-                            callback(ulsan_bus_location_seq);
+
                             downCallback();
                         } else {
                             $li.each(function (i) {
@@ -146,7 +121,7 @@ ulsanObject.urlRouteRequest = function (dbObject, callback) {
                                     down_seq.push(i * 1 + 1);
                                 }
                             });
-                            ulsan_bus_location_seq.push(down_seq);
+
                             downCallback();
                         }
 
@@ -158,12 +133,12 @@ ulsanObject.urlRouteRequest = function (dbObject, callback) {
 
         },
         function(resCallback){
+            ulsan_bus_location_seq.push(up_seq);
+            ulsan_bus_location_seq.push(down_seq);
             callback(ulsan_bus_location_seq);
             resCallback();
         }
     ]);
-
-
 
 };
 
@@ -171,39 +146,84 @@ ulsanObject.urlStationRequest = function (dbObject, callback) {
 
     var ulsan_list = [];
 
-    var j=0;
-
     var dbTemp = dbObject[0];
 
-    for (var i in dbTemp) {
 
-        requestData.station.brtNo = dbTemp[i].routenm;
-        var stringArray = splitColon(dbTemp[i].routedesc);
-        requestData.station.brtDirection = stringArray[3];
-        requestData.station.brtClass = stringArray[1];
-        requestData.station.bnodeOldid = dbTemp[i].stopdesc;
-        requestData.station.stopServiceid = dbTemp[i].arsid;
-        requestData.station.stopName = "";
-        requestData.station.brtId = dbTemp[i].routeid;
+    var start = 0;
+    var end = dbTemp.length;
 
-        var url = stationurl + "?brtNo=" + requestData.station.brtNo +
-            "&brtDirection=" + requestData.station.brtDirection +
-            "&brtClass=" + requestData.station.brtClass +
-            "&bnodeOldid=" + requestData.station.bnodeOldid +
-            "&stopServiceid=" + requestData.station.stopServiceid +
-            "&stopName=" +
-            "&brtId=" + requestData.station.brtId;
+    (function loop() {
+        if (start < end) {
+
+            var descArr = dbTemp[start].routedesc.split('^');
+
+            if (dbTemp[start].updownflag === '0') {
+
+                //상행
+                requestData.station.brtNo = dbTemp[start].routenm;
+                var stringArray = splitColon(descArr[0]);
+                requestData.station.brtDirection = stringArray[0];
+                requestData.station.brtClass = stringArray[1];
+                requestData.station.bnodeOldid = dbTemp[start].mobilestopid;
+                requestData.station.stopServiceid = dbTemp[start].arsid;
+                requestData.station.stopName = "";
+                requestData.station.brtId = dbTemp[start].routeid;
+
+                var url = stationurl + "?brtNo=" + requestData.station.brtNo +
+                    "&brtDirection=" + requestData.station.brtDirection +
+                    "&brtClass=" + requestData.station.brtClass +
+                    "&bnodeOldid=" + requestData.station.bnodeOldid +
+                    "&stopServiceid=" + requestData.station.stopServiceid +
+                    "&stopName=" +
+                    "&brtId=" + requestData.station.brtId;
+
+                requestUlsan(dbTemp[start], url, function (tempData) {
+
+                    ulsan_list.push(tempData);
+
+                    start++;
+                    loop();
+                });
+
+            } else {
+                if(descArr[1] === undefined){
+                    start++;
+                    loop();
+
+                }else{
+
+                    requestData.station.brtNo = dbTemp[start].routenm;
+                    var stringArray = splitColon(descArr[1]);
+                    requestData.station.brtDirection = stringArray[0];
+                    requestData.station.brtClass = stringArray[1];
+                    requestData.station.bnodeOldid = dbTemp[start].mobilestopid;
+                    requestData.station.stopServiceid = dbTemp[start].arsid;
+                    requestData.station.stopName = "";
+                    requestData.station.brtId = dbTemp[start].routeid;
 
 
-        requestUlsan(dbTemp[i], url, function (tempData) {
-            console.log(tempData);
-            ulsan_list.push(tempData);
-            j++;
-            if(j == dbTemp.length){
-                callback(ulsan_list);
+                    var url = stationurl + "?brtNo=" + requestData.station.brtNo +
+                        "&brtDirection=" + requestData.station.brtDirection +
+                        "&brtClass=" + requestData.station.brtClass +
+                        "&bnodeOldid=" + requestData.station.bnodeOldid +
+                        "&stopServiceid=" + requestData.station.stopServiceid +
+                        "&stopName=" +
+                        "&brtId=" + requestData.station.brtId;
+
+                    requestUlsan(dbTemp[start], url, function (tempData) {
+
+                        ulsan_list.push(tempData);
+                        start++;
+                        loop();
+
+                    });
+                }
             }
-        });
-    }
+        } else {
+            callback(ulsan_list);
+        }
+    }());
+
 };
 
 function splitColon(beforeString) {
@@ -211,25 +231,39 @@ function splitColon(beforeString) {
     return afterString;
 }
 
-function requestUlsan(dbObj, url, endCallback){
+function requestUlsan(dbObj, url, endCallback) {
+
+    console.log(url);
+
     request(url, function (error, response, html) {
             if (!error && response.statusCode == 200) {
                 var $ = cheerio.load(html);
                 var arr_temp = [];
                 var temp = {};
-                var $dl = $('dd');
-                $dl.each(function () {
-                    if ($(this).find("span[class='strong']").text() !== '') {
-                        arr_temp.push($(this).find("span[class='strong']").text());
-                    }
-                });
+
+                var $dt = $(".strong");
+
+
+                if($dt.length === 0){
+                    arr_temp.push('');
+                }else{
+                    $dt.each(function (i) {
+
+                        if(i == 0){
+                            arr_temp.push($(this).text());
+                        }else{
+                            arr_temp.push('');
+                        }
+                    });
+                }
 
                 temp.routeid = dbObj.routeid;
                 temp.routenm = dbObj.routenm;
-                if(arr_temp[0] !== undefined){
+
+                if (arr_temp[0] !== '') {
                     temp.arrive_time = "약 " + arr_temp[0] + "후 도착";
-                }else{
-                    temp.arrive_time = arr_temp[0];
+                } else {
+                    temp.arrive_time = '';
                 }
                 temp.cur_pos = '';
                 endCallback(temp);

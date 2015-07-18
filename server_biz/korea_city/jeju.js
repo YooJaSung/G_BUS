@@ -2,18 +2,10 @@
  * Created by airnold on 15. 4. 27..
  */
 
-// get html
-// route -> http://mbus.jeju.go.kr/mobile/busLocation.jsp
-// param -> routeId
-// station -> http://mbus.jeju.go.kr/mobile/busArrStation.jsp
-// param -> stationId
-
 var request = require('request');
-var jsdom = require('jsdom');
-
-
 var commonBiz = require('../korea_common/common_biz.js');
-
+var iconv = require('iconv');
+var cheerio = require('cheerio');
 
 var jejuObject = {};
 
@@ -105,19 +97,25 @@ jejuObject.urlStationRequest = function (dbObject, callback) {
 
             var $tr = $('.layer_station_detail_info_arrive_bus_info_list tr');
 
+            var $routeid = $("input[name='arriveBusRouteId']");
+            var rtemp = [];
+            $routeid.each(function(){
+                rtemp.push($(this).val());
+            });
+
             $tr.each(function(i){
                 var temp = {};
-
+                temp.routeid = rtemp[i];
                 temp.routenm = $(this).find('td:nth-child(1)').text();
                 temp.arrive_time = '약' +  $(this).find('td:nth-child(2)').text() + ' 후 도착';
                 temp.cur_pos = $(this).find('td:nth-child(3)').text();
-                temp.routeid = commonBiz.findRouteid(dbTemp, temp.routenm);
 
                 jeju_list.push(temp);
 
             });
 
             callback(jeju_list);
+
         }else{
             throw error;
         }
@@ -129,11 +127,8 @@ function findRouteSeq(stopid, dbTemp) {
     var seq = undefined;
 
     for (var i in dbTemp) {
-        /**
-         * urlarr에 있는 stopid와 db에 stopnm을 비교하여 seq저장
-         */
 
-        if (dbTemp[i].stopid === stopid) {
+        if (dbTemp[i].stopid == stopid) {
             seq = dbTemp[i].seq;
             break;
         }

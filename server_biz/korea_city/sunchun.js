@@ -2,12 +2,6 @@
  * Created by airnold on 15. 4. 24..
  */
 
-// get method // html
-//   http://bis.sc.go.kr:8282/internet/pgm/map/route/routeMap.jsp 
-    //   route param -> upperBusRouteID, busRouteID
-// html data
-//   http://mbis.sc.go.kr:8286/smart/search/arrivalList.jsp
-    //   station param -> stationID, nodeID, bitFlag, toNodeName=인코딩, mobile_no, menuSeq
 
 var request = require('request');
 var cheerio = require('cheerio');
@@ -45,10 +39,6 @@ requestData.station.menuSeq = "";
 
 sunchunObject.urlRouteRequest = function(dbObject, callback){
 
-    /**
-     * 1. routeUrl 포멧을 db에서 선택한 데이터를 가지고 맞춰준다
-     * 2. post or get 방식에 따라 request 까지 해준다.
-     */
 
     var dbTemp = dbObject[0];
 
@@ -100,9 +90,8 @@ sunchunObject.urlRouteRequest = function(dbObject, callback){
             throw error;
         }
     });
-
-
 };
+
 sunchunObject.urlStationRequest = function(dbObject, callback){
 
     var dbTemp = dbObject[0];
@@ -117,7 +106,7 @@ sunchunObject.urlStationRequest = function(dbObject, callback){
 
     var url = stationurl + "?stationID=" + requestData.station.stationID +
         "&nodeID=" + requestData.station.nodeID +
-        "&bitFlag=" + requestData.station.bitFalg +
+        "&bitFlag=" + requestData.station.bitFlag +
         "&toNodeName=" + requestData.station.toNodeName +
         "&mobile_no=" + requestData.station.mobile_no +
         "&menuSeq=" + requestData.station.menuSeq;
@@ -139,10 +128,20 @@ sunchunObject.urlStationRequest = function(dbObject, callback){
 
                     temp.routenm = $(this).find('td:nth-child(1)').text();
                     var second_td = $(this).find('td:nth-child(2)');
-                    temp.arrive_time = "약 " + second_td.find('span:nth-child(1)').text() + "분 후 도착" ;
-                    temp.cur_pos = second_td.children().last().text();
-                    temp.routeid = commonBiz.findRouteid(dbTemp, commonBiz.splitSomething(temp.routenm, '번'));
 
+                    if(second_td.find('span:nth-child(1)').text() === '잠시후'){
+                        temp.arrive_time = second_td.find('span:nth-child(1)').text() + ' 도착'  ;
+                    }else{
+                        temp.arrive_time = "약 " + second_td.find('span:nth-child(1)').text() + "분 후 도착" ;
+                    }
+
+                    if(second_td.children().last().text() === '-' ){
+                        temp.cur_pos = '';
+                    }else{
+                        temp.cur_pos = second_td.children().last().text()
+                    }
+
+                    temp.routeid = commonBiz.findRouteid(dbTemp, commonBiz.splitSomething(temp.routenm, '번'));
 
                     sunchun_arrive_list.push(temp);
 
@@ -155,9 +154,6 @@ sunchunObject.urlStationRequest = function(dbObject, callback){
         });
 
 };
-
-
-
 
 
 module.exports = sunchunObject;

@@ -55,7 +55,6 @@ yeosuObject.urlRouteRequest = function (dbObject, callback) {
             var $ = cheerio.load(html);
             var $td = $('td[width="20"]');
             if ($td.length === 0) {
-                //잘못된 버스 번호 요청
                 yeosu_bus_location_seq.push(up_seq);
                 callback(yeosu_bus_location_seq);
             } else {

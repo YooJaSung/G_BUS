@@ -2,16 +2,9 @@
  * Created by airnold on 15. 4. 27..
  */
 
-// get html
-// route -> http://mbus.pohang.go.kr/mobile/busLocation.jsp
-// param -> routeId
-// station -> http://mbus.pohang.go.kr/mobile/busArrStation.jsp
-// param -> stationId
 
 var request = require('request');
 var cheerio = require('cheerio');
-
-
 
 var commonBiz = require('../korea_common/common_biz.js');
 
@@ -22,23 +15,12 @@ var routeurl = "http://bis2.ipohang.org/bis2/busWayPop.do";
 
 var stationurl = "http://bis2.ipohang.org/bis2/bstopDetailSearchAjax.do";
 
-
-
-/**
- *
- * request data format
- */
-
 var requestData = {};
 requestData.route = {};
 requestData.route.routeId = '';
 
-
-
-
 requestData.station = {};
 requestData.station.bStopid = '';
-
 
 pohangObject.urlRouteRequest = function (dbObject, callback) {
 
@@ -53,6 +35,7 @@ pohangObject.urlRouteRequest = function (dbObject, callback) {
             var up_seq = [];
             var down_seq = [];
             var pohang_bus_location_seq = [];
+            var trnseq = dbTemp[0].trnseq;
 
             var $temp = $('#busWayHeight div');
             $temp.each(function(){
@@ -69,7 +52,7 @@ pohangObject.urlRouteRequest = function (dbObject, callback) {
             $temp.each(function(){
                 if($(this).find('img').attr('src') === '../images/busLineInfo/icon_busCar.png'){
 
-                    down_seq.push(findRouteSeq($(this).prev().text(), dbTemp));
+                    down_seq.push(findRouteSeqFrom($(this).prev().text(), dbTemp, trnseq)*1-trnseq);
 
                 }
             });
@@ -102,9 +85,6 @@ pohangObject.urlStationRequest = function (dbObject, callback) {
 
             for (var i in pohang_temp) {
                 if (pohang_temp[i].CURR_BSTOP !== null) {
-                    console.log("노선 번호 : " + pohang_temp[i].ROUTE_NAME);
-                    console.log("예상도착 시간 : " + pohang_temp[i].REST_TIME + "분");
-                    console.log("노선 번호 : " + pohang_temp[i].REST_BSTOP + "전\n");
 
                     var temp = {};
                     temp.routenm = pohang_temp[i].ROUTE_NAME;
@@ -132,10 +112,6 @@ function findRouteSeq(stopnm, dbTemp) {
     var seq = undefined;
 
     for (var i in dbTemp) {
-        /**
-         * urlarr에 있는 stopid와 db에 stopnm을 비교하여 seq저장
-         */
-
         if (dbTemp[i].stopnm === stopnm) {
             seq = dbTemp[i].seq;
             break;
@@ -144,6 +120,18 @@ function findRouteSeq(stopnm, dbTemp) {
     return seq;
 }
 
+function findRouteSeqFrom(stopnm, dbTemp, trnseq) {
+    var seq = undefined;
+
+    for(var i = trnseq ; i < dbTemp.length ; i++){
+        if (dbTemp[i].stopnm === stopnm) {
+            seq = dbTemp[i].seq;
+            break;
+        }
+
+    }
+    return seq;
+}
 
 module.exports = pohangObject;
 

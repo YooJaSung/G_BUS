@@ -2,12 +2,6 @@
  * Created by airnold on 15. 4. 24..
  */
 
-// post method // json
-//   http://bis.hwasun.go.kr/busmap/busLocationList
-//   route param -> LINE_ID
-
-//   http://m.bis.hwasun.go.kr/mobile/busArriveInfoList
-//   station param -> BUSSTOP_ID
 
 var request = require('request');
 
@@ -28,10 +22,6 @@ requestData.route.LINE_ID = "" ;
 
 requestData.station = {};
 requestData.station.BUSSTOP_ID = "";
-
-
-
-
 
 
 hwasoonObject.urlRouteRequest = function(dbObject, callback){
@@ -58,14 +48,12 @@ hwasoonObject.urlRouteRequest = function(dbObject, callback){
 
             var parsed = JSON.parse(json);
             var arr = [];
-
             for(var x in parsed){
                 arr.push(parsed[x]);
             }
             var jsondata = arr[0];
 
             if(jsondata.length === 0){
-                //잘못된 버스번호
                 hwasoon_bus_location_seq.push(up_seq);
                 callback(hwasoon_bus_location_seq);
             }else{
@@ -105,16 +93,17 @@ hwasoonObject.urlStationRequest = function(dbObject, callback){
             for(var i in hwasoon_list) {
                 var temp = {};
                 temp.arrive_time = "약 " + hwasoon_list[i].REMAIN_MIN + "분 후 도착";
-                temp.cur_pos = hwasoon_list[i].REMAIN_STOP;
+                temp.cur_pos = hwasoon_list[i].REMAIN_STOP + ' 구간 전';
                 temp.routenm = hwasoon_list[i].LINE_NAME;
                 temp.routeid = hwasoon_list[i].LINE_ID ;
+
 
                 hwasoon_arrive_list.push(temp);
             }
             if(hwasoon_arrive_list.length === 0){
 
                 var temp = {};
-                temp.arrive_time = "도착예정 버스가 없습니다";
+                temp.arrive_time = "";
                 temp.routenm = "";
                 temp.cur_pos = "";
                 temp.routeid = "";

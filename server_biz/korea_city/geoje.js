@@ -2,20 +2,10 @@
  * Created by airnold on 15. 4. 27..
  */
 
-// get html
-// route -> http://mbus.geoje.go.kr/mobile/busLocation.jsp
-// param -> routeId
-// station -> http://mbus.geoje.go.kr/mobile/busArrStation.jsp
-// param -> stationId
 
 var request = require('request');
-
 var cheerio = require('cheerio');
-
-
 var commonBiz = require('../korea_common/common_biz.js');
-
-
 var geojeObject = {};
 
 var routeurl = "http://bis.geoje.go.kr/map/realTimeBusInfo.do?action=serviceRoute";
@@ -26,28 +16,17 @@ var stationurl = "http://bis.geoje.go.kr/map/realTimeBusInfo.do?action=stationAr
 
 
 
-/**
- *
- * request data format
- */
-
 var requestData = {};
 requestData.route = {};
 requestData.route.searchLineId = '';
 requestData.route.searchBusStopId = '';
 requestData.route.searchRoute = '';
 
-
-
 requestData.station = {};
 requestData.station.searchBusStopName = '';
 requestData.station.searchType = 'search';
 requestData.station.searchBusStopId = '';
 requestData.station.txtStationName = '';
-
-
-
-
 
 
 geojeObject.urlRouteRequest = function (dbObject, callback) {
@@ -96,7 +75,6 @@ geojeObject.urlRouteRequest = function (dbObject, callback) {
             }
 
             geoje_bus_location_seq.push(up_seq);
-
             callback(geoje_bus_location_seq);
 
         } else {
@@ -144,16 +122,25 @@ geojeObject.urlStationRequest = function (dbObject, callback) {
 
 
                 div_text = text_arr[1];
+                if(div_text === ''){
+                    callback(geoje_list);
+                }
+
                 text_arr = div_text.split('(');
 
 
-                temp.cur_pos = text_arr[0].trim();
 
+                if(text_arr[1] === undefined){
+                    text_arr = $(this).find('div').text().split('잠');
 
-                div_text = text_arr[1];
-                text_arr = div_text.split(')');
+                    temp.arrive_time = '잠'+text_arr[1];
+                    temp.cur_pos = '';
+                }else{
+                    text_arr = $(this).find('div').text().split('약');
 
-                temp.arrive_time = text_arr[1];
+                    temp.arrive_time = '약'+text_arr[1];
+                    temp.cur_pos = text_arr[0].trim();
+                }
 
                 temp.routeid = commonBiz.findRouteid(dbTemp, temp.routenm);
 

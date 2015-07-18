@@ -32,16 +32,10 @@ requestData.route.moveDir = "1";
 requestData.station = {};
 requestData.station.act = "arrInfo";
 requestData.station.bsId = "";
-//bsNm 인코딩 필요함
 requestData.station.bsNm = "";
 
 
 daeguObject.urlRouteRequest = function (dbObject, callback) {
-
-    /**
-     * 1. routeUrl 포멧을 db에서 선택한 데이터를 가지고 맞춰준다
-     * 2. post or get 방식에 따라 request 까지 해준다.
-     */
 
     var dbTemp = dbObject[0];
 
@@ -62,7 +56,6 @@ daeguObject.urlRouteRequest = function (dbObject, callback) {
             var daegu_bus_location_seq = [];
             var $ = cheerio.load(html);
 
-            //정방역방 없는것 -> 바로 검색 무조건 실행
             var $li = $('.bl li');
             if($li.length === 0) {
                 //잘못된 버스 검색
@@ -70,15 +63,13 @@ daeguObject.urlRouteRequest = function (dbObject, callback) {
                 daegu_bus_location_seq.push(down_seq);
                 callback(daegu_bus_location_seq);
             }else{
-                console.log($li.length);
+
                 $li.each(function (i) {
                     var seq = undefined;
                     if ($(this).attr('class') === 'bloc_b nsbus' || $(this).attr('class') === 'bloc_b') {
                         var temp = $(this).prev().find('span').text();
                         seq = temp.split('.');
-                        /**
-                         * .이전걸 짤라서 담기
-                         */
+
 
                         up_seq.push(seq[0]*1);
 
@@ -97,7 +88,7 @@ daeguObject.urlRouteRequest = function (dbObject, callback) {
                     "&roNo=" + requestData.route.roNo +
                     "&moveDir=" + requestData.route.moveDir;
 
-                    //정방역방 있는것 -> http://m.businfo.go.kr/bp/m/realTime.do?act=posInfo&roId=3000726000&roNo=726&moveDir=0 로 다시 요청
+
                     request(url, function (error, response, html) {
                         if (!error && response.statusCode == 200) {
                             var $ = cheerio.load(html);
@@ -109,9 +100,7 @@ daeguObject.urlRouteRequest = function (dbObject, callback) {
                                     if ($(this).attr('class') === 'bloc_b nsbus' || $(this).attr('class') === 'bloc_b') {
                                         var temp = $(this).prev().find('span').text();
                                         var seq = temp.split('.');
-                                        /**
-                                         * .이전걸 짤라서 담기
-                                         */
+
                                         down_seq.push(seq);
                                     }
                                 });
@@ -144,8 +133,6 @@ daeguObject.urlStationRequest = function (dbObject, callback) {
             "&bsId=" + requestData.station.bsId +
             "&bsNm=";
 
-    console.log(url);
-
     request.get({
             uri: url,
             encoding: null
@@ -169,16 +156,16 @@ daeguObject.urlStationRequest = function (dbObject, callback) {
                 if($gd.length === 1){
 
                     var temp = {};
-                    temp.arrive_time = "도착예정 버스가 없습니다";
+                    temp.arrive_time = "";
                     temp.routenm = "";
-                    temp.cur_pos = "";
+                    temp.curr_pos = "";
                     temp.routeid = "";
                     daegu_arrive_list.push(temp);
 
                     callback(daegu_arrive_list);
 
                 }else{
-                    //대구 버스정보 시스템은 '전', '전전' 으로 예상도착시간을 표시함.
+
                     $st.each(function () {
                         var temp = {};
                         temp.routenm = $(this).find('span[class=marquee]').first().text();

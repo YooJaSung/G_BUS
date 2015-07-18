@@ -2,12 +2,6 @@
  * Created by airnold on 15. 4. 24..
  */
 
-// post method // get json data
-//   http://bus.asan.go.kr/mobile/traffic/searchBusRealLocationDetail -> route
-//   route param -> busRouteId
-//   http://bus.asan.go.kr/mobile/traffic/searchBusStopRoute  -> station
-//   station param -> busStopId
-
 var request = require('request');
 
 
@@ -28,19 +22,9 @@ requestData.route.busRouteId = "";
 requestData.station = {};
 requestData.station.busStopId = "";
 
-/**
- *
- * database data format
- */
 
 asanObject.urlRouteRequest = function (dbObject, callback) {
 
-    // dbObject에 있는 stop_name과 비교해야 함.
-
-    /**
-     * 1. routeUrl 포멧을 db에서 선택한 데이터를 가지고 맞춰준다
-     * 2. post or get 방식에 따라 request 까지 해준다.
-     */
 
     var dbTemp = dbObject[0];
     requestData.route.busRouteId = dbTemp[0].routeid;
@@ -62,13 +46,13 @@ asanObject.urlRouteRequest = function (dbObject, callback) {
             throw error;
         } else {
             var parsed = JSON.parse(json);
-            // json -> array 변환
+
             var arr = [];
             for (var x in parsed) {
                 arr.push(parsed[x]);
             }
             if (arr.length === 0) {
-                //잘못된 버스번호
+                asan_bus_location_seq.push(up_seq);
                 callback(asan_bus_location_seq);
             }
             var jsondata = arr[0];
@@ -84,7 +68,6 @@ asanObject.urlRouteRequest = function (dbObject, callback) {
                 up_seq = asan_bus_location_temp;
                 asan_bus_location_seq.push(up_seq);
                 callback(asan_bus_location_seq);
-
 
             }else{
                 for(var i in asan_bus_location_temp){
@@ -124,7 +107,7 @@ asanObject.urlStationRequest = function (dbObject, callback) {
 
             for (var i in asan_list) {
                 var temp = {};
-                temp.arrive_time = asan_list[i].provide_type + " 도착";
+                temp.arrive_time = asan_list[i].provide_type;
                 temp.routenm = asan_list[i].route_name;
                 temp.cur_pos = asan_list[i].rstop;
                 temp.routeid = asan_list[i].route_id;
@@ -145,9 +128,6 @@ function findRouteSeq(stopid, dbTemp) {
     var seq = undefined;
 
     for (var i in dbTemp) {
-        /**
-         * urlarr에 있는 stopid와 db에 stopnm을 비교하여 seq저장
-         */
 
         if (dbTemp[i].stopid === stopid) {
             seq = dbTemp[i].seq;

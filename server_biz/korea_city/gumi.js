@@ -2,12 +2,6 @@
  * Created by airnold on 15. 4. 24..
  */
 
-// get method // html
-//   http://m.bis.gumi.go.kr/GMBIS/m/page/getBrtBusPosList.do
-//   route param -> act=srchBrtBusPos, brtId, brtDirection, brtClass, menuCode=1_12
-
-//   http://m.bis.gumi.go.kr/GMBIS/m/page/srchBusArr.do
-//   station param -> act=srchBusArr, stopId, stopKname, menuCode=1_03, stopServiceid
 
 var request = require('request');
 var cheerio = require('cheerio');
@@ -19,11 +13,6 @@ var routeurl = "http://m.bis.gumi.go.kr/GMBIS/m/page/getBrtBusPosList.do";
 
 var stationurl = "http://m.bis.gumi.go.kr/GMBIS/m/page/srchBusArr.do";
 
-/**
- *
- * request data format
- */
-
 var requestData = {};
 requestData.route = {};
 requestData.route.act = "srchBrtBusPos" ;
@@ -31,8 +20,6 @@ requestData.route.brtId = "" ;
 requestData.route.brtDirection = "" ;
 requestData.route.brtClass = "" ;
 requestData.route.menuCode = "1_12" ;
-
-
 
 requestData.station = {};
 requestData.station.act = "srchBusArr";
@@ -72,10 +59,12 @@ gumiObject.urlRouteRequest = function(dbObject, callback){
                 gumi_bus_location_seq.push(up_seq);
                 callback(gumi_bus_location_seq);
             }else{
+                var j = 0;
                 $li.each(function(i){
-                    console.log($(this).attr('class'));
+
                     if($(this).attr('class') === 'list_desc'){
-                        up_seq.push(i);
+                        up_seq.push(i-j);
+                        j++;
                     }
                 });
 
@@ -91,8 +80,6 @@ gumiObject.urlRouteRequest = function(dbObject, callback){
 gumiObject.urlStationRequest = function(dbObject, callback){
 
     var dbTemp = dbObject[0];
-
-
     requestData.station.stopId = dbTemp[0].stopid;
 
     var url = stationurl + "?act=" + requestData.station.act +
@@ -112,7 +99,7 @@ gumiObject.urlStationRequest = function(dbObject, callback){
 
                     var temp = {};
                     temp.routenm = $(this).find("BLINK[name='brtNo']").text();
-                    temp.route_time = $(this).find("li[class='bus_state'] > span").text();
+                    temp.arrive_time = $(this).find("li[class='bus_state'] > span").text();
                     temp.cur_pos = $(this).children().last().text();
                     temp.routeid = commonBiz.findRouteid(dbTemp, temp.routenm);
 
@@ -122,7 +109,7 @@ gumiObject.urlStationRequest = function(dbObject, callback){
 
                 if(gumi_arrive_list.length === 0){
                     var temp = {};
-                    temp.arrive_time = "도착예정 버스가 없습니다";
+                    temp.arrive_time = "";
                     temp.routenm = "";
                     temp.cur_pos = "";
                     temp.routeid = "";
@@ -139,6 +126,7 @@ gumiObject.urlStationRequest = function(dbObject, callback){
             }
         });
 };
+
 module.exports = gumiObject;
 
 

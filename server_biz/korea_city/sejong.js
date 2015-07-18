@@ -2,13 +2,6 @@
  * Created by airnold on 15. 4. 24..
  */
 
-// post method // json
-//   http://mbis.sejong.go.kr/web/traffic/searchBusRealLocationDetail
-//   http://mbis.sejong.go.kr/mobile/traffic/searchBusRouteDetail
-//   route param -> busRouteId
-// 두개의 요청을 비교하여 seq 생성
-//   http://mbis.sejong.go.kr/mobile/traffic/searchBusStopRoute
-//   station param -> busStopId
 
 var request = require('request');
 
@@ -82,8 +75,6 @@ sejongObject.urlRouteRequest = function (dbObject, callback) {
                     var parsed = JSON.parse(json);
 
                     if(parsed.busRealLocList.length === 0){
-                        //잘못된 버스번호
-                        //실시간 정보 없을때도
 
                         sejong_bus_location_seq.push(up_seq);
                         sejong_bus_location_seq.push(down_seq);
@@ -116,13 +107,11 @@ sejongObject.urlRouteRequest = function (dbObject, callback) {
                     var routedata = routename[0];
                     var busloc = routerealbusloc[0];
 
-
                     for (var i in routedata) {
 
                         for (var j in busloc) {
                             if (routedata[i].stop_id === busloc[j].stop_id) {
 
-                                sejong_bus_location_seq.push(i*1+1);
                                 if((i*1+1)<= trnseq){
                                     up_seq.push(i*1+1);
                                 }else{

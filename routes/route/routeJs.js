@@ -19,14 +19,7 @@ var myCache = new nodeCache(
 );
 
 
-routeRouter.all('/routeSearch', function (req, res, next) {
-
-    /**
-     * 1. database access and get data
-     * 2. url format method call param @dataObject
-     * 3. url request devide city
-     * 4. function( dbDataObject ) -> return url format
-     */
+routeRouter.post('/routeSearch', function (req, res, next) {
 
      var getdata = req.body.data;
      var routeNm = getdata.routenm;
@@ -73,10 +66,6 @@ routeRouter.all('/routeDetail', function (req, res, next) {
     var timetempObject = undefined;
     var routeObject = {};
 
-    /**
-     * nimble 사용하여 series 로 구성 dbObject -> urlrequest method
-     */
-
     nimble.series([
         function(DBCallback){
             koreaDb.dbRouteDetail(cityCode, rid, function (routeDetailData) {
@@ -102,6 +91,7 @@ routeRouter.all('/routeDetail', function (req, res, next) {
             routeObject.dbObject = dbObject;
             routeObject.timeObject = timetempObject;
             console.log('Route_Deatil Response Nimble');
+
             res.send(routeObject);
 
             resCallback();

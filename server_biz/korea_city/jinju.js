@@ -104,10 +104,10 @@ jinjuObject.urlStationRequest = function(dbObject, callback){
 
             for(var i in jinju_bus_curr) {
                 var temp = {};
-                temp.arrive_time = "약 " + commonBiz.changeTomin(jinju_bus_curr[i].remainTime) + " 후 도착";    //분 계산해줘야함
+                temp.arrive_time = "약 " + commonBiz.changeTomin(jinju_bus_curr[i].remainTime) + " 후 도착";
                 temp.routenm = jinju_bus_curr[i].lineNo;
                 temp.routeid = jinju_bus_curr[i].routeId;
-                temp.cur_pos = jinju_bus_curr[i].remainStopCnt;
+                temp.cur_pos = jinju_bus_curr[i].remainStopCnt + ' 구간 전';
 
                 jinju_arrive_list.push(temp);
             }

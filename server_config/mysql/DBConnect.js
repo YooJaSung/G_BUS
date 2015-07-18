@@ -7,7 +7,7 @@ var con = require('./mysql_config');
 var mysql = require('mysql');
 
 var pool  = mysql.createPool({
-    connectionLimit : 400,
+    connectionLimit : 40000,
     host     : con.database.host,
     user     : con.database.user,
     password : con.database.password,
@@ -15,3 +15,4 @@ var pool  = mysql.createPool({
 });
 
 module.exports = pool;
+

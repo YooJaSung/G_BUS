@@ -2,11 +2,6 @@
  * Created by airnold on 15. 4. 27..
  */
 
-// get html
-// route -> http://mits.busan.go.kr/bus_real.jsp
-// param -> line_id
-// station -> http://bus.busan.go.kr/busanBIMS/Ajax/map_Arrival.asp
-// param -> optARSNO
 
 var request = require('request');
 var xml2jsparser = require('xml2json');
@@ -27,9 +22,7 @@ requestData.station.bstopid = "";
 
 busanObject.urlRouteRequest = function (dbObject, callback) {
 
-
     var dbTemp = dbObject[0];
-
 
     requestData.route.lineid = dbTemp[0].routeid;
     var url = routeurl+"&lineid=" + requestData.route.lineid;
@@ -51,7 +44,7 @@ busanObject.urlRouteRequest = function (dbObject, callback) {
 
                 var bus_location_data = xml2jsparser.toJson(xmldata, options);
 
-                if(bus_location_data.response[0].body[0].items[0].length === undefined){
+                if(bus_location_data.response[0].body[0].items[0].item.length === undefined){
 
                     busan_bus_location_seq.push(up_seq);
                     busan_bus_location_seq.push(down_seq);
@@ -82,8 +75,8 @@ busanObject.urlRouteRequest = function (dbObject, callback) {
         }
     )
 };
-busanObject.urlStationRequest = function (dbObject, callback) {
 
+busanObject.urlStationRequest = function (dbObject, callback) {
 
     var dbTemp = dbObject[0];
     requestData.station.bstopid = dbTemp[0].stopid;
@@ -101,10 +94,9 @@ busanObject.urlStationRequest = function (dbObject, callback) {
                     arrayNotation: true
                 };
                 var bus_arr_data = xml2jsparser.toJson(xmldata, options);
-                if(bus_arr_data.response[0].body[0].items[0].length === undefined){
+                if(bus_arr_data.response[0].body[0].items[0].item.length === undefined){
 
                     callback(busan_list);
-
 
                 }else{
                     var arr = bus_arr_data.response[0].body[0].items[0].item;
@@ -114,17 +106,25 @@ busanObject.urlStationRequest = function (dbObject, callback) {
                         var temp = {};
                         temp.routeid = arr[i].lineid[0];
                         temp.routenm = arr[i].lineNo[0];
-                        temp.arrive_time = '약 ' + arr[i].min[0] + '분 후 도착';
-                        temp.cur_pos = arr[i].station[0] + '정거장 전';
+
+                        if(arr[i].min !== undefined){
+
+                            temp.arrive_time = '약 ' + arr[i].min[0] + '분 후 도착';
+                        }else{
+                            temp.arrive_time = '';
+                        }
+
+                        if(arr[i].station !== undefined){
+
+                            temp.cur_pos = arr[i].station[0] + '정거장 전';
+                        }
+                        else{
+                            temp.cur_pos = '';
+                        }
                         busan_list.push(temp);
-
                     }
-
                     callback(busan_list);
                 }
-
-
-
             }else{
                 throw error;
             }

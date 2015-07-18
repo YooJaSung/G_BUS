@@ -1,14 +1,8 @@
 
-
 /**
  * Created by airnold on 15. 4. 24..
  */
 
-// post method // json
-//   http://m.dcbis.go.kr/rest/getRunBusDetail.json
-//   route param -> routeid
-//   http://www.dcbis.go.kr/rest/getRouteRunBusDetail.json
-//   station param -> sid
 
 var request = require('request');
 
@@ -33,17 +27,10 @@ requestData.route = {};
 requestData.route.txtKeyword = "" ;
 
 requestData.station = {};
-requestData.station.txtKeyword = "";
+requestData.station.keyword = "";
 
 
 gimhaeObject.urlRouteRequest = function(dbObject, callback){
-
-    /**
-     * 1. routeUrl 포멧을 db에서 선택한 데이터를 가지고 맞춰준다
-     * 2. post or get 방식에 따라 request 까지 해준다.
-     *
-     */
-
 
     var dbTemp = dbObject[0];
     requestData.route.txtKeyword = dbTemp[0].routeid;
@@ -57,19 +44,14 @@ gimhaeObject.urlRouteRequest = function(dbObject, callback){
         return ph.createPage(function (page) {
             return page.open(url, function (status) {
                 page.injectJs('http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js', function () {
-                    //jQuery Loaded
-                    //We can use things like $("body").html() in here.
 
                     return page.evaluate(function () {
-
                         var $temp = $('.al');
-
                         var temparr = [];
                         $temp.each(function (i) {
                             if ($(this).find('img').attr('src') === '../../images/map/ic_trs01.gif') {
                                 temparr.push(i);
                             }
-
                         });
                         return temparr;
                     }, function (result) {
@@ -89,23 +71,18 @@ gimhaeObject.urlStationRequest = function(dbObject, callback){
 
     var dbTemp = dbObject[0];
 
-    requestData.station.txtKeyword = dbObject[0].stopid;
-    var url = stationurl + '&' + requestData.station.txtKeyword;
-
+    requestData.station.keyword = dbTemp[0].stopid;
+    var url = stationurl + '&keyword' + requestData.station.keyword;
 
     phantom.create(function (ph) {
 
         return ph.createPage(function (page) {
             return page.open(url, function (status) {
-                console.log(status);
-                //jQuery Loaded
-                //We can use things like $("body").html() in here.
 
                 return page.evaluate(function () {
 
                     var gimhae_arrive_list = [];
                     var n = 'previousElementSibling';
-
                     var elementLength = document.defaultView.document.documentElement.childElementCount;
 
                     var lastElement = document.defaultView.document.documentElement.lastElementChild;
@@ -114,7 +91,6 @@ gimhaeObject.urlStationRequest = function(dbObject, callback){
                     var firsttemp = {};
                     firsttemp.routenm = firstAttrTemp['0'].value;
                     firsttemp.arrive_time = firstAttrTemp['3'].value;
-                    firsttemp.routeid = commonBiz.findRouteid(dbTemp, firsttemp.routenm);
                     firsttemp.cur_pos = '';
                     gimhae_arrive_list.push(firsttemp);
 
@@ -125,7 +101,6 @@ gimhaeObject.urlStationRequest = function(dbObject, callback){
                         var temp = {};
                         temp.routenm = attrTemp['0'].value;
                         temp.arrive_time = attrTemp['3'].value;
-                        temp.routeid = commonBiz.findRouteid(dbTemp, temp.routenm);
                         temp.cur_pos = '';
                         gimhae_arrive_list.push(temp);
                         lastElement = preElement;
@@ -142,12 +117,6 @@ gimhaeObject.urlStationRequest = function(dbObject, callback){
         })
     });
 };
-
-
-
-
-
-
 
 module.exports = gimhaeObject;
 

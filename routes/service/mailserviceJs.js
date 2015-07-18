@@ -7,6 +7,7 @@
 var send_mail = require('../../utility/mailService.js');
 var express = require('express');
 var router = express.Router();
+var msg = require('../../utility/msg.json');
 
 
 router.post('/mailfaq', function(req, res) {
@@ -18,6 +19,10 @@ router.post('/mailfaq', function(req, res) {
     send_mail.sendFAQEmail(faq_subject, faq_contents);
     res.send('문의메일을 성공적으로 보냈습니다');
 
+});
+
+router.post('/servermsg', function(req,res){
+    res.json(msg);
 });
 
 module.exports = router;

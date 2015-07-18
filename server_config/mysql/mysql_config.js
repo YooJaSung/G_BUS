@@ -9,6 +9,7 @@ var mysqlconfig = {};
 mysqlconfig.database = {};
 
 
+
 /**
  *
  * connection setting
@@ -18,26 +19,23 @@ mysqlconfig.g_busquery = {};
 
 
 mysqlconfig.g_busquery.ROUTESEARCH =
-    'call globus_v2.routeSearch(?,?);';     // citycds, routenm
-
+    'call routeSearch(?,?);';     // citycds, routenm
 
 
 mysqlconfig.g_busquery.ROUTEDETAIL =
-    'call globus_v2.routeSearchDetail(?, ?);';  // citycd , rid
-
-
+    'call routeSearchDetail(?, ?);';  // citycd , rid
 
 
 mysqlconfig.g_busquery.STATIONSEARCH =
-    'call globus_v2.stationSearch(?,?);';   // citycds, stopnm
+    'call stationSearch(?,?);';   // citycds, stopnm
 
 
 mysqlconfig.g_busquery.STATIONDETAIL =
-    'call globus_v2.stationDetailSearch(?,?);'; // citycd , sid
+    'call stationDetailSearch(?,?);'; // citycd , sid
 
 
 mysqlconfig.g_busquery.AROUNDXY =
-    ' call globus_v2.aroundStationSearch(?,?,?);'; // citycd, x,y
+    ' call aroundStationSearch(?,?,?);'; // citycd, x,y
 
 
 

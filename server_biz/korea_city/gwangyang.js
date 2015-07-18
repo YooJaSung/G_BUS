@@ -2,12 +2,6 @@
  * Created by airnold on 15. 4. 24..
  */
 
-// get method // html
-//   http://bis.gwangyang.go.kr:8282/internet/pgm/map/route/routeMap.jsp
-    //   route param -> upperBusRouteID, busRouteID
-// html data
-//   http://mbis.gwangyang.go.kr:8286/search/arrivalList.jsp
-    //   station param -> stationID, nodeID, bitFlag, toNodeName=인코딩, mobile_no, menuSeq
 
 var request = require('request');
 var cheerio = require('cheerio');
@@ -20,10 +14,6 @@ var routemurl = "http://mbis.gwangyang.go.kr:8286/smart/search/routeResult.jsp";
 
 var stationurl = "http://mbis.gwangyang.go.kr:8286/search/arrivalList.jsp";
 
-/**
- *
- * request data format
- */
 
 var requestData = {};
 
@@ -40,11 +30,6 @@ requestData.station.mobile_no = "";
 requestData.station.menuSeq = "";
 
 gwangyangObject.urlRouteRequest = function(dbObject, callback){
-
-    /**
-     * 1. routeUrl 포멧을 db에서 선택한 데이터를 가지고 맞춰준다
-     * 2. post or get 방식에 따라 request 까지 해준다.
-     */
 
 
     var dbTemp = dbObject[0];

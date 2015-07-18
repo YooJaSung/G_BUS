@@ -55,7 +55,7 @@ jeonjuObject.urlRouteRequest = function(dbObject , callback){
                 for(var i in routedata){
                     var json_data = routedata[i].busNo[0];
                     if(json_data.$t !== undefined){
-                        jeonju_bus_location_seq.push(i);
+                        up_seq.push(i*1+1);
                     }
                 }
                 jeonju_bus_location_seq.push(up_seq);
@@ -98,8 +98,9 @@ jeonjuObject.urlStationRequest = function(dbObject, callback){
                         var temp = {};
 
                         temp.routenm = $(this).find('td:nth-child(2)').text();
-                        temp.arrive_time = $(this).find('td:nth-child(4)').text();
-                        temp.cur_pos = $(this).find('td:nth-child(5)').text();
+                        temp.arrive_time = '약 ' + $(this).find('td:nth-child(4)').text() + ' 후 도착';
+
+                        temp.cur_pos = $(this).find('td:nth-child(5)').text() + ' 구간 전';
                         temp.routeid =  commonBiz.findRouteid(dbTemp, temp.routenm);
 
                         jeonju_arrive_list.push(temp);
@@ -107,12 +108,8 @@ jeonjuObject.urlStationRequest = function(dbObject, callback){
                 });
                 if(jeonju_arrive_list[0].routenm === "" && jeonju_arrive_list.length === 1 && jeonju_arrive_list[0].arrive_time === ""){
 
-                    /**
-                     * 버스없다고 다시 셋팅
-                     */
-
                     var temp = {};
-                    temp.arrive_time = "도착예정 버스가 없습니다";
+                    temp.arrive_time = "";
                     temp.routenm = "";
                     temp.cur_pos = "";
                     temp.routeid = "";

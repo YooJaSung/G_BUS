@@ -2,12 +2,6 @@
  * Created by airnold on 15. 4. 24..
  */
 
-// get method // html
-//   http://m.ictr.or.kr/localbus/busRoutePath.do
-//   route param -> keyword
-//   http://m.ictr.or.kr/localbus/busStopArriveInfo.do
-//   station param -> keyword
-
 var request = require('request');
 var jsdom = require('jsdom');
 var iconv = require('iconv');
@@ -35,19 +29,12 @@ requestData.station.keyword = "";
 
 incheonObject.urlRouteRequest = function(dbObject, callback){
 
-    /**
-     * 1. routeUrl 포멧을 db에서 선택한 데이터를 가지고 맞춰준다
-     * 2. post or get 방식에 따라 request 까지 해준다.
-     */
-
     var dbTemp = dbObject[0];
 
     requestData.route.keyword = dbTemp[0].routeid;
 
     var url = routeurl + "?keyword=" + requestData.route.keyword;
     var up_seq = [];
-    var down_seq = [];
-
 
     request(url , function (error, response, html) {
 
@@ -57,7 +44,7 @@ incheonObject.urlRouteRequest = function(dbObject, callback){
             var $a = $('.subMenu2 > li a');
 
             if($a.length === 0){
-                //잘못된 버스번호로 없는 요청
+                incheon_bus_location_seq.push(up_seq);
                 callback(incheon_bus_location_seq);
             }else{
                 $a.each(function (i) {
@@ -67,7 +54,6 @@ incheonObject.urlRouteRequest = function(dbObject, callback){
                 });
 
                 incheon_bus_location_seq.push(up_seq);
-
                 callback(incheon_bus_location_seq);
             }
 
@@ -79,8 +65,8 @@ incheonObject.urlRouteRequest = function(dbObject, callback){
 
 incheonObject.urlStationRequest = function(dbObject, callback){
 
-
     var dbTemp = dbObject[0];
+
     requestData.station.keyword = dbTemp[0].stopid;
 
     var url = stationurl+"?keyword=" + requestData.station.keyword;
@@ -97,7 +83,7 @@ incheonObject.urlStationRequest = function(dbObject, callback){
                 html: utf8String,
                 scripts: ['http://code.jquery.com/jquery-1.6.min.js'],
                 done: function (err, window) {
-                    //Use jQuery just as in a regular HTML page
+
                     var $ = window.jQuery;
                     var $sub_a = $(".subMenu2 li");
 
@@ -116,7 +102,6 @@ incheonObject.urlStationRequest = function(dbObject, callback){
                         incheon_arrive_list.push(temp);
 
                     });
-
                     callback(incheon_arrive_list);
                 }
             });
@@ -126,12 +111,6 @@ incheonObject.urlStationRequest = function(dbObject, callback){
     });
 
 };
-
-
-
-
-
-
 
 module.exports = incheonObject;
 

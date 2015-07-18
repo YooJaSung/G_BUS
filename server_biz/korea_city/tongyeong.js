@@ -2,27 +2,16 @@
  * Created by airnold on 15. 4. 24..
  */
 
-// post method // html
-//   http://bms.tongyeong.go.kr/serviceRoute.do
-//   route param -> prmOperation=getServiceRoute, prmRouteName=인코딩, prmRouteID
-// html data
-//   http://bms.tongyeong.go.kr/stationInfo.do
-//   station param -> prmOperation=getStationInfo, prmStationName=인코딩, prmStationID
 
 var request = require('request');
 var cheerio = require('cheerio');
-
 var iconv = require('iconv');
 
-
 var commonBiz = require('../korea_common/common_biz.js');
-
-
 
 var tongyeongObject = {};
 
 var routeurl = "http://bms.tongyeong.go.kr/serviceRoute.do";
-
 
 var stationurl = "http://bms.tongyeong.go.kr/stationInfo.do";
 
@@ -30,7 +19,6 @@ var stationurl = "http://bms.tongyeong.go.kr/stationInfo.do";
  *
  * request data format
  */
-
 
 var requestData = {};
 requestData.route = {};
@@ -44,12 +32,6 @@ requestData.station.prmStationName = "";
 requestData.station.prmStationID = "";
 
 tongyeongObject.urlRouteRequest = function(dbObject, callback){
-
-    /**
-     * 1. routeUrl 포멧을 db에서 선택한 데이터를 가지고 맞춰준다
-     * 2. post or get 방식에 따라 request 까지 해준다.
-     */
-
 
     var dbTemp = dbObject[0];
 
@@ -80,7 +62,6 @@ tongyeongObject.urlRouteRequest = function(dbObject, callback){
 
                     tongyeong_bus_location_temp.push(i*1+1);
 
-                    //seq -1해주셈
                 }
             });
 
@@ -88,14 +69,13 @@ tongyeongObject.urlRouteRequest = function(dbObject, callback){
 
                 $tdname.each(function(j){
                     if(tongyeong_bus_location_temp[i] === j+1){
-                        up_seq.push(biz.splitSomething($(this).text(), ' '));
-                        // space 로 split 해서 저장
+                        up_seq.push(commonBiz.splitSomething($(this).text(), ' '));
+
                         return false;
                     }
                 })
             }
             tongyeong_bus_location_seq.push(up_seq);
-
             callback(tongyeong_bus_location_seq);
 
         } else {

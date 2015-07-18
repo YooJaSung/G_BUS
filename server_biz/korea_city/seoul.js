@@ -1,17 +1,8 @@
-/**
- * route & arrive 모두 여기서 포멧팅
- * 1. url 설정(url config)
- * 2. 요청 변수 설정
- * 3. module.exports 로 외부에서 사용가능하도록 만들어줄 예정
- */
 
 
 /**
  * Created by airnold on 15. 4. 24..
  */
-
-// seoul url
-//
 
 
 var request = require('request');
@@ -43,24 +34,15 @@ requestData.station.arsId = "";
 
 seoulObject.urlRouteRequest = function (dbObject, callback) {
 
-    /**
-     * 1. routeUrl 포멧을 db에서 선택한 데이터를 가지고 맞춰준다
-     * 2. post or get 방식에 따라 request 까지 해준다.
-     */
-
-
     var dbTemp = dbObject[0];
 
     requestData.route.busRouteId = dbTemp[0].routeid;
 
-
     var url = routeurl + "&busRouteId=" + requestData.route.busRouteId;
-
 
     request(url, function (error, response, body) {
         var seoul_bus_location_seq = [];
         var up_seq = [];
-        var down_seq = [];
         if (error) {
             throw error;
         }
@@ -81,9 +63,7 @@ seoulObject.urlRouteRequest = function (dbObject, callback) {
                 seq = seq*1+1;
                 up_seq.push(seq);
             }
-
             seoul_bus_location_seq.push(up_seq);
-
             callback(seoul_bus_location_seq);
 
         }
@@ -125,8 +105,13 @@ seoulObject.urlStationRequest = function (dbObject, callback) {
                 var temp = {};
                 temp.routenm = stArr[i].rtNm[0];
                 temp.routeid = stArr[i].busRouteId[0];
-                temp.arrive_time = "약 " + commonBiz.changeTomin(stArr[i].traTime1[0]) + "후 도착";
-                temp.cur_pos = stArr[i].stationNm1[0];
+                temp.arrive_time = "약 " + commonBiz.changeTomin(stArr[i].traTime1[0]) + " 후 도착";
+                if(stArr[i].stationNm1 === undefined){
+                    temp.cur_pos = '';
+                }else{
+                    temp.cur_pos = stArr[i].stationNm1[0];
+                }
+
                 seoul_list.push(temp);
             }
             callback(seoul_list);
