@@ -40,7 +40,7 @@ mysqlconfig.g_busquery.AROUNDXY =
 
 
 mysqlconfig.g_busquery.PLACESEARCH =
-    " CALL SEARCHPATH( ?, ?, ? ,? ); ";
+    " CALL SEARCHPATH( ?, ?, ? ,? ,?, ?); ";
 
 
 module.exports = mysqlconfig;

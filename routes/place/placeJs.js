@@ -17,7 +17,10 @@ placeRouter.post('/placeSearch', function(req,res,next){
     var ex = getdata.ex;
     var ey = getdata.ey;
 
-    koreaDB.placeSearch(sx,sy, ex, ey, function(placeData){
+    var sname = getdata.sname;
+    var ename = getdata.ename;
+
+    koreaDB.placeSearch(sx,sy, ex, ey, sname, ename, function(placeData){
         res.send(placeData);
     })
 

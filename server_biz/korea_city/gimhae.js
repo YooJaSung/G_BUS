@@ -3,7 +3,6 @@
  * Created by airnold on 15. 4. 24..
  */
 
-
 var request = require('request');
 
 var phantom = require('phantom');
@@ -15,7 +14,6 @@ var gimhaeObject = {};
 var routeurl = "http://bus.gimhae.go.kr/ver4/map/inc/inc_result_bus_location.php?hdGubn=L&rdMode_L=ID_L&rdMode_B=";
 
 var stationurl = "http://bus.gimhae.go.kr/ver4/map/ajax_get_data.php?mode=BUS_ARRIVAL&lobs=&menu=&smenu=";
-
 
 /**
  *
@@ -72,7 +70,7 @@ gimhaeObject.urlStationRequest = function(dbObject, callback){
     var dbTemp = dbObject[0];
 
     requestData.station.keyword = dbTemp[0].stopid;
-    var url = stationurl + '&keyword' + requestData.station.keyword;
+    var url = stationurl + '&keyword=' + requestData.station.keyword;
 
     phantom.create(function (ph) {
 

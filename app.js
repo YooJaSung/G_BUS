@@ -61,6 +61,7 @@ app.use('/', mailService);
  * show index page first get request
  */
 
+
 app.get('/', function (req, res) {
     res.sendFile(__dirname + '/index.html');
 });

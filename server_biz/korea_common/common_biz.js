@@ -59,6 +59,17 @@ koreaCommonBiz.makeCacheName = function(cityCodeObj, id){
     return tempCacheName;
 };
 
+koreaCommonBiz.makeDetailCacheName = function(citycd, id){
+    var tempCacheName = "";
+
+
+    tempCacheName += citycd;
+    tempCacheName += id;
+
+    return tempCacheName;
+};
+
+
 koreaCommonBiz.makeTimeObject = function(dbObject){
     var dbTemp = dbObject[0];
     var temp = {};

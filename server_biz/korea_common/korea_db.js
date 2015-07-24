@@ -13,6 +13,16 @@
 var koreaDbObject = {};
 var dbQuery = require('../../server_config/mysql/mysql_config.js');
 var pool = require('../../server_config/mysql/DBConnect.js');
+var koreaCommonBiz = require('../../server_biz/korea_common/common_biz.js');
+
+
+var nodeCache = require('node-cache');
+var DetailCache = new nodeCache(
+    {
+        stdTTL : 100,
+        checkperiod: 150
+    }
+);
 
 koreaDbObject.routeSearch = function(cityObject, routeNm, callback){
 
@@ -97,27 +107,48 @@ function queryCityCode (cityObject){
 koreaDbObject.dbRouteDetail = function(cityCd, rid, callback){
 
 
-    var routeDetailQuery = dbQuery.g_busquery.ROUTEDETAIL;
-    //citycd, rid
-    pool.getConnection(function(err, db){
-        if(err){
-            throw err;
+
+    var cacheName  = koreaCommonBiz.makeDetailCacheName(cityCd, rid);
+
+    DetailCache.get(cacheName, function(err,value){
+        if(!err){
+            if(value === undefined){
+                var routeDetailQuery = dbQuery.g_busquery.ROUTEDETAIL;
+                //citycd, rid
+                pool.getConnection(function(err, db){
+                    if(err){
+                        throw err;
+                    }else{
+                        db.query(routeDetailQuery, [cityCd, rid], function(err, rows){
+
+                            if(err){
+                                throw err;
+
+                            }else{
+                                db.release();
+                                console.log('Route_Detail DB Result');
+
+                                DetailCache.set(cacheName, rows, function(err, success){
+                                    if(!err && success){
+                                        console.log('Route_Detail input cache success ');
+                                    }else{
+                                        throw err;
+                                    }
+                                });
+
+                                callback(rows);
+                            }
+                        })
+                    }
+                });
+            }else{
+                console.log('Route_Detail Cache Result');
+                callback(value);
+            }
         }else{
-            db.query(routeDetailQuery, [cityCd, rid], function(err, rows){
-
-                if(err){
-                    throw err;
-
-                }else{
-                    db.release();
-                    console.log('Route_Detail DB Result');
-                    callback(rows);
-                }
-
-            })
+            throw err;
         }
     });
-
 };
 
 /**
@@ -132,23 +163,48 @@ koreaDbObject.dbRouteDetail = function(cityCd, rid, callback){
 
 koreaDbObject.dbStationDetail = function(cityCd, sid, callback){
 
-    var stationDetailQuery = dbQuery.g_busquery.STATIONDETAIL;
-    //cityCd, sid
-    pool.getConnection(function(err, db){
-        if(err){
-            throw err;
+    var cacheName  = koreaCommonBiz.makeDetailCacheName(cityCd, sid);
+
+
+    DetailCache.get(cacheName, function(err,value){
+        if(!err){
+            if(value === undefined){
+
+                var stationDetailQuery = dbQuery.g_busquery.STATIONDETAIL;
+                //cityCd, sid
+                pool.getConnection(function(err, db){
+                    if(err){
+                        throw err;
+                    }else{
+                        db.query(stationDetailQuery, [cityCd, sid], function(err, rows){
+
+                            if(err){
+                                throw err;
+
+                            }else{
+                                db.release();
+                                console.log('Station_Detail DB Result');
+
+                                DetailCache.set(cacheName, rows, function(err, success){
+                                    if(!err && success){
+                                        console.log('Station_Detail input cache success ');
+                                    }else{
+                                        throw err;
+                                    }
+                                });
+
+                                callback(rows);
+                            }
+                        })
+                    }
+                });
+
+            }else{
+                console.log('Station_Detail Cache Result');
+                callback(value);
+            }
         }else{
-            db.query(stationDetailQuery, [cityCd, sid], function(err, rows){
-
-                if(err){
-                    throw err;
-
-                }else{
-                    db.release();
-                    console.log('Station_Detail DB Result');
-                    callback(rows);
-                }
-            })
+            throw err;
         }
     });
 };
@@ -184,14 +240,14 @@ koreaDbObject.dbAroundXY = function(cityCd, dbObject, callback){
  *
  */
 
-koreaDbObject.placeSearch = function( sx, sy, ex, ey ,callback){
+koreaDbObject.placeSearch = function( sx, sy, ex, ey ,sname, ename, callback){
     var placeSearchQuery = dbQuery.g_busquery.PLACESEARCH;
 
     pool.getConnection(function(err, db){
        if(err){
            throw err;
        }else{
-           db.query(placeSearchQuery,[sx, sy, ex, ey], function(err, rows){
+           db.query(placeSearchQuery,[sx, sy, ex, ey, sname, ename], function(err, rows){
                if(err){
                    throw err;
 
