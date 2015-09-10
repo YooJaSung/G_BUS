@@ -244,6 +244,7 @@ function requestUlsan(dbObj, url, endCallback) {
                 var $dt = $(".strong");
 
 
+
                 if($dt.length === 0){
                     arr_temp.push('');
                 }else{
@@ -261,7 +262,11 @@ function requestUlsan(dbObj, url, endCallback) {
                 temp.routenm = dbObj.routenm;
 
                 if (arr_temp[0] !== '') {
-                    temp.arrive_time = "약 " + arr_temp[0] + "후 도착";
+                    if(arr_temp[0] == '0분'){
+                        temp.arrive_time = '';
+                    }else{
+                        temp.arrive_time = "약 " + arr_temp[0] + "후 도착";
+                    }
                 } else {
                     temp.arrive_time = '';
                 }

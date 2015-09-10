@@ -23,8 +23,6 @@ var stationurl = "";
 var requestData = {};
 requestData.route = {};
 
-
-
 requestData.station = {};
 
 

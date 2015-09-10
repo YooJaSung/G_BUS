@@ -115,11 +115,13 @@ geojeObject.urlStationRequest = function (dbObject, callback) {
 
 
                 var div_text = $(this).find('div').text();
+                if(div_text.length === 0){
+                    return false;
+                }
+
                 var text_arr = div_text.split('번');
 
-
                 temp.routenm = text_arr[0];
-
 
                 div_text = text_arr[1];
                 if(div_text === ''){
@@ -127,8 +129,6 @@ geojeObject.urlStationRequest = function (dbObject, callback) {
                 }
 
                 text_arr = div_text.split('(');
-
-
 
                 if(text_arr[1] === undefined){
                     text_arr = $(this).find('div').text().split('잠');
@@ -141,15 +141,15 @@ geojeObject.urlStationRequest = function (dbObject, callback) {
                     temp.arrive_time = '약'+text_arr[1];
                     temp.cur_pos = text_arr[0].trim();
                 }
-
                 temp.routeid = commonBiz.findRouteid(dbTemp, temp.routenm);
-
                 geoje_list.push(temp);
             });
             callback(geoje_list);
         }
     });
 };
+
+
 
 
 module.exports = geojeObject;

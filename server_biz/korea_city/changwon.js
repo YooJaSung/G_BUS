@@ -56,7 +56,6 @@ changwonObject.urlRouteRequest = function (dbObject, callback) {
                     else {
                         $sub_a.each(function (i) {
 
-
                             if ($(this).find('img').attr('src') === '../images/mobile/ico_bus_7.gif') {
                                 var tseq = i * 1 + 1;
 
@@ -118,7 +117,6 @@ changwonObject.urlStationRequest = function (dbObject, callback) {
             throw error;
         }
     });
-
 };
 
 

@@ -51,6 +51,7 @@ gimhaeObject.urlRouteRequest = function(dbObject, callback){
                                 temparr.push(i);
                             }
                         });
+
                         return temparr;
                     }, function (result) {
                         up_seq = result;

@@ -57,13 +57,19 @@ seoulObject.urlRouteRequest = function (dbObject, callback) {
 
             var tempre = result.ServiceResult[0].msgBody[0];
             var locArr = tempre.itemList;
+            if(locArr === undefined){
+                seoul_bus_location_seq.push(up_seq);
+            }else {
 
-            for(var i in locArr){
-                var seq = locArr[i].sectOrd[0];
-                seq = seq*1+1;
-                up_seq.push(seq);
+
+                for (var i in locArr) {
+                    var seq = locArr[i].sectOrd[0];
+                    seq = seq * 1 + 1;
+                    up_seq.push(seq);
+                }
+                seoul_bus_location_seq.push(up_seq);
             }
-            seoul_bus_location_seq.push(up_seq);
+
             callback(seoul_bus_location_seq);
 
         }
@@ -102,15 +108,33 @@ seoulObject.urlStationRequest = function (dbObject, callback) {
             var tempre = result.ServiceResult[0].msgBody[0];
             var stArr = tempre.itemList;
             for(var i in stArr){
-                var temp = {};
-                temp.routenm = stArr[i].rtNm[0];
-                temp.routeid = stArr[i].busRouteId[0];
-                temp.arrive_time = "약 " + commonBiz.changeTomin(stArr[i].traTime1[0]) + " 후 도착";
-                if(stArr[i].stationNm1 === undefined){
+
+                if(stArr[i].isLast1 === '-2'){
+                    var temp = {};
+                    temp.routenm = stArr[i].rtNm[0];
+                    temp.routeid = stArr[i].busRouteId[0];
+                    temp.arrive_time = "운행종료";
                     temp.cur_pos = '';
-                }else{
-                    temp.cur_pos = stArr[i].stationNm1[0];
+                }else if(stArr[i].isLast1 === '-1'){
+                    var temp = {};
+                    temp.routenm = stArr[i].rtNm[0];
+                    temp.routeid = stArr[i].busRouteId[0];
+                    temp.arrive_time = "출발준비중";
+                    temp.cur_pos = '';
                 }
+                else{
+                    var temp = {};
+                    temp.routenm = stArr[i].rtNm[0];
+                    temp.routeid = stArr[i].busRouteId[0];
+                    temp.arrive_time = "약 " + commonBiz.changeTomin(stArr[i].traTime1[0]) + " 후 도착";
+                    if(stArr[i].stationNm1 === undefined){
+                        temp.cur_pos = '';
+                    }else{
+                        temp.cur_pos = stArr[i].stationNm1[0];
+                    }
+                }
+
+
 
                 seoul_list.push(temp);
             }

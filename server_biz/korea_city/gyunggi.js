@@ -54,8 +54,8 @@ gyunggiObject.urlRouteRequest = function (dbObject, callback) {
                 gyunggi_bus_location_seq.push(up_seq);
                 gyunggi_bus_location_seq.push(down_seq);
                 callback(gyunggi_bus_location_seq);
-
             }
+
             else {
                 var tempre = result.response[0].msgBody[0];
                 var locarr = tempre.busLocationList;

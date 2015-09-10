@@ -62,7 +62,7 @@ sejongObject.urlRouteRequest = function (dbObject, callback) {
 
 
     nimble.series([
-        function(locCallback){
+        function (locCallback) {
             request.post({
                 url: routeurl_first,
                 form: {
@@ -74,13 +74,9 @@ sejongObject.urlRouteRequest = function (dbObject, callback) {
 
                     var parsed = JSON.parse(json);
 
-                    if(parsed.busRealLocList.length === 0){
-
-                        sejong_bus_location_seq.push(up_seq);
-                        sejong_bus_location_seq.push(down_seq);
-                        callback(sejong_bus_location_seq);
+                    if (parsed.busRealLocList.length === 0) {
                         locCallback();
-                    }else{
+                    } else {
                         for (var x in parsed) {
                             routerealbusloc.push(parsed[x]);
                         }
@@ -91,43 +87,46 @@ sejongObject.urlRouteRequest = function (dbObject, callback) {
                 }
             });
         },
-        function(routeCallback){
-
-            request.post({
-                url: routeurl_second,
-                form: {
-                    busRouteId: requestData.route.busRouteId
-                }
-            }, function (error, response, json) {
-                if (!error && response.statusCode == 200) {
-                    var parsed = JSON.parse(json);
-                    for (var x in parsed) {
-                        routename.push(parsed[x]);
+        function (routeCallback) {
+            if (routerealbusloc.length == 0) {
+                routeCallback();
+            } else {
+                request.post({
+                    url: routeurl_second,
+                    form: {
+                        busRouteId: requestData.route.busRouteId
                     }
-                    var routedata = routename[0];
-                    var busloc = routerealbusloc[0];
+                }, function (error, response, json) {
+                    if (!error && response.statusCode == 200) {
+                        var parsed = JSON.parse(json);
+                        for (var x in parsed) {
+                            routename.push(parsed[x]);
+                        }
+                        var routedata = routename[0];
+                        var busloc = routerealbusloc[0];
 
-                    for (var i in routedata) {
+                        for (var i in routedata) {
 
-                        for (var j in busloc) {
-                            if (routedata[i].stop_id === busloc[j].stop_id) {
+                            for (var j in busloc) {
+                                if (routedata[i].stop_id === busloc[j].stop_id) {
 
-                                if((i*1+1)<= trnseq){
-                                    up_seq.push(i*1+1);
-                                }else{
-                                    down_seq.push((i*1+1)-trnseq);
+                                    if ((i * 1 + 1) <= trnseq) {
+                                        up_seq.push(i * 1 + 1);
+                                    } else {
+                                        down_seq.push((i * 1 + 1) - trnseq);
+                                    }
                                 }
                             }
                         }
-                    }
-                    routeCallback();
+                        routeCallback();
 
-                } else {
-                    throw error;
-                }
-            });
+                    } else {
+                        throw error;
+                    }
+                });
+            }
         },
-        function(resCallback){
+        function (resCallback) {
             sejong_bus_location_seq.push(up_seq);
             sejong_bus_location_seq.push(down_seq);
 
@@ -155,7 +154,7 @@ sejongObject.urlStationRequest = function (dbObject, callback) {
             var sejong_list = parsed_json.busStopRouteList;
             var sejong_arrive_list = [];
 
-            for(var i in sejong_list){
+            for (var i in sejong_list) {
                 var temp = {};
 
                 temp.routenm = sejong_list[i].route_name;
@@ -167,7 +166,7 @@ sejongObject.urlStationRequest = function (dbObject, callback) {
             }
             callback(sejong_arrive_list);
 
-        }else{
+        } else {
             throw error;
         }
     });

@@ -123,10 +123,15 @@ gwangyangObject.urlStationRequest = function(dbObject, callback){
                     var temp = {};
 
                     temp.routenm = $(this).find('td:nth-child(1)').text();
-                    temp.arrive_time = "약 " + $(this).find('span').text() + " 후 도착";
-                    temp.cur_pos = "";
-                    temp.routeid = commonBiz.findRouteid(dbTemp, commonBiz.splitSomething(temp.routenm, '번'));
-                    gwangyang_arrive_list.push(temp);
+                    if(temp.routenm === "정류장도착 예정정보가 없습니다."){
+
+                    }else{
+                        temp.arrive_time = "약 " + $(this).find('span').text() + " 후 도착";
+                        temp.cur_pos = "";
+                        temp.routeid = commonBiz.findRouteid(dbTemp, commonBiz.splitSomething(temp.routenm, '번'));
+                        gwangyang_arrive_list.push(temp);
+                    }
+
 
                 });
                 callback(gwangyang_arrive_list);

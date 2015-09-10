@@ -127,23 +127,28 @@ sunchunObject.urlStationRequest = function(dbObject, callback){
                     var temp = {};
 
                     temp.routenm = $(this).find('td:nth-child(1)').text();
-                    var second_td = $(this).find('td:nth-child(2)');
 
-                    if(second_td.find('span:nth-child(1)').text() === '잠시후'){
-                        temp.arrive_time = second_td.find('span:nth-child(1)').text() + ' 도착'  ;
+                    if(temp.routenm === "정류장도착 예정정보가 없습니다."){
+
                     }else{
-                        temp.arrive_time = "약 " + second_td.find('span:nth-child(1)').text() + "분 후 도착" ;
+                        var second_td = $(this).find('td:nth-child(2)');
+
+                        if(second_td.find('span:nth-child(1)').text() === '잠시후'){
+                            temp.arrive_time = second_td.find('span:nth-child(1)').text() + ' 도착'  ;
+                        }else{
+                            temp.arrive_time = "약 " + second_td.find('span:nth-child(1)').text() + "분 후 도착" ;
+                        }
+
+                        if(second_td.children().last().text() === '-' ){
+                            temp.cur_pos = '';
+                        }else{
+                            temp.cur_pos = second_td.children().last().text()
+                        }
+
+                        temp.routeid = commonBiz.findRouteid(dbTemp, commonBiz.splitSomething(temp.routenm, '번'));
+
+                        sunchun_arrive_list.push(temp);
                     }
-
-                    if(second_td.children().last().text() === '-' ){
-                        temp.cur_pos = '';
-                    }else{
-                        temp.cur_pos = second_td.children().last().text()
-                    }
-
-                    temp.routeid = commonBiz.findRouteid(dbTemp, commonBiz.splitSomething(temp.routenm, '번'));
-
-                    sunchun_arrive_list.push(temp);
 
                 });
                 callback(sunchun_arrive_list);

@@ -90,16 +90,21 @@ incheonObject.urlStationRequest = function(dbObject, callback){
                     var incheon_arrive_list = [];
 
                     $sub_a.each(function () {
-                        var temp = {};
-                        var str = $(this).text();
-                        var res = str.split(" ");
 
-                        temp.routenm= res[0].replace(/\s/gi, '');
-                        temp.arrive_time = "약 " + res[2].replace(/\s/gi, '') + res[3].replace(/\s/gi, '') + "후 도착";
-                        temp.cur_pos = res[4].replace(/\s/gi, '') + res[5].replace(/\s/gi, '');
-                        temp.routeid = commonBiz.findRouteid(dbTemp, temp.routenm);
+                        if($(this).text() === '일치하는 검색 결과가 없습니다.'){
+                        } else {
 
-                        incheon_arrive_list.push(temp);
+                            var temp = {};
+                            var str = $(this).text();
+                            var res = str.split(" ");
+
+                            temp.routenm = res[0].replace(/\s/gi, '');
+                            temp.arrive_time = "약 " + res[2].replace(/\s/gi, '') + res[3].replace(/\s/gi, '') + "후 도착";
+                            temp.cur_pos = res[4].replace(/\s/gi, '') + res[5].replace(/\s/gi, '');
+                            temp.routeid = commonBiz.findRouteid(dbTemp, temp.routenm);
+
+                            incheon_arrive_list.push(temp);
+                        }
 
                     });
                     callback(incheon_arrive_list);

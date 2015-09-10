@@ -98,28 +98,19 @@ jeonjuObject.urlStationRequest = function(dbObject, callback){
                         var temp = {};
 
                         temp.routenm = $(this).find('td:nth-child(2)').text();
-                        temp.arrive_time = '약 ' + $(this).find('td:nth-child(4)').text() + ' 후 도착';
 
-                        temp.cur_pos = $(this).find('td:nth-child(5)').text() + ' 구간 전';
-                        temp.routeid =  commonBiz.findRouteid(dbTemp, temp.routenm);
+                        if(temp.routenm === ""){
+                        }
+                        else{
+                            temp.arrive_time = '약 ' + $(this).find('td:nth-child(4)').text() + ' 후 도착';
 
-                        jeonju_arrive_list.push(temp);
+                            temp.cur_pos = $(this).find('td:nth-child(5)').text() + ' 구간 전';
+                            temp.routeid =  commonBiz.findRouteid(dbTemp, temp.routenm);
+                            jeonju_arrive_list.push(temp);
+                        }
                     }
                 });
-                if(jeonju_arrive_list[0].routenm === "" && jeonju_arrive_list.length === 1 && jeonju_arrive_list[0].arrive_time === ""){
-
-                    var temp = {};
-                    temp.arrive_time = "";
-                    temp.routenm = "";
-                    temp.cur_pos = "";
-                    temp.routeid = "";
-                    jeonju_arrive_list.push(temp);
-
-                    callback(jeonju_arrive_list);
-
-                }else{
-                    callback(jeonju_arrive_list);
-                }
+                callback(jeonju_arrive_list);
             }else{
                 throw error;
             }

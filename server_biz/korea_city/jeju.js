@@ -98,6 +98,7 @@ jejuObject.urlStationRequest = function (dbObject, callback) {
             var $tr = $('.layer_station_detail_info_arrive_bus_info_list tr');
 
             var $routeid = $("input[name='arriveBusRouteId']");
+
             var rtemp = [];
             $routeid.each(function(){
                 rtemp.push($(this).val());
@@ -107,10 +108,14 @@ jejuObject.urlStationRequest = function (dbObject, callback) {
                 var temp = {};
                 temp.routeid = rtemp[i];
                 temp.routenm = $(this).find('td:nth-child(1)').text();
-                temp.arrive_time = '약' +  $(this).find('td:nth-child(2)').text() + ' 후 도착';
-                temp.cur_pos = $(this).find('td:nth-child(3)').text();
+                if(temp.routenm === "도착예정정보가 없습니다."){
 
-                jeju_list.push(temp);
+                }else{
+                    temp.arrive_time = '약' +  $(this).find('td:nth-child(2)').text() + ' 후 도착';
+                    temp.cur_pos = $(this).find('td:nth-child(3)').text();
+
+                    jeju_list.push(temp);
+                }
 
             });
 
